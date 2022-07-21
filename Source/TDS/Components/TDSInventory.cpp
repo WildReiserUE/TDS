@@ -11,6 +11,7 @@ void UTDSInventory::BeginPlay(){
 	const auto ComponentOwner = GetOwner();
 	if (!ComponentOwner) return;
 	ComponentOwner->OnActorBeginOverlap.AddDynamic(this, &UTDSInventory::OverlapItem);
+	ComponentOwner->OnActorEndOverlap.AddDynamic(this, &UTDSInventory::EndOverlapItem);
 }
 
 void UTDSInventory::OverlapItem(AActor* OverlappedActor, AActor* OtherActor){
@@ -18,8 +19,16 @@ void UTDSInventory::OverlapItem(AActor* OverlappedActor, AActor* OtherActor){
 	if(BaseActor) //TODO: правило поднятия предмета
 	{
 		AddItem(BaseActor);
-		OtherActor->Destroy();
+		UE_LOG(LogViewport, Log,TEXT("FOUND ITEM"));
+		FoundAround=true;
+		//OtherActor->Destroy();
 	}		
+}
+
+void UTDSInventory::EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor)
+{
+	if(OtherActor)
+		FoundAround=false;
 }
 
 void UTDSInventory::AddItem(ATDSItemBase* Item)

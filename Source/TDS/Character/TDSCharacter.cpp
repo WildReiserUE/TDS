@@ -1,4 +1,7 @@
 #include "TDSCharacter.h"
+
+#include "TDSInventory.h"
+#include "TDSItemBase.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -53,6 +56,17 @@ void ATDSCharacter::Tick(float DeltaSeconds){
 				FRotator CursorR = CursorFV.Rotation();
 				CursorToWorld->SetWorldLocation(TraceHitResult.Location);
 				CursorToWorld->SetWorldRotation(CursorR);
+				auto Target = Cast<ATDSItemBase>(TraceHitResult.Actor);				
+				if(Target)
+				{
+					const auto InventoryComponent = FindComponentByClass<UTDSInventory>();
+					if(InventoryComponent && InventoryComponent->FoundAround)
+					{
+						NotifyActorOnClicked(EKeys::LeftMouseButton);
+						Target->Destroy();
+						InventoryComponent->FoundAround = false;
+					}
+				}
 			}
 		}
 	}
@@ -66,7 +80,7 @@ void ATDSCharacter::Tick(float DeltaSeconds){
 	AddMovementInput(FVector(1.0f, 0.0f, 0.0f), AxisX);
 	AddMovementInput(FVector(0.0f, 1.0f, 0.0f), AxisY);
 
-	//Character rotation to Cursor
+	//Character rotation only if Move
 	APlayerController* myController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	if (myController){
 		if (AxisX!=0 || AxisY!=0){

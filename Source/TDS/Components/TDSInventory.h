@@ -26,6 +26,10 @@ public:
 	UFUNCTION()
 	void OverlapItem(AActor* OverlappedActor, AActor* OtherActor);
 	
+	UFUNCTION()
+	void EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor);
+
 	void AddItem(ATDSItemBase* Item);
 	int FindItemById(int aId);
+	bool FoundAround = false;
 };

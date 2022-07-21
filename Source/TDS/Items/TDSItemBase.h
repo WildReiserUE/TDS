@@ -7,7 +7,7 @@
 
 class ATDSItemBase;
 
-UENUM()
+UENUM(BlueprintType)
 enum class EItemType : uint8
 {
 	Item,
@@ -16,7 +16,7 @@ enum class EItemType : uint8
 	Arrow
 };
 
-UENUM()
+UENUM(BlueprintType)
 enum class EArmorType : uint8
 {
 	Light,
@@ -24,7 +24,7 @@ enum class EArmorType : uint8
 	Magic
 };
 
-UENUM()
+UENUM(BlueprintType)
 enum class EArmorPart : uint8
 {
 	Helmet,
@@ -37,7 +37,7 @@ enum class EArmorPart : uint8
 	Underwear
 };
 
-UENUM()
+UENUM(BlueprintType)
 enum class EWeaponType : uint8
 {
 	RightHand,
@@ -46,7 +46,7 @@ enum class EWeaponType : uint8
 	Bow
 };
 
-UENUM()
+UENUM(BlueprintType)
 enum class EWeaponClass : uint8
 {
 	Knife,
@@ -58,7 +58,7 @@ enum class EWeaponClass : uint8
 	Shield
 };
 
-UENUM()
+UENUM(BlueprintType)
 enum class EWeaponAttackSpeed : uint8
 {
 	VerySlow,
@@ -68,7 +68,7 @@ enum class EWeaponAttackSpeed : uint8
 	VeryFast
 };
 
-UENUM()
+UENUM(BlueprintType)
 enum class EItemGrade : uint8
 {
 	NoGrade,
@@ -97,7 +97,7 @@ struct FItemInfo
 {
 	GENERATED_USTRUCT_BODY()
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int ItemID;
+	int ItemID = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName ItemName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -105,11 +105,11 @@ struct FItemInfo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UTexture2D* ItemIcon = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	USoundBase* PickupSound;
+	USoundBase* PickupSound = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UParticleSystem* PickupFX;
+	UParticleSystem* PickupFX = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UParticleSystem* DropFX;
+	UParticleSystem* DropFX = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bIsStackable = false;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="bIsStackable"))
@@ -177,24 +177,28 @@ public:
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-	void ChangeSettings();
 #endif
+
+	void ChangeSettings();
+	
+	UFUNCTION()
+	void SomeClicked(UPrimitiveComponent* pComponent, FKey pKey);
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "StaticMesh", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* ItemMeshComponent;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ItemInfo")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")
 	EItemType ItemType;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ItemSettings")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")
 	FItemInfo ItemInfo;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ItemSettings", meta = (EditCondition="ItemType == EItemType::Weapon", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings", meta = (EditCondition="ItemType == EItemType::Weapon", EditConditionHides))
 	FWeaponInfo WeaponInfo;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ItemSettings", meta = (EditCondition="ItemType == EItemType::Armor", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings", meta = (EditCondition="ItemType == EItemType::Armor", EditConditionHides))
 	FArmorInfo ArmorInfo;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ItemSettings", meta = (EditCondition="ItemType == EItemType::Arrow", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings", meta = (EditCondition="ItemType == EItemType::Arrow", EditConditionHides))
 	FArrowInfo ArrowInfo;
 };

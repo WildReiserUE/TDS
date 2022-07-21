@@ -7,7 +7,7 @@ ATDSItemBase::ATDSItemBase()
 	ItemMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMesh"));
 	ItemMeshComponent->SetGenerateOverlapEvents(true);
 	SetRootComponent(ItemMeshComponent);
-	//ItemMeshComponent->OnClicked.AddUniqueDynamic(this, &ATDSItemBase::RenderOn);
+	ItemMeshComponent->OnClicked.AddUniqueDynamic(this, &ATDSItemBase::SomeClicked);
 	ItemMeshComponent->OnBeginCursorOver.AddUniqueDynamic(this, &ATDSItemBase::RenderOn);
 	ItemMeshComponent->OnEndCursorOver.AddUniqueDynamic(this, &ATDSItemBase::RenderOff);
 }
@@ -57,4 +57,9 @@ void ATDSItemBase::RenderOff(UPrimitiveComponent* pComponent)
 	{
 		pComponent->SetRenderCustomDepth(false);
 	}
+}
+
+void ATDSItemBase::SomeClicked(UPrimitiveComponent* pComponent, FKey pKey)
+{
+	UE_LOG(LogViewport, Display, TEXT("SOME CLICK ME"));
 }
