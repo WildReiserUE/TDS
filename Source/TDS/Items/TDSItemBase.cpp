@@ -6,6 +6,7 @@ ATDSItemBase::ATDSItemBase()
 	PrimaryActorTick.bCanEverTick = true;
 	ItemMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMesh"));
 	ItemMeshComponent->SetGenerateOverlapEvents(true);
+	ItemMeshComponent->SetCanEverAffectNavigation(false);
 	SetRootComponent(ItemMeshComponent);
 	ItemMeshComponent->OnClicked.AddUniqueDynamic(this, &ATDSItemBase::SomeClicked);
 	ItemMeshComponent->OnBeginCursorOver.AddUniqueDynamic(this, &ATDSItemBase::RenderOn);
@@ -46,7 +47,7 @@ void ATDSItemBase::RenderOn(UPrimitiveComponent* pComponent)
 	if(pComponent)
 	{
 		pComponent->SetRenderCustomDepth(true);
-	}		
+	}
 }
 
 void ATDSItemBase::RenderOff(UPrimitiveComponent* pComponent)
