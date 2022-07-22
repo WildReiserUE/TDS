@@ -201,4 +201,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings", meta = (EditCondition="ItemType == EItemType::Arrow", EditConditionHides))
 	FArrowInfo ArrowInfo;
+
+	bool bIsClicked = false;
 };

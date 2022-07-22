@@ -27,7 +27,7 @@ ATDSCharacter::ATDSCharacter(){
 	
 	CameraArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraArm"));
 	CameraArm->SetupAttachment(RootComponent);
-	CameraArm->bUsePawnControlRotation = false; // Don't want arm to rotate when character does
+	CameraArm->bUsePawnControlRotation = false;
 	CameraArm->TargetArmLength = 1000.f;
 	CameraArm->SetRelativeRotation(FRotator(-65.0f,-10.0f,0.0f));
 	CameraArm->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
@@ -56,17 +56,6 @@ void ATDSCharacter::Tick(float DeltaSeconds){
 				FRotator CursorR = CursorFV.Rotation();
 				CursorToWorld->SetWorldLocation(TraceHitResult.Location);
 				CursorToWorld->SetWorldRotation(CursorR);
-				auto Target = Cast<ATDSItemBase>(TraceHitResult.Actor);				
-				if(Target)
-				{
-					const auto InventoryComponent = FindComponentByClass<UTDSInventory>();
-					if(InventoryComponent && InventoryComponent->FoundAround)
-					{
-						NotifyActorOnClicked(EKeys::LeftMouseButton);
-						Target->Destroy();
-						InventoryComponent->FoundAround = false;
-					}
-				}
 			}
 		}
 	}
@@ -92,8 +81,7 @@ void ATDSCharacter::Tick(float DeltaSeconds){
 	}
 }
 
-void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent)
-{
+void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent){
 	Super::SetupPlayerInputComponent(NewInputComponent);
 	
 	NewInputComponent->BindAxis(TEXT("MoveForward"), this, &ATDSCharacter::InputAxisX);
@@ -108,12 +96,25 @@ void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent
 	// NewInputComponent->BindAction(TEXT("Fire"),IE_Released,this,&ATDSCharacter::FireOff);
 }
 
-void ATDSCharacter::BeginPlay()
-{
+void ATDSCharacter::BeginPlay(){
 	Super::BeginPlay();
 	
 	if (CursorMaterial){
 		CursorToWorld = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CursorMaterial,CursorSize,FVector(0));
+	}
+	this->OnActorBeginOverlap.AddUniqueDynamic(this,&ATDSCharacter::Overlap);
+}
+
+void ATDSCharacter::Overlap(AActor* OverlappedActor, AActor* OtherActor){
+	auto const Target = Cast<ATDSItemBase>(OtherActor);
+	if(Target){
+		UE_LOG(LogViewport, Log,TEXT("CHARACTER FOUND ITEM"));
+		const auto InventoryComponent = FindComponentByClass<UTDSInventory>();
+		if(InventoryComponent && Target->bIsClicked && InventoryComponent->FoundAround){
+			NotifyActorOnClicked(EKeys::LeftMouseButton);
+			Target->Destroy();
+			InventoryComponent->FoundAround = false;
+		}
 	}
 }
 
@@ -139,8 +140,7 @@ void ATDSCharacter::InputCameraOut(){
 		CameraArm->TargetArmLength += 75.0f;
 }
 
-void ATDSCharacter::ActivateSprint()
-{
+void ATDSCharacter::ActivateSprint(){
 	const auto SprintComponent = FindComponentByClass<UTDSSprintComponent>();
 	if (SprintComponent){
 		if (SprintComponent->SprintPoint > SprintComponent->SprintSettings.SprintLosePoint){
@@ -150,8 +150,7 @@ void ATDSCharacter::ActivateSprint()
 	}
 }
 
-void ATDSCharacter::DeActivateSprint()
-{
+void ATDSCharacter::DeActivateSprint(){
 	const auto SprintComponent = FindComponentByClass<UTDSSprintComponent>();
 	if (SprintComponent){
 		SprintComponent->StopSprint();
@@ -173,8 +172,7 @@ void ATDSCharacter::DeActivateSprint()
 // 	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 // }
 
-void ATDSCharacter::CalculateAllowSprint()
-{
+void ATDSCharacter::CalculateAllowSprint(){
 	bSprintAllow = MeshDirection >= -35.0f && MeshDirection <=35.0f;
 	if(!bSprintAllow){
 		const auto SprintComponent = FindComponentByClass<UTDSSprintComponent>();
@@ -183,8 +181,7 @@ void ATDSCharacter::CalculateAllowSprint()
 	}
 }
 
-UDecalComponent* ATDSCharacter::GetCursorToWorld()
-{
+UDecalComponent* ATDSCharacter::GetCursorToWorld(){
 	return CursorToWorld;
 }
 

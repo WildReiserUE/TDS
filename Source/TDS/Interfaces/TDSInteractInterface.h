@@ -4,12 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-
-#include "TDSUInterface.generated.h"
+#include "TDSInteractInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UTDSUInterface : public UInterface
+class UTDSInteractInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -17,7 +16,7 @@ class UTDSUInterface : public UInterface
 /**
  * Metods
  */
-class TDS_API ITDSUInterface
+class TDS_API ITDSInteractInterface
 {
 	GENERATED_BODY()
 

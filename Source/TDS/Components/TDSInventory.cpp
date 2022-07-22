@@ -2,7 +2,7 @@
 #include "Kismet/GameplayStatics.h"
 
 UTDSInventory::UTDSInventory(){
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 	
 }
 

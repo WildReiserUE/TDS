@@ -8,7 +8,25 @@ public class TDS : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "NavigationSystem", "AIModule" });
-        PublicIncludePaths.AddRange(new string[]{"TDS/Components", "TDS/Character","TDS/Items","TDS/DamageType", "TDS/StateEffects"});
+        PublicDependencyModuleNames.AddRange(new string[]
+        {
+	        "Core",
+	        "CoreUObject",
+	        "Engine",
+	        "InputCore",
+	        "HeadMountedDisplay",
+	        "NavigationSystem",
+	        "AIModule"
+        });
+        PublicIncludePaths.AddRange(new string[]
+        {
+	        "TDS/Components",
+	        "TDS/Character",
+	        "TDS/Items",
+	        "TDS/DamageType",
+	        "TDS/StateEffects",
+	        "TDS/Interfaces",
+	        "TDS/AI"
+        });
 	}
 }

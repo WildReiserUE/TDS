@@ -19,8 +19,9 @@ public:
 	
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
-
+	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;	
+	void CalculateAllowSprint();
+	
 	/** Returns TopDownCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetCharacterCameraComponent() const { return CharacterCameraComponent; }
 	/** Returns CameraBoom subobject **/
@@ -28,32 +29,37 @@ public:
 	/** Returns CursorToWorld subobject **/
 	
 	UFUNCTION()
+		void Overlap(AActor* OverlappedActor, AActor* OtherActor);
+	
+	UFUNCTION()
 		void InputAxisY(float Value);
+	
 	UFUNCTION()
 		void InputAxisX(float Value);
+	
 	UFUNCTION()
 		void InputCameraIn();
+	
 	UFUNCTION()
 		void InputCameraOut();
+	
 	UFUNCTION()
 		UDecalComponent* GetCursorToWorld();
-	
-	// UFUNCTION(BlueprintCallable)
-	// 	ATDSWeaponBase* GetCurrentWeapon();
-	// UFUNCTION(BlueprintCallable)
-	// 	void SetCurrentWeapon(ATDSWeaponBase* CurWeapon);
-	// UFUNCTION(BlueprintCallable)
-	// 	void FireOn();
-	// UFUNCTION(BlueprintCallable)
-	// 	void FireOff();
-	//
-	void CalculateAllowSprint();
 	
 	UFUNCTION()
 		void ActivateSprint();
 	
 	UFUNCTION()
     	void DeActivateSprint();
+    // UFUNCTION(BlueprintCallable)
+    // 	ATDSWeaponBase* GetCurrentWeapon();
+    // UFUNCTION(BlueprintCallable)
+    // 	void SetCurrentWeapon(ATDSWeaponBase* CurWeapon);
+    // UFUNCTION(BlueprintCallable)
+    // 	void FireOn();
+    // UFUNCTION(BlueprintCallable)
+    // 	void FireOff();
+    //
     // UFUNCTION()
     // 	void SniperModeOn();
     // UFUNCTION()
