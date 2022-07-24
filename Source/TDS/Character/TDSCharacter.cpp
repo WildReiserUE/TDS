@@ -37,7 +37,7 @@ ATDSCharacter::ATDSCharacter(){
 	
 	CharacterCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CharacterCamera"));
 	CharacterCameraComponent->SetupAttachment(CameraArm, USpringArmComponent::SocketName);
-	CharacterCameraComponent->bUsePawnControlRotation = false; 
+	CharacterCameraComponent->bUsePawnControlRotation = false;
 	
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;

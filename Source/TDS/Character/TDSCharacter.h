@@ -7,6 +7,7 @@
 #include "TDSHealthComponent.h"
 #include "GameFramework/Character.h"
 #include "TDSSprintComponent.h"
+#include "Perception/PawnSensingComponent.h"
 #include "TDSCharacter.generated.h"
 
 UCLASS()
@@ -91,7 +92,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	TArray<TSubclassOf<UActorComponent>> ComponentList;
-
+	
 	// UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	// UTDSHealthComponent* HealthComponent;
 
