@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "GameFramework/ProjectileMovementComponent.h"
 #include "TDSItemBase.generated.h"
 
 class ATDSItemBase;
@@ -13,7 +12,7 @@ enum class EItemType : uint8
 	Item,
 	Weapon,
 	Armor,
-	Arrow
+	Projectile
 };
 
 UENUM(BlueprintType)
@@ -81,7 +80,7 @@ enum class EItemGrade : uint8
 };
 
 USTRUCT(BlueprintType)
-struct FArrowInfo
+struct FProjectileInfo
 {
 	GENERATED_USTRUCT_BODY()
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -129,7 +128,7 @@ struct FWeaponInfo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EWeaponClass WeaponClass;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::Bow", EditConditionHides))
-	TSubclassOf<ATDSItemBase> WeaponArrow = nullptr;
+	TSubclassOf<ATDSItemBase> Projectile = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EItemGrade WeaponGrade;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -199,8 +198,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings", meta = (EditCondition="ItemType == EItemType::Armor", EditConditionHides))
 	FArmorInfo ArmorInfo;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings", meta = (EditCondition="ItemType == EItemType::Arrow", EditConditionHides))
-	FArrowInfo ArrowInfo;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings", meta = (EditCondition="ItemType == EItemType::Projectile", EditConditionHides))
+	FProjectileInfo ProjectileInfo;
 
 	bool bIsClicked = false;
 };
