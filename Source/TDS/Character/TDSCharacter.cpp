@@ -115,6 +115,16 @@ void ATDSCharacter::BeginPlay()
 	if (CursorMaterial){
 		CursorToWorld = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CursorMaterial,CursorSize,FVector(0));
 	}
+
+	if(ComponentList.Num()>0)
+	{
+		const int Comp = ComponentList.Num();
+		for (int i = 0; i < Comp; i++)
+		{
+			UE_LOG(LogViewport, Display, TEXT("TOTALL Components --- %i"), i);
+			this->AddComponentByClass(ComponentList[i], false, FTransform(FVector(0)),false);
+		}
+	}
 }
 
 void ATDSCharacter::InputAxisY(float Value){
