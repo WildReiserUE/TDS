@@ -75,7 +75,7 @@ void ATDSCharacter::Tick(float DeltaSeconds){
 	CurrentCharSpeed = GetVelocity().Size();
 	MeshDirection = GetMesh()->GetAnimInstance()->CalculateDirection(GetVelocity(),GetActorRotation());
 	
-	CalculateAllowSprint();
+	//CalculateAllowSprint();
 	
 	AddMovementInput(FVector(1.0f, 0.0f, 0.0f), AxisX);
 	AddMovementInput(FVector(0.0f, 1.0f, 0.0f), AxisY);
@@ -100,8 +100,8 @@ void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent
 	NewInputComponent->BindAxis(TEXT("MoveRight"), this, &ATDSCharacter::InputAxisY);
 	NewInputComponent->BindAction(TEXT("CameraZoomIn"), IE_Pressed, this, &ATDSCharacter::InputCameraIn);
 	NewInputComponent->BindAction(TEXT("CameraZoomOut"),IE_Pressed, this, &ATDSCharacter::InputCameraOut);
-	NewInputComponent->BindAction(TEXT("Sprint"),IE_Pressed, this, &ATDSCharacter::ActivateSprint);
-	NewInputComponent->BindAction(TEXT("Sprint"),IE_Released, this, &ATDSCharacter::DeActivateSprint);
+	// NewInputComponent->BindAction(TEXT("Sprint"),IE_Pressed, this, &ATDSCharacter::ActivateSprint);
+	// NewInputComponent->BindAction(TEXT("Sprint"),IE_Released, this, &ATDSCharacter::DeActivateSprint);
 	// NewInputComponent->BindAction(TEXT("SniperMode"),IE_Pressed, this, &ATDSCharacter::SniperModeOn);
 	// NewInputComponent->BindAction(TEXT("SniperMode"),IE_Released, this, &ATDSCharacter::SniperModeOff);
 	// NewInputComponent->BindAction(TEXT("Fire"),IE_Pressed,this,&ATDSCharacter::FireOn);
@@ -121,9 +121,11 @@ void ATDSCharacter::BeginPlay()
 		const int Comp = ComponentList.Num();
 		for (int i = 0; i < Comp; i++)
 		{
-			UE_LOG(LogViewport, Display, TEXT("TOTALL Components --- %i"), i);
+			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Orange, FString::Printf(TEXT("ADDED Components: %i"), i));
 			this->AddComponentByClass(ComponentList[i], false, FTransform(FVector(0)),false);
 		}
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Orange, FString::Printf(TEXT("TOTALL ADDED Components: %i"), ComponentList.Num()));
+		ComponentsAdded.Broadcast();
 	}
 }
 
@@ -149,7 +151,7 @@ void ATDSCharacter::InputCameraOut(){
 		CameraArm->TargetArmLength += 75.0f;
 }
 
-void ATDSCharacter::ActivateSprint()
+/*void ATDSCharacter::ActivateSprint()
 {
 	const auto SprintComponent = FindComponentByClass<UTDSSprintComponent>();
 	if (SprintComponent){
@@ -169,6 +171,15 @@ void ATDSCharacter::DeActivateSprint()
 	}
 }
 
+void ATDSCharacter::CalculateAllowSprint()
+{
+	bSprintAllow = MeshDirection >= -35.0f && MeshDirection <=35.0f;
+	if(!bSprintAllow){
+		const auto SprintComponent = FindComponentByClass<UTDSSprintComponent>();
+		if (SprintComponent)
+			DeActivateSprint();
+	}
+}*/
 
 // void ATDSCharacter::SniperModeOn(){
 // 	if(bSprintActivate)
@@ -182,16 +193,6 @@ void ATDSCharacter::DeActivateSprint()
 // 		bSniperMode = false;
 // 	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 // }
-
-void ATDSCharacter::CalculateAllowSprint()
-{
-	bSprintAllow = MeshDirection >= -35.0f && MeshDirection <=35.0f;
-	if(!bSprintAllow){
-		const auto SprintComponent = FindComponentByClass<UTDSSprintComponent>();
-		if (SprintComponent)
-			DeActivateSprint();
-	}
-}
 
 UDecalComponent* ATDSCharacter::GetCursorToWorld()
 {

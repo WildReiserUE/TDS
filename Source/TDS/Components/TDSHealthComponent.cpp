@@ -44,12 +44,12 @@ void UTDSHealthComponent::HealthChange(float Value)
 			Health = Health + Shield + Value;
 			OnShieldChange.Broadcast(Shield,PlayerHealthSettings.Shield);
 			OnHealthChange.Broadcast(Health, PlayerHealthSettings.Health);
-			ShieldRecovery();
+			//ShieldRecovery();
 		}
-		UE_LOG(LogTemp, Warning, TEXT("CHARACTER SHIELD %f"), Shield);
-		UE_LOG(LogTemp, Warning, TEXT("CHARACTER HEALTH %f"), Health);
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::Printf(TEXT("SHIELD: %f"), Shield));
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("Health: %f"), Health));
 	}
-	else
+	else //Healing or some else
 	{
 
 	}

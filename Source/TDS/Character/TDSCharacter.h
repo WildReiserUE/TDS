@@ -6,8 +6,9 @@
 #include "CoreMinimal.h"
 #include "TDSHealthComponent.h"
 #include "GameFramework/Character.h"
-#include "TDSSprintComponent.h"
 #include "TDSCharacter.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComponentsAdded);
 
 UCLASS()
 class ATDSCharacter : public ACharacter
@@ -47,19 +48,19 @@ public:
 	// UFUNCTION(BlueprintCallable)
 	// 	void FireOff();
 	//
-	void CalculateAllowSprint();
-	
-	UFUNCTION()
-		void ActivateSprint();
-	
-	UFUNCTION()
-    	void DeActivateSprint();
-    // UFUNCTION()
-    // 	void SniperModeOn();
-    // UFUNCTION()
-    // 	void SniperModeOff();
-    // UFUNCTION()
-    // 	void ActivateStaminaMovement();
+	// void CalculateAllowSprint();
+	//
+	// UFUNCTION()
+	// 	void ActivateSprint();
+	//
+	// UFUNCTION()
+	// 	void DeActivateSprint();
+	// UFUNCTION()
+	// 	void SniperModeOn();
+	// UFUNCTION()
+	// 	void SniperModeOff();
+	// UFUNCTION()
+	// 	void ActivateStaminaMovement();
 	
 	float AxisX = 0.0f;
 	float AxisY = 0.0f;
@@ -86,6 +87,9 @@ public:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	TArray<TSubclassOf<UActorComponent>> ComponentList;
 
+	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Components")
+	FOnComponentsAdded ComponentsAdded;
+	
 	// UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	// UTDSHealthComponent* HealthComponent;
 
