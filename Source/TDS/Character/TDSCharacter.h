@@ -65,6 +65,7 @@ public:
 	float AxisX = 0.0f;
 	float AxisY = 0.0f;
 	bool bSprintAllow = false;
+	bool bIsALife = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterDirection")
 	float MeshDirection = 0.0f;
@@ -89,9 +90,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Components")
 	FOnComponentsAdded ComponentsAdded;
-	
-	// UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
-	// UTDSHealthComponent* HealthComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UAnimMontage* DeathAnim;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))

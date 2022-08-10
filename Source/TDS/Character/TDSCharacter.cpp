@@ -45,49 +45,51 @@ ATDSCharacter::ATDSCharacter(){
 
 void ATDSCharacter::Tick(float DeltaSeconds){
 	Super::Tick(DeltaSeconds);
-	
-	//Cursor drawing
-	if (CursorToWorld != nullptr){
-		if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0)){
-			if (PC != nullptr){
-				FHitResult TraceHitResult;
-				PC->GetHitResultUnderCursor(ECC_Visibility, false, TraceHitResult);
-				FVector CursorFV = TraceHitResult.ImpactNormal;
-				FRotator CursorR = CursorFV.Rotation();
-				CursorToWorld->SetWorldLocation(TraceHitResult.Location);
-				CursorToWorld->SetWorldRotation(CursorR);
-				auto Target = Cast<ATDSItemBase>(TraceHitResult.Actor);				
-				if(Target)
-				{
-					const auto InventoryComponent = FindComponentByClass<UTDSInventory>();
-					if(InventoryComponent && InventoryComponent->FoundAround)
+	if(bIsALife)
+	{
+		//Cursor drawing
+		if (CursorToWorld != nullptr){
+			if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0)){
+				if (PC != nullptr){
+					FHitResult TraceHitResult;
+					PC->GetHitResultUnderCursor(ECC_Visibility, false, TraceHitResult);
+					FVector CursorFV = TraceHitResult.ImpactNormal;
+					FRotator CursorR = CursorFV.Rotation();
+					CursorToWorld->SetWorldLocation(TraceHitResult.Location);
+					CursorToWorld->SetWorldRotation(CursorR);
+					auto Target = Cast<ATDSItemBase>(TraceHitResult.Actor);
+					if(Target)
 					{
-						NotifyActorOnClicked(EKeys::LeftMouseButton);
-						Target->Destroy();
-						InventoryComponent->FoundAround = false;
+						const auto InventoryComponent = FindComponentByClass<UTDSInventory>();
+						if(InventoryComponent && InventoryComponent->FoundAround)
+						{
+							NotifyActorOnClicked(EKeys::LeftMouseButton);
+							Target->Destroy();
+							InventoryComponent->FoundAround = false;
+						}
 					}
 				}
 			}
 		}
-	}
 	
-	//Movement logic	
-	CurrentCharSpeed = GetVelocity().Size();
-	MeshDirection = GetMesh()->GetAnimInstance()->CalculateDirection(GetVelocity(),GetActorRotation());
+		//Movement logic
+		CurrentCharSpeed = GetVelocity().Size();
+		MeshDirection = GetMesh()->GetAnimInstance()->CalculateDirection(GetVelocity(),GetActorRotation());
 	
-	//CalculateAllowSprint();
+		//CalculateAllowSprint();
 	
-	AddMovementInput(FVector(1.0f, 0.0f, 0.0f), AxisX);
-	AddMovementInput(FVector(0.0f, 1.0f, 0.0f), AxisY);
+		AddMovementInput(FVector(1.0f, 0.0f, 0.0f), AxisX);
+		AddMovementInput(FVector(0.0f, 1.0f, 0.0f), AxisY);
 
-	//Character rotation only if Move
-	APlayerController* myController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (myController){
-		if (AxisX!=0 || AxisY!=0){
-			FHitResult ResultHit;
-			myController->GetHitResultUnderCursor(ECC_GameTraceChannel1, false, ResultHit);
-			float FindRotaterResultYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), ResultHit.Location).Yaw;
-			SetActorRotation(FQuat(FRotator(0.0f, FindRotaterResultYaw, 0.0f)));
+		//Character rotation only if Move
+		APlayerController* myController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		if (myController){
+			if (AxisX!=0 || AxisY!=0){
+				FHitResult ResultHit;
+				myController->GetHitResultUnderCursor(ECC_GameTraceChannel1, false, ResultHit);
+				float FindRotaterResultYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), ResultHit.Location).Yaw;
+				SetActorRotation(FQuat(FRotator(0.0f, FindRotaterResultYaw, 0.0f)));
+			}
 		}
 	}
 }
@@ -95,7 +97,6 @@ void ATDSCharacter::Tick(float DeltaSeconds){
 void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent)
 {
 	Super::SetupPlayerInputComponent(NewInputComponent);
-	
 	NewInputComponent->BindAxis(TEXT("MoveForward"), this, &ATDSCharacter::InputAxisX);
 	NewInputComponent->BindAxis(TEXT("MoveRight"), this, &ATDSCharacter::InputAxisY);
 	NewInputComponent->BindAction(TEXT("CameraZoomIn"), IE_Pressed, this, &ATDSCharacter::InputCameraIn);

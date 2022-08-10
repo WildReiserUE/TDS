@@ -44,7 +44,16 @@ void UTDSHealthComponent::HealthChange(float Value)
 			Health = Health + Shield + Value;
 			OnShieldChange.Broadcast(Shield,PlayerHealthSettings.Shield);
 			OnHealthChange.Broadcast(Health, PlayerHealthSettings.Health);
-			//ShieldRecovery();
+			if(Health <= 0)
+			{
+				Health = 0;
+				UE_LOG(LogViewport, Display, TEXT("Player is Dead"));
+				GetOwner()->SetActorEnableCollision(ECollisionResponse::ECR_Ignore);
+				
+				if(GetWorld()->GetTimerManager().IsTimerActive(ShieldRecoveryTimer))
+					GetWorld()->GetTimerManager().ClearTimer(ShieldRecoveryTimer);
+				OnPlayerDeath.Broadcast();
+			}
 		}
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::Printf(TEXT("SHIELD: %f"), Shield));
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("Health: %f"), Health));
