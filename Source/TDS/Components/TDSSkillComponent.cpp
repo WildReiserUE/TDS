@@ -9,7 +9,7 @@ void UTDSSkillComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	InitSprint();	
+	InitSprint();
 }
 
 void UTDSSkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
