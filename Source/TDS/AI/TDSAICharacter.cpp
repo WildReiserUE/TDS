@@ -1,6 +1,6 @@
 // Created WildReiser @2022
 
-
+#include "Net/UnrealNetwork.h"
 #include "TDSAICharacter.h"
 
 // Sets default values
@@ -35,3 +35,8 @@ void ATDSAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 }
 
+void ATDSAICharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ATDSAICharacter, Strafing);
+}
