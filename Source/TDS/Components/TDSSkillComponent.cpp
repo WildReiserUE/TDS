@@ -8,13 +8,14 @@ UTDSSkillComponent::UTDSSkillComponent()
 void UTDSSkillComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	auto ComponentOwner = GetOwner();
+	if (!ComponentOwner) return;
 	InitSprint();	
 }
 
 void UTDSSkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);	
 
 }
 
@@ -25,18 +26,25 @@ void UTDSSkillComponent::InitSprint()
 	SprintRecoveryValue			= SprintSettings.SprintRecoveryValue;
 	SprintRecoveryTimerStart	= SprintSettings.SprintRecoveryTimerStart;
 	SprintTimerTick				= SprintSettings.SprintTimerTick;
+	SprintCoef					= SprintSettings.SprintCoef;
 }
 
 void UTDSSkillComponent::StartSprint()
 {
-	OnSprintValueChange.Broadcast(SprintPoint, SprintSettings.SprintPoint);
-	if(GetWorld()->GetTimerManager().IsTimerActive(StaminaRecoveryTimer))
-		GetWorld()->GetTimerManager().ClearTimer(StaminaRecoveryTimer);	
-	GetWorld()->GetTimerManager().SetTimer(StaminaLoseTimer,this, &UTDSSkillComponent::DecreaseStamina,SprintTimerTick, true,0.0f);
+	UE_LOG(LogTemp,Warning,TEXT("SprintActivated"));
+	auto ComponentOwner = GetOwner();
+	if (ComponentOwner)
+	{
+		OnSprintValueChange.Broadcast(SprintPoint, SprintSettings.SprintPoint);
+		if(GetWorld()->GetTimerManager().IsTimerActive(StaminaRecoveryTimer))
+			GetWorld()->GetTimerManager().ClearTimer(StaminaRecoveryTimer);	
+		GetWorld()->GetTimerManager().SetTimer(StaminaLoseTimer,this, &UTDSSkillComponent::DecreaseStamina,SprintTimerTick, true,0.0f);
+	}
 }
 
 void UTDSSkillComponent::StopSprint()
 {
+	UE_LOG(LogTemp,Warning,TEXT("SprintDEActivated"));
 	if(GetWorld()->GetTimerManager().IsTimerActive(StaminaLoseTimer))
 		GetWorld()->GetTimerManager().ClearTimer(StaminaLoseTimer);
 	GetWorld()->GetTimerManager().SetTimer(StaminaRecoveryTimer,this,&UTDSSkillComponent::IncreaseStamina,SprintTimerTick,true,SprintSettings.SprintRecoveryTimerStart);

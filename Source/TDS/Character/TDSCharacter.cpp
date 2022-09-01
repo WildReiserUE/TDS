@@ -2,6 +2,7 @@
 
 #include "TDSInventory.h"
 #include "TDSItemBase.h"
+#include "TDSSkillComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -100,10 +101,10 @@ void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent
 	NewInputComponent->BindAxis(TEXT("MoveRight"), this, &ATDSCharacter::InputAxisY);
 	NewInputComponent->BindAction(TEXT("CameraZoomIn"), IE_Pressed, this, &ATDSCharacter::InputCameraIn);
 	NewInputComponent->BindAction(TEXT("CameraZoomOut"),IE_Pressed, this, &ATDSCharacter::InputCameraOut);
-	// NewInputComponent->BindAction(TEXT("Sprint"),IE_Pressed, this, &ATDSCharacter::ActivateSprint);
-	// NewInputComponent->BindAction(TEXT("Sprint"),IE_Released, this, &ATDSCharacter::DeActivateSprint);
-	// NewInputComponent->BindAction(TEXT("SniperMode"),IE_Pressed, this, &ATDSCharacter::SniperModeOn);
-	// NewInputComponent->BindAction(TEXT("SniperMode"),IE_Released, this, &ATDSCharacter::SniperModeOff);
+	NewInputComponent->BindAction(TEXT("Sprint"),IE_Pressed, this, &ATDSCharacter::ActivateSprint);
+	NewInputComponent->BindAction(TEXT("Sprint"),IE_Released, this, &ATDSCharacter::DeActivateSprint);
+	NewInputComponent->BindAction(TEXT("SniperMode"),IE_Pressed, this, &ATDSCharacter::SniperModeOn);
+	NewInputComponent->BindAction(TEXT("SniperMode"),IE_Released, this, &ATDSCharacter::SniperModeOff);
 	// NewInputComponent->BindAction(TEXT("Fire"),IE_Pressed,this,&ATDSCharacter::FireOn);
 	// NewInputComponent->BindAction(TEXT("Fire"),IE_Released,this,&ATDSCharacter::FireOff);
 }
@@ -127,6 +128,16 @@ void ATDSCharacter::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Orange, FString::Printf(TEXT("TOTALL ADDED Components: %i"), ComponentList.Num()));
 		ComponentsAdded.Broadcast();
 	}
+	InitParams();
+}
+
+void ATDSCharacter::InitParams()
+{
+	MaxCameraLenght = CharacterInfo.CameraMaxLenght;
+	MinCameraLenght = CharacterInfo.CameraMinLenght;
+	CameraChangeStep = CharacterInfo.CameraChangeStep;
+	CharBaseMoveSpeed = CharacterInfo.BaseMoveSpeed;
+	CharAimMoveSpeed = CharacterInfo.AimMoveSpeed;
 }
 
 void ATDSCharacter::InputAxisY(float Value){
@@ -138,61 +149,61 @@ void ATDSCharacter::InputAxisX(float Value){
 }
 
 void ATDSCharacter::InputCameraIn(){
-	if(CameraArm->TargetArmLength <= 300){
+	if(CameraArm->TargetArmLength <= MinCameraLenght){
 	}
 	else
-		CameraArm->TargetArmLength -= 75.0f;
+		CameraArm->TargetArmLength -= CameraChangeStep;
 }
 
 void ATDSCharacter::InputCameraOut(){
-	if(CameraArm->TargetArmLength >= 1500){
+	if(CameraArm->TargetArmLength >= MaxCameraLenght){
 	}
 	else
-		CameraArm->TargetArmLength += 75.0f;
+		CameraArm->TargetArmLength += CameraChangeStep;
 }
 
-/*void ATDSCharacter::ActivateSprint()
+void ATDSCharacter::ActivateSprint()
 {
-	const auto SprintComponent = FindComponentByClass<UTDSSprintComponent>();
-	if (SprintComponent){
-		if (SprintComponent->SprintPoint > SprintComponent->SprintSettings.SprintLosePoint){
-			GetCharacterMovement()->MaxWalkSpeed = 900.0f;
-			SprintComponent->StartSprint();
+	const auto SkillComponent = FindComponentByClass<UTDSSkillComponent>();
+	if (SkillComponent){
+		if (SkillComponent->SprintPoint > SkillComponent->SprintSettings.SprintLosePoint){
+			//GetCharacterMovement()->MaxWalkSpeed = CharBaseMoveSpeed*SkillComponent->SprintCoef;
+			SkillComponent->StartSprint();
 		}
 	}
 }
 
 void ATDSCharacter::DeActivateSprint()
 {
-	const auto SprintComponent = FindComponentByClass<UTDSSprintComponent>();
-	if (SprintComponent){
-		SprintComponent->StopSprint();
-		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+	const auto SkillComponent = FindComponentByClass<UTDSSkillComponent>();
+	if (SkillComponent){
+		SkillComponent->StopSprint();
+		//GetCharacterMovement()->MaxWalkSpeed = 600.0f;
 	}
 }
 
 void ATDSCharacter::CalculateAllowSprint()
 {
-	bSprintAllow = MeshDirection >= -35.0f && MeshDirection <=35.0f;
-	if(!bSprintAllow){
-		const auto SprintComponent = FindComponentByClass<UTDSSprintComponent>();
-		if (SprintComponent)
-			DeActivateSprint();
-	}
-}*/
+	// bSprintAllow = MeshDirection >= -35.0f && MeshDirection <=35.0f;
+	// if(!bSprintAllow){
+	// 	const auto SprintComponent = ComponentList.Find();
+	// 	if (SprintComponent)
+	// 		DeActivateSprint();
+	// }
+}
 
-// void ATDSCharacter::SniperModeOn(){
-// 	if(bSprintActivate)
-// 		bSprintActivate=false;
-// 	bSniperMode = true;
-// 	GetCharacterMovement()->MaxWalkSpeed = 200.0f;
-// }
+void ATDSCharacter::SniperModeOn(){
+	if(bSprintActivate)
+		bSprintActivate=false;
+	bSniperMode = true;
+	GetCharacterMovement()->MaxWalkSpeed = CharAimMoveSpeed;
+}
 
-// void ATDSCharacter::SniperModeOff(){
-// 	if(bSniperMode)
-// 		bSniperMode = false;
-// 	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
-// }
+void ATDSCharacter::SniperModeOff(){
+	if(bSniperMode)
+		bSniperMode = false;
+	GetCharacterMovement()->MaxWalkSpeed = CharBaseMoveSpeed;
+}
 
 UDecalComponent* ATDSCharacter::GetCursorToWorld()
 {
