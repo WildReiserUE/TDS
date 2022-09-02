@@ -65,27 +65,21 @@ void ATDSCharacter::Tick(float DeltaSeconds){
 						if(InventoryComponent && InventoryComponent->FoundAround)
 						{
 							NotifyActorOnClicked(EKeys::LeftMouseButton);
-							Target->Destroy();
-							InventoryComponent->FoundAround = false;
 						}
 					}
 				}
 			}
 		}
-	
-		//Movement logic
 		CurrentCharSpeed = GetVelocity().Size();
 		MeshDirection = GetMesh()->GetAnimInstance()->CalculateDirection(GetVelocity(),GetActorRotation());
-	
-		//CalculateAllowSprint();
 	
 		AddMovementInput(FVector(1.0f, 0.0f, 0.0f), AxisX);
 		AddMovementInput(FVector(0.0f, 1.0f, 0.0f), AxisY);
 
-		//Character rotation only if Move
+		//Character rotation only if Move or Aiming
 		APlayerController* myController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 		if (myController){
-			if (AxisX!=0 || AxisY!=0){
+			if (AxisX!=0 || AxisY!=0 || bSniperMode){
 				FHitResult ResultHit;
 				myController->GetHitResultUnderCursor(ECC_GameTraceChannel1, false, ResultHit);
 				float FindRotaterResultYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), ResultHit.Location).Yaw;
@@ -168,7 +162,7 @@ void ATDSCharacter::ActivateSprint()
 	const auto SkillComponent = FindComponentByClass<UTDSSkillComponent>();
 	if (SkillComponent){
 		if (SkillComponent->SprintPoint > SkillComponent->SprintSettings.SprintLosePoint){
-			//GetCharacterMovement()->MaxWalkSpeed = CharBaseMoveSpeed*SkillComponent->SprintCoef;
+			GetCharacterMovement()->MaxWalkSpeed = CharBaseMoveSpeed*SkillComponent->SprintCoef;
 			SkillComponent->StartSprint();
 		}
 	}
@@ -179,18 +173,18 @@ void ATDSCharacter::DeActivateSprint()
 	const auto SkillComponent = FindComponentByClass<UTDSSkillComponent>();
 	if (SkillComponent){
 		SkillComponent->StopSprint();
-		//GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+		GetCharacterMovement()->MaxWalkSpeed = CharBaseMoveSpeed;
 	}
 }
 
 void ATDSCharacter::CalculateAllowSprint()
 {
-	// bSprintAllow = MeshDirection >= -35.0f && MeshDirection <=35.0f;
-	// if(!bSprintAllow){
-	// 	const auto SprintComponent = ComponentList.Find();
-	// 	if (SprintComponent)
-	// 		DeActivateSprint();
-	// }
+	bSprintAllow = MeshDirection >= -35.0f && MeshDirection <=35.0f;
+	if(!bSprintAllow){
+		const auto SkillComponent = FindComponentByClass<UTDSSkillComponent>();
+		if (SkillComponent)
+			DeActivateSprint();
+	}
 }
 
 void ATDSCharacter::SniperModeOn(){

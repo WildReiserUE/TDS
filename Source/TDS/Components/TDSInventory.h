@@ -16,6 +16,7 @@ public:
 	UTDSInventory();
 	
 	virtual void BeginPlay() override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override; 
 	
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Inventory")
 	TArray<FItemInfo> Inventory;
@@ -25,7 +26,7 @@ public:
 
 	UFUNCTION()
 	void OverlapItem(AActor* OverlappedActor, AActor* OtherActor);
-	
+
 	UFUNCTION()
 	void EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor);
 

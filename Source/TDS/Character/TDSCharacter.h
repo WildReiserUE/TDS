@@ -14,10 +14,10 @@ USTRUCT(BlueprintType)
 struct FCharacterInfo
 {
 	GENERATED_BODY()
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	float CameraMaxLenght = 1500.f;
 	float CameraMinLenght = 300.f;
 	float CameraChangeStep = 75.f;
+	//TODO: Move to SkillComponent
 	float BaseMoveSpeed = 600.f;
 	float AimMoveSpeed = 200.f;
 };
@@ -60,9 +60,9 @@ public:
 	// 	void FireOn();
 	// UFUNCTION(BlueprintCallable)
 	// 	void FireOff();
-	//
+
 	void CalculateAllowSprint();
-	//
+
 	UFUNCTION()
 		void ActivateSprint();	
 	UFUNCTION()
@@ -71,8 +71,6 @@ public:
 		void SniperModeOn();
 	UFUNCTION()
 		void SniperModeOff();
-	// UFUNCTION()
-	// 	void ActivateStaminaMovement();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CharacterDirection")
 	float MeshDirection = 0.0f;

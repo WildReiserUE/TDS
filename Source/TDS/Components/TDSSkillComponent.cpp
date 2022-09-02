@@ -17,8 +17,9 @@ void UTDSSkillComponent::BeginPlay()
 
 void UTDSSkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);	
-
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	
+	//CalculateAllowSprint();
 }
 
 void UTDSSkillComponent::InitSprint()

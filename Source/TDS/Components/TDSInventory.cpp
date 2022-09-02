@@ -13,21 +13,31 @@ void UTDSInventory::BeginPlay(){
 	ComponentOwner->OnActorEndOverlap.AddDynamic(this, &UTDSInventory::EndOverlapItem);
 }
 
-void UTDSInventory::OverlapItem(AActor* OverlappedActor, AActor* OtherActor){
-	ATDSItemBase* BaseActor = Cast<ATDSItemBase>(OtherActor);
-	if(BaseActor) //TODO: правило поднятия предмета
-	{
-		AddItem(BaseActor);
+void UTDSInventory::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if(FoundAround)
 		UE_LOG(LogViewport, Log,TEXT("FOUND ITEM"));
-		FoundAround=true;
-		//OtherActor->Destroy();
+}
+
+void UTDSInventory::OverlapItem(AActor* OverlappedActor, AActor* OtherActor){
+	if(OverlappedActor)
+	{
+		ATDSItemBase* BaseItem = Cast<ATDSItemBase>(OtherActor);
+		if(BaseItem)
+		{
+			FoundAround=true;			
+		}
 	}		
 }
 
 void UTDSInventory::EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor)
 {
-	if(OtherActor)
+	if(OverlappedActor)
+	{
 		FoundAround=false;
+        UE_LOG(LogViewport, Log,TEXT("LOST ITEM"));
+	}		
 }
 
 void UTDSInventory::AddItem(ATDSItemBase* Item)
@@ -48,9 +58,10 @@ void UTDSInventory::AddItem(ATDSItemBase* Item)
 			FItemInfo NewItem;
             NewItem = Item->ItemInfo;
             Inventory.Add(NewItem);
-		}		
-		OnPlayerFindItem.Broadcast();
+		}
 	}
+	OnPlayerFindItem.Broadcast();
+	Item->Destroy();
 }
 
 int UTDSInventory::FindItemById(int aId)
