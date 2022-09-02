@@ -118,4 +118,5 @@ private:
 	float CharBaseMoveSpeed = 0.f;
 	float CharAimMoveSpeed = 0.f;
 	bool bSprintActivate = false;
+	bool bIsALife = true;
 };

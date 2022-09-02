@@ -1,7 +1,7 @@
 // Created WildReiser @2022
 
-#include "Net/UnrealNetwork.h"
 #include "TDSAICharacter.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ATDSAICharacter::ATDSAICharacter()
