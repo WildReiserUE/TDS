@@ -1,5 +1,7 @@
 #include "TDSSkillComponent.h"
 
+#include "TDSCharacter.h"
+
 UTDSSkillComponent::UTDSSkillComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -31,7 +33,6 @@ void UTDSSkillComponent::InitSprint()
 
 void UTDSSkillComponent::StartSprint()
 {
-	UE_LOG(LogTemp,Warning,TEXT("SprintActivated"));
 	auto ComponentOwner = GetOwner();
 	if (ComponentOwner)
 	{
@@ -39,15 +40,23 @@ void UTDSSkillComponent::StartSprint()
 		if(GetWorld()->GetTimerManager().IsTimerActive(StaminaRecoveryTimer))
 			GetWorld()->GetTimerManager().ClearTimer(StaminaRecoveryTimer);	
 		GetWorld()->GetTimerManager().SetTimer(StaminaLoseTimer,this, &UTDSSkillComponent::DecreaseStamina,SprintTimerTick, true,0.0f);
+		if(ComponentOwner->IsA(ATDSCharacter::StaticClass()))
+		{
+			UE_LOG(LogTemp,Warning,TEXT("SprintActivated"));
+		}
 	}
 }
 
 void UTDSSkillComponent::StopSprint()
 {
-	UE_LOG(LogTemp,Warning,TEXT("SprintDEActivated"));
+	auto ComponentOwner = GetOwner();
 	if(GetWorld()->GetTimerManager().IsTimerActive(StaminaLoseTimer))
 		GetWorld()->GetTimerManager().ClearTimer(StaminaLoseTimer);
 	GetWorld()->GetTimerManager().SetTimer(StaminaRecoveryTimer,this,&UTDSSkillComponent::IncreaseStamina,SprintTimerTick,true,SprintSettings.SprintRecoveryTimerStart);
+	if(ComponentOwner->IsA(ATDSCharacter::StaticClass()))
+	{
+		UE_LOG(LogTemp,Warning,TEXT("SprintDEActivated"));
+	}
 }
 
 void UTDSSkillComponent::DecreaseStamina()
