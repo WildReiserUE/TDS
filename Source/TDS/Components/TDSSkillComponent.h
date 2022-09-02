@@ -8,11 +8,12 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSprint, float, CurrentSprintValue, float, MaxSprintValue);
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FSprintSettings
 {
 	GENERATED_BODY()
 	float SprintPoint = 100.0f;
+	float SprintCoef = 1.5f;
 	float SprintLosePoint = 3.0f;
 	float SprintRecoveryValue = 5.0f;
 	float SprintRecoveryTimerStart = 2.0f;
@@ -42,26 +43,23 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, BlueprintReadWrite, Category="Sprint")
 	bool bSprintStart = false;
 
-	//Initialize sprint params
 	UFUNCTION()
 	void InitSprint();
-	
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-	
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;	
 	void StartSprint();	
 	void DecreaseStamina();
 	void StopSprint();
 	void IncreaseStamina();
-
+	
 	float SprintPoint;
 	float SprintLoseValue;
 	float SprintRecoveryValue;
 	float SprintRecoveryTimerStart;
 	float SprintTimerTick;
+	float SprintCoef;
+	
+protected:
+	// Called when the game starts
+	virtual void BeginPlay() override;
+
 };

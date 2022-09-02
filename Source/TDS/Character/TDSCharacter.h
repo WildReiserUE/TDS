@@ -10,6 +10,18 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComponentsAdded);
 
+USTRUCT(BlueprintType)
+struct FCharacterInfo
+{
+	GENERATED_BODY()
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	float CameraMaxLenght = 1500.f;
+	float CameraMinLenght = 300.f;
+	float CameraChangeStep = 75.f;
+	float BaseMoveSpeed = 600.f;
+	float AimMoveSpeed = 200.f;
+};
+
 UCLASS()
 class ATDSCharacter : public ACharacter
 {
@@ -19,7 +31,7 @@ public:
 	ATDSCharacter();
 	
 	virtual void Tick(float DeltaSeconds) override;
-	virtual void BeginPlay() override;
+	virtual void BeginPlay() override;	
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 	/** Returns TopDownCameraComponent subobject **/
@@ -27,7 +39,8 @@ public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraArm; }
 	/** Returns CursorToWorld subobject **/
-	
+	UFUNCTION()
+    	void InitParams();
 	UFUNCTION()
 		void InputAxisY(float Value);
 	UFUNCTION()
@@ -48,41 +61,35 @@ public:
 	// UFUNCTION(BlueprintCallable)
 	// 	void FireOff();
 	//
-	// void CalculateAllowSprint();
+	void CalculateAllowSprint();
 	//
-	// UFUNCTION()
-	// 	void ActivateSprint();
-	//
-	// UFUNCTION()
-	// 	void DeActivateSprint();
-	// UFUNCTION()
-	// 	void SniperModeOn();
-	// UFUNCTION()
-	// 	void SniperModeOff();
+	UFUNCTION()
+		void ActivateSprint();	
+	UFUNCTION()
+		void DeActivateSprint();
+	UFUNCTION()
+		void SniperModeOn();
+	UFUNCTION()
+		void SniperModeOff();
 	// UFUNCTION()
 	// 	void ActivateStaminaMovement();
-	
-	float AxisX = 0.0f;
-	float AxisY = 0.0f;
-	bool bSprintAllow = false;
-	bool bIsALife = true;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterDirection")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CharacterDirection")
 	float MeshDirection = 0.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterDirection")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CharacterDirection")
 	float CurrentCharSpeed = 0.0f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterStateParam")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CharacterStateParam")
 	bool bSniperMode = false;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Camera")
 	UDecalComponent* CursorToWorld;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Cursor)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Cursor")
 	UMaterialInterface* CursorMaterial =nullptr;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category=Cursor)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Cursor")
 	FVector CursorSize=FVector(10.0f,20.0f,20.0f);
 	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
@@ -91,14 +98,24 @@ public:
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Components")
 	FOnComponentsAdded ComponentsAdded;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UAnimMontage* DeathAnim;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="CharacterParams")
+	FCharacterInfo CharacterInfo;
+	
+	float AxisX = 0.0f;
+	float AxisY = 0.0f;
+	bool bSprintAllow = false;
 
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* CharacterCameraComponent;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraArm;	
 
+	float MaxCameraLenght = 0.f;
+	float MinCameraLenght = 0.f;
+	float CameraChangeStep = 0.f;
+	float CharBaseMoveSpeed = 0.f;
+	float CharAimMoveSpeed = 0.f;
+	bool bSprintActivate = false;
 };

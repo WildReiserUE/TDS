@@ -2,8 +2,7 @@
 #include "Kismet/GameplayStatics.h"
 
 UTDSInventory::UTDSInventory(){
-	PrimaryComponentTick.bCanEverTick = true;
-	
+	PrimaryComponentTick.bCanEverTick = true;	
 }
 
 void UTDSInventory::BeginPlay(){
