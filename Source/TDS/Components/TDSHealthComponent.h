@@ -40,12 +40,10 @@ public:
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Health")
 	FOnAIDeath OnAIDeath;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Health, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	FHealthSettings PlayerHealthSettings;
 
-	FTimerHandle ShieldRecoveryTimer;
-	
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	FTimerHandle ShieldRecoveryTimer;	
 	
 	UFUNCTION()
 	void HealthChange(float Value);
@@ -58,7 +56,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
 private:
 	float Health;
 	float Shield;
