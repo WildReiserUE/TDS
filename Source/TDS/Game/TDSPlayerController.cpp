@@ -8,9 +8,9 @@ ATDSPlayerController::ATDSPlayerController()
 	bEnableMouseOverEvents = true;
 }
 
-void ATDSPlayerController::PlayerTick(float DeltaTime)
+void ATDSPlayerController::Tick(float DeltaTime)
 {
-	Super::PlayerTick(DeltaTime);
+	Super::Tick(DeltaTime);
 }
 
 void ATDSPlayerController::SetupInputComponent()
@@ -20,7 +20,6 @@ void ATDSPlayerController::SetupInputComponent()
 
 void ATDSPlayerController::BeginPlay()
 {
-	Super::BeginPlay();
-	
+	Super::BeginPlay();	
 	
 }

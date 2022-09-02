@@ -14,7 +14,7 @@ public:
 
 
 protected:
-	virtual void PlayerTick(float DeltaTime) override;
+	virtual void Tick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
 	virtual void BeginPlay() override;
 };
