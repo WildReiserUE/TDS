@@ -2,7 +2,7 @@
 #include "Kismet/GameplayStatics.h"
 
 UTDSInventory::UTDSInventory(){
-	PrimaryComponentTick.bCanEverTick = true;	
+	PrimaryComponentTick.bCanEverTick = true;
 }
 
 void UTDSInventory::BeginPlay(){
@@ -24,20 +24,18 @@ void UTDSInventory::OverlapItem(AActor* OverlappedActor, AActor* OtherActor){
 	if(OverlappedActor)
 	{
 		ATDSItemBase* BaseItem = Cast<ATDSItemBase>(OtherActor);
-		if(BaseItem)
-		{
-			FoundAround=true;			
+		if(BaseItem){
+			FoundAround=true;
 		}
-	}		
+	}
 }
 
 void UTDSInventory::EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor)
 {
-	if(OverlappedActor)
-	{
+	if(OverlappedActor){
 		FoundAround=false;
-        UE_LOG(LogViewport, Log,TEXT("LOST ITEM"));
-	}		
+		UE_LOG(LogViewport, Log,TEXT("LOST ITEM"));
+	}
 }
 
 void UTDSInventory::AddItem(ATDSItemBase* Item)
@@ -56,8 +54,8 @@ void UTDSInventory::AddItem(ATDSItemBase* Item)
 		}
 		else{
 			FItemInfo NewItem;
-            NewItem = Item->ItemInfo;
-            Inventory.Add(NewItem);
+			NewItem = Item->ItemInfo;
+			Inventory.Add(NewItem);
 		}
 	}
 	OnPlayerFindItem.Broadcast();
@@ -68,9 +66,8 @@ int UTDSInventory::FindItemById(int aId)
 {
 	int n = INDEX_NONE;
 	int i = 0;
-	for (FItemInfo aItem : Inventory)	{
-		if (aItem.ItemID == aId)
-		{
+	for (FItemInfo aItem : Inventory){
+		if (aItem.ItemID == aId){
 			n = i;
 			break;
 		}

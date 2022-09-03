@@ -13,8 +13,7 @@ UTDSHealthComponent::UTDSHealthComponent()
 }
 
 // Called when the game starts
-void UTDSHealthComponent::BeginPlay()
-{
+void UTDSHealthComponent::BeginPlay(){
 	Super::BeginPlay();
 	const auto ComponentOwner = GetOwner();
 	if (!ComponentOwner) return;
@@ -23,33 +22,26 @@ void UTDSHealthComponent::BeginPlay()
 	InitParams();
 }
 
-void UTDSHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
+void UTDSHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction){
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UTDSHealthComponent::HealthChange(float Value)
-{
-	if(Value < 0 )
-	{
-		if(Shield + Value >= 0)
-		{
+void UTDSHealthComponent::HealthChange(float Value){
+	if(Value < 0 ){
+		if(Shield + Value >= 0){
 			Shield+=Value;
 			OnShieldChange.Broadcast(Shield,PlayerHealthSettings.Shield);
 			ShieldRecovery();
 		}
-		else if(Shield + Value < 0)
-		{
+		else if(Shield + Value < 0){
 			Shield = 0;
 			Health = Health + Shield + Value;
 			OnShieldChange.Broadcast(Shield,PlayerHealthSettings.Shield);
 			OnHealthChange.Broadcast(Health, PlayerHealthSettings.Health);
-			if(Health <= 0)
-			{
+			if(Health <= 0){
 				Health = 0;
 				UE_LOG(LogViewport, Display, TEXT("Player is Dead"));
 				GetOwner()->SetActorEnableCollision(ECollisionResponse::ECR_Ignore);
-				
 				if(GetWorld()->GetTimerManager().IsTimerActive(ShieldRecoveryTimer))
 					GetWorld()->GetTimerManager().ClearTimer(ShieldRecoveryTimer);
 				OnPlayerDeath.Broadcast();
@@ -58,45 +50,37 @@ void UTDSHealthComponent::HealthChange(float Value)
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::Printf(TEXT("SHIELD: %f"), Shield));
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("Health: %f"), Health));
 	}
-	else //Healing or some else
-	{
-
-	}
+	else{ //Healing or some else
 	
+	}
 }
 
-void UTDSHealthComponent::TakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
-{
+void UTDSHealthComponent::TakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser){
 	static ATDSCharacter* PlayerInstig = Cast<ATDSCharacter>(InstigatedBy);
 	static ATDSCharacter* PlayerCauser = Cast<ATDSCharacter>(DamageCauser);
 	
-	if(PlayerInstig || PlayerCauser) return;	
+	if(PlayerInstig || PlayerCauser) return;
 	HealthChange(-Damage);
 }
 
-void UTDSHealthComponent::ShieldRecovery()
-{
+void UTDSHealthComponent::ShieldRecovery(){
 	if(!GetWorld()->GetTimerManager().IsTimerActive(ShieldRecoveryTimer))
 	{
 		GetWorld()->GetTimerManager().SetTimer(ShieldRecoveryTimer, this, &UTDSHealthComponent::ShieldRecoveryStart, PlayerHealthSettings.ShieldRecoveryTick, true,PlayerHealthSettings.ShieldStartDelay);
 	}
 }
 
-void UTDSHealthComponent::ShieldRecoveryStart()
-{
-	if(Shield<PlayerHealthSettings.Shield)
-	{
+void UTDSHealthComponent::ShieldRecoveryStart(){
+	if(Shield<PlayerHealthSettings.Shield){
 		Shield+=PlayerHealthSettings.ShieldRecoveryValue;
 		OnShieldChange.Broadcast(Shield,PlayerHealthSettings.Shield);
 	}
-	else
-	{
+	else{
 		GetWorld()->GetTimerManager().ClearTimer(ShieldRecoveryTimer);
 	}
 }
 
-void UTDSHealthComponent::InitParams()
-{
+void UTDSHealthComponent::InitParams(){
 	Health = PlayerHealthSettings.Health;
 	Shield = PlayerHealthSettings.Shield;
 }

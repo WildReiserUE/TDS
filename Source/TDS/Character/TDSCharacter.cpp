@@ -59,11 +59,9 @@ void ATDSCharacter::Tick(float DeltaSeconds){
 					CursorToWorld->SetWorldLocation(TraceHitResult.Location);
 					CursorToWorld->SetWorldRotation(CursorR);
 					auto Target = Cast<ATDSItemBase>(TraceHitResult.Actor);
-					if(Target)
-					{
+					if(Target){
 						const auto InventoryComponent = FindComponentByClass<UTDSInventory>();
-						if(InventoryComponent && InventoryComponent->FoundAround)
-						{
+						if(InventoryComponent && InventoryComponent->FoundAround){
 							NotifyActorOnClicked(EKeys::LeftMouseButton);
 						}
 					}
@@ -115,8 +113,7 @@ void ATDSCharacter::BeginPlay()
 	if(ComponentList.Num()>0)
 	{
 		const int Comp = ComponentList.Num();
-		for (int i = 0; i < Comp; i++)
-		{
+		for (int i = 0; i < Comp; i++){
 			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Orange, FString::Printf(TEXT("ADDED Components: %i"), i));
 			this->AddComponentByClass(ComponentList[i], false, FTransform(FVector(0)),false);
 		}
@@ -126,8 +123,7 @@ void ATDSCharacter::BeginPlay()
 	InitParams();
 }
 
-void ATDSCharacter::InitParams()
-{
+void ATDSCharacter::InitParams(){
 	MaxCameraLenght = CharacterInfo.CameraMaxLenght;
 	MinCameraLenght = CharacterInfo.CameraMinLenght;
 	CameraChangeStep = CharacterInfo.CameraChangeStep;
@@ -157,8 +153,7 @@ void ATDSCharacter::InputCameraOut(){
 		CameraArm->TargetArmLength += CameraChangeStep;
 }
 
-void ATDSCharacter::ActivateSprint()
-{
+void ATDSCharacter::ActivateSprint(){
 	const auto SkillComponent = FindComponentByClass<UTDSSkillComponent>();
 	if (SkillComponent){
 		if (SkillComponent->SprintPoint > SkillComponent->SprintSettings.SprintLosePoint){
@@ -168,8 +163,7 @@ void ATDSCharacter::ActivateSprint()
 	}
 }
 
-void ATDSCharacter::DeActivateSprint()
-{
+void ATDSCharacter::DeActivateSprint(){
 	const auto SkillComponent = FindComponentByClass<UTDSSkillComponent>();
 	if (SkillComponent){
 		SkillComponent->StopSprint();
@@ -200,8 +194,7 @@ void ATDSCharacter::SniperModeOff(){
 	GetCharacterMovement()->MaxWalkSpeed = CharBaseMoveSpeed;
 }
 
-UDecalComponent* ATDSCharacter::GetCursorToWorld()
-{
+UDecalComponent* ATDSCharacter::GetCursorToWorld(){
 	return CursorToWorld;
 }
 
