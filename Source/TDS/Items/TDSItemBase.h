@@ -7,16 +7,16 @@
 
 class ATDSItemBase;
 
-UENUM(BlueprintType)
+UENUM(BlueprintType, meta = (ExposeOnSpawn))
 enum class EItemType : uint8
 {
 	Item,
 	Weapon,
 	Armor,
-	Arrow
+	Projectile
 };
 
-UENUM(BlueprintType)
+UENUM(BlueprintType, meta = (ExposeOnSpawn))
 enum class EArmorType : uint8
 {
 	Light,
@@ -24,7 +24,7 @@ enum class EArmorType : uint8
 	Magic
 };
 
-UENUM(BlueprintType)
+UENUM(BlueprintType, meta = (ExposeOnSpawn))
 enum class EArmorPart : uint8
 {
 	Helmet,
@@ -37,7 +37,7 @@ enum class EArmorPart : uint8
 	Underwear
 };
 
-UENUM(BlueprintType)
+UENUM(BlueprintType, meta = (ExposeOnSpawn))
 enum class EWeaponType : uint8
 {
 	RightHand,
@@ -46,7 +46,7 @@ enum class EWeaponType : uint8
 	Bow
 };
 
-UENUM(BlueprintType)
+UENUM(BlueprintType, meta = (ExposeOnSpawn))
 enum class EWeaponClass : uint8
 {
 	Knife,
@@ -54,11 +54,11 @@ enum class EWeaponClass : uint8
 	Blunt,
 	DualSword,
 	Polearm,
-	Bow,
+	Shoting,
 	Shield
 };
 
-UENUM(BlueprintType)
+UENUM(BlueprintType, meta = (ExposeOnSpawn))
 enum class EWeaponAttackSpeed : uint8
 {
 	VerySlow,
@@ -68,7 +68,7 @@ enum class EWeaponAttackSpeed : uint8
 	VeryFast
 };
 
-UENUM(BlueprintType)
+UENUM(BlueprintType, meta = (ExposeOnSpawn))
 enum class EItemGrade : uint8
 {
 	NoGrade,
@@ -80,19 +80,31 @@ enum class EItemGrade : uint8
 	S84Grade
 };
 
-USTRUCT(BlueprintType)
-struct FArrowInfo
+USTRUCT(BlueprintType, meta = (ExposeOnSpawn))
+struct FProjectileInfo
 {
 	GENERATED_USTRUCT_BODY()
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	EItemGrade ArrowGrade;
+	EItemGrade ProjectileGrade;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UParticleSystem* HitFX = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	USoundBase* HitSound = nullptr;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	float ProjectileSpeed = 0.f;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	float ProjectileMaxSpeed = 0.f;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	FVector ProjectileDirection = FVector(0);
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	bool bBounced = false;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	float ProjectileBouncines = 0.3f;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	float ProjectileGravity = 0.f;
 };
 
-USTRUCT(BlueprintType)
+USTRUCT(BlueprintType, meta = (ExposeOnSpawn))
 struct FItemInfo
 {
 	GENERATED_USTRUCT_BODY()
@@ -100,6 +112,8 @@ struct FItemInfo
 	int ItemID = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName ItemName;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	EItemType ItemType;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UStaticMesh* ItemMesh = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -120,7 +134,7 @@ struct FItemInfo
 	int Weight = 0;
 };
 
-USTRUCT(BlueprintType)
+USTRUCT(BlueprintType, meta = (ExposeOnSpawn))
 struct FWeaponInfo
 {
 	GENERATED_USTRUCT_BODY()
@@ -128,8 +142,8 @@ struct FWeaponInfo
 	EWeaponType WeaponType;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EWeaponClass WeaponClass;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::Bow", EditConditionHides))
-	TSubclassOf<ATDSItemBase> WeaponArrow = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::Shoting", EditConditionHides))
+	TSubclassOf<ATDSItemBase> WeaponProjectile = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EItemGrade WeaponGrade;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -140,7 +154,7 @@ struct FWeaponInfo
 	int MagicalDamage = 0;
 };
 
-USTRUCT(BlueprintType)
+USTRUCT(BlueprintType, meta = (ExposeOnSpawn))
 struct FArmorInfo
 {
 	GENERATED_USTRUCT_BODY()
@@ -153,7 +167,7 @@ struct FArmorInfo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float PhysicalDefence = 0.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float MagicalDefence = 0.0f;	
+	float MagicalDefence = 0.0f;
 };
 
 UCLASS()
@@ -187,20 +201,20 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "StaticMesh", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* ItemMeshComponent;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")
-	EItemType ItemType;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	UProjectileMovementComponent* ProjectileMovementComponent;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")
 	FItemInfo ItemInfo;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings", meta = (EditCondition="ItemType == EItemType::Weapon", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")//, meta = (EditCondition="ItemType == EItemType::Weapon", EditConditionHides))
 	FWeaponInfo WeaponInfo;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings", meta = (EditCondition="ItemType == EItemType::Armor", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")//, meta = (EditCondition="ItemType == EItemType::Armor", EditConditionHides))
 	FArmorInfo ArmorInfo;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings", meta = (EditCondition="ItemType == EItemType::Arrow", EditConditionHides))
-	FArrowInfo ArrowInfo;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")//, meta = (EditCondition="ItemType == EItemType::Projectile", EditConditionHides))
+	FProjectileInfo ProjectileInfo;
 
 	bool bIsClicked = false;
 private:

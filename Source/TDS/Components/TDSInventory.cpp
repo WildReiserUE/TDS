@@ -16,8 +16,6 @@ void UTDSInventory::BeginPlay(){
 void UTDSInventory::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	if(FoundAround)
-		UE_LOG(LogViewport, Log,TEXT("FOUND ITEM"));
 }
 
 void UTDSInventory::OverlapItem(AActor* OverlappedActor, AActor* OtherActor){
@@ -26,6 +24,14 @@ void UTDSInventory::OverlapItem(AActor* OverlappedActor, AActor* OtherActor){
 		ATDSItemBase* BaseItem = Cast<ATDSItemBase>(OtherActor);
 		if(BaseItem){
 			FoundAround=true;
+			switch (BaseItem->ItemInfo.ItemType)
+			{
+			case EItemType::Item:
+				AddItem(BaseItem);
+				BaseItem->Destroy();
+			default:
+				break;
+			}
 		}
 	}
 }
