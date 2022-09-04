@@ -21,6 +21,9 @@ public:
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Inventory")
 	TArray<FItemInfo> Inventory;
 
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Inventory")
+	TArray<FWeaponInfo> WeaponInventory;
+	
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Health")
 	FOnPlayerFindItem OnPlayerFindItem;
 

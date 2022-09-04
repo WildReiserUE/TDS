@@ -27,8 +27,11 @@ void UTDSInventory::OverlapItem(AActor* OverlappedActor, AActor* OtherActor){
 			switch (BaseItem->ItemInfo.ItemType)
 			{
 			case EItemType::Item:
-				AddItem(BaseItem);
-				BaseItem->Destroy();
+				AddItem(BaseItem);break;
+			case EItemType::Weapon:
+				AddItem(BaseItem);break;
+			case EItemType::Armor:
+				AddItem(BaseItem);break;
 			default:
 				break;
 			}
@@ -39,19 +42,26 @@ void UTDSInventory::OverlapItem(AActor* OverlappedActor, AActor* OtherActor){
 void UTDSInventory::EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor)
 {
 	if(OverlappedActor){
-		FoundAround=false;
-		UE_LOG(LogViewport, Log,TEXT("LOST ITEM"));
+		ATDSItemBase* BaseItem = Cast<ATDSItemBase>(OtherActor);
+		if(BaseItem)
+		{
+			FoundAround=false;
+		}
 	}
 }
 
 void UTDSInventory::AddItem(ATDSItemBase* Item)
 {
 	const int i = FindItemById(Item->ItemInfo.ItemID);
-	if (i == INDEX_NONE)
-	{
+	if (i == INDEX_NONE){
 		FItemInfo NewItem;
 		NewItem = Item->ItemInfo;
 		Inventory.Add(NewItem);
+		if(NewItem.ItemType ==  EItemType::Weapon){
+			FWeaponInfo NewWeaponItem;
+			NewWeaponItem = Item->ItemInfo.Weapon;
+			WeaponInventory.Add(NewWeaponItem);
+		}
 		OnPlayerFindItem.Broadcast();
 	}
 	else{
@@ -62,14 +72,18 @@ void UTDSInventory::AddItem(ATDSItemBase* Item)
 			FItemInfo NewItem;
 			NewItem = Item->ItemInfo;
 			Inventory.Add(NewItem);
+			if(NewItem.ItemType ==  EItemType::Weapon){
+				FWeaponInfo NewWeaponItem;
+				NewWeaponItem = Item->ItemInfo.Weapon;
+				WeaponInventory.Add(NewWeaponItem);
+			}
 		}
 	}
 	OnPlayerFindItem.Broadcast();
 	Item->Destroy();
 }
 
-int UTDSInventory::FindItemById(int aId)
-{
+int UTDSInventory::FindItemById(int aId){
 	int n = INDEX_NONE;
 	int i = 0;
 	for (FItemInfo aItem : Inventory){

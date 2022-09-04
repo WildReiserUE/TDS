@@ -5,10 +5,12 @@
 
 #include "CoreMinimal.h"
 #include "TDSHealthComponent.h"
+#include "TDSItemBase.h"
 #include "GameFramework/Character.h"
 #include "TDSCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComponentsAdded);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponSwitch);
 
 USTRUCT(BlueprintType)
 struct FCharacterInfo
@@ -31,7 +33,7 @@ public:
 	ATDSCharacter();
 	
 	virtual void Tick(float DeltaSeconds) override;
-	virtual void BeginPlay() override;	
+	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 	/** Returns TopDownCameraComponent subobject **/
@@ -51,20 +53,24 @@ public:
 		void InputCameraOut();
 	UFUNCTION()
 		UDecalComponent* GetCursorToWorld();
-	
+	ATDSItemBase* SpawnWeapon(int WeaponIndex);
+	void PrevWeapon();
+	void NextWeapon();
+
 	// UFUNCTION(BlueprintCallable)
 	// 	ATDSWeaponBase* GetCurrentWeapon();
 	// UFUNCTION(BlueprintCallable)
 	// 	void SetCurrentWeapon(ATDSWeaponBase* CurWeapon);
-	// UFUNCTION(BlueprintCallable)
-	// 	void FireOn();
-	// UFUNCTION(BlueprintCallable)
-	// 	void FireOff();
+	
+	UFUNCTION(BlueprintCallable)
+		void FireOn();
+	UFUNCTION(BlueprintCallable)
+		void FireOff();
 
 	void CalculateAllowSprint();
 
 	UFUNCTION()
-		void ActivateSprint();	
+		void ActivateSprint();
 	UFUNCTION()
 		void DeActivateSprint();
 	UFUNCTION()
@@ -95,7 +101,10 @@ public:
 
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Components")
 	FOnComponentsAdded ComponentsAdded;
-
+	
+	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Inventory")
+	FOnWeaponSwitch OnWeaponSwitch;
+	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="CharacterParams")
 	FCharacterInfo CharacterInfo;
 	

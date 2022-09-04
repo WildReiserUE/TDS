@@ -15,8 +15,7 @@
 
 ATDSCharacter::ATDSCharacter(){
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-	
-	// Don't rotate character to camera direction
+
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
@@ -71,8 +70,8 @@ void ATDSCharacter::Tick(float DeltaSeconds){
 		CurrentCharSpeed = GetVelocity().Size();
 		MeshDirection = GetMesh()->GetAnimInstance()->CalculateDirection(GetVelocity(),GetActorRotation());
 	
-		AddMovementInput(FVector(1.0f, 0.0f, 0.0f), AxisX);
-		AddMovementInput(FVector(0.0f, 1.0f, 0.0f), AxisY);
+		AddMovementInput(FVector(1.f, -0.1f, 0.0f), AxisX);
+		AddMovementInput(FVector(0.1f, 1.f, 0.0f), AxisY);
 
 		//Character rotation only if Move or Aiming
 		APlayerController* myController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
@@ -110,14 +109,12 @@ void ATDSCharacter::BeginPlay()
 		CursorToWorld = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CursorMaterial,CursorSize,FVector(0));
 	}
 
-	if(ComponentList.Num()>0)
+	if (ComponentList.Num()>0)
 	{
 		const int Comp = ComponentList.Num();
 		for (int i = 0; i < Comp; i++){
-			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Orange, FString::Printf(TEXT("ADDED Components: %i"), i));
 			this->AddComponentByClass(ComponentList[i], false, FTransform(FVector(0)),false);
 		}
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Orange, FString::Printf(TEXT("TOTALL ADDED Components: %i"), ComponentList.Num()));
 		ComponentsAdded.Broadcast();
 	}
 	InitParams();
@@ -155,18 +152,20 @@ void ATDSCharacter::InputCameraOut(){
 
 void ATDSCharacter::ActivateSprint(){
 	const auto SkillComponent = FindComponentByClass<UTDSSkillComponent>();
-	if (SkillComponent){
+	if (SkillComponent && !bSniperMode){
 		if (SkillComponent->SprintPoint > SkillComponent->SprintSettings.SprintLosePoint){
 			GetCharacterMovement()->MaxWalkSpeed = CharBaseMoveSpeed*SkillComponent->SprintCoef;
 			SkillComponent->StartSprint();
+			bSprintActivate=true;
 		}
 	}
 }
 
 void ATDSCharacter::DeActivateSprint(){
 	const auto SkillComponent = FindComponentByClass<UTDSSkillComponent>();
-	if (SkillComponent){
+	if (SkillComponent && !bSniperMode){
 		SkillComponent->StopSprint();
+		bSprintActivate=false;
 		GetCharacterMovement()->MaxWalkSpeed = CharBaseMoveSpeed;
 	}
 }
@@ -183,7 +182,7 @@ void ATDSCharacter::CalculateAllowSprint()
 
 void ATDSCharacter::SniperModeOn(){
 	if(bSprintActivate)
-		bSprintActivate=false;
+		DeActivateSprint();
 	bSniperMode = true;
 	GetCharacterMovement()->MaxWalkSpeed = CharAimMoveSpeed;
 }
@@ -198,16 +197,104 @@ UDecalComponent* ATDSCharacter::GetCursorToWorld(){
 	return CursorToWorld;
 }
 
-// void ATDSCharacter::FireOn()
-// {
-// 	if(CurrentWeapon->WeaponCanFire)
-// 	{
-// 		//UE_LOG(LogViewport, Display, TEXT("Command to Weapon - Fire"));
-// 		CurrentWeapon->Fire();		
-// 	}	
-// }
-// void ATDSCharacter::FireOff()
-// {
-// 	//UE_LOG(LogViewport, Display, TEXT("Command to Weapon - Stop Fire"));
-// 	CurrentWeapon->StopFire();
-// }
+ATDSItemBase* ATDSCharacter::SpawnWeapon(int WeaponIndex)
+{
+	const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
+	if(PlayerInventory)
+	{
+		if(PlayerInventory->WeaponInventory.Num() > 0)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			SpawnParams.Owner = GetOwner();
+			SpawnParams.Instigator = GetInstigator();
+			const FVector Loc(0,0,0);
+			const FRotator Rot(0,0,0);
+
+			ATDSItemBase* MyWeapon = Cast<ATDSItemBase>(GetWorld()->SpawnActor(PlayerInventory->WeaponInventory[WeaponIndex].BaseClass, &Loc, &Rot, SpawnParams));
+			MyWeapon->ItemMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+			if (MyWeapon && bIsALife)
+			{
+				FAttachmentTransformRules Rule(EAttachmentRule::SnapToTarget, false);
+				MyWeapon->AttachToComponent(GetMesh(), Rule, FName("RightHandSocket"));
+			}
+			return MyWeapon;
+		}
+	}
+	return nullptr;
+}
+
+void ATDSCharacter::PrevWeapon()
+{
+	if(bIsALife)
+	{
+		const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
+		/*if(PlayerInventory->WeaponInventory.Num() > 0 && !GetWorld()->GetTimerManager().IsTimerActive(WeaponReloadTimer))
+		{
+			if(CurrentWeapon)
+			{
+				CurrentWeapon->StopFire();
+				CurrentWeapon->WeaponInfo.WeaponType=EWeaponType::NoWeapon;
+				//CurrentWeapon->OnWeaponFire.RemoveDynamic(this, &ATDSCharacter::DecreaseBulletCount);
+				CurrentWeapon->Destroy();
+			}
+			CurrentWeaponIndex --;
+			if(CurrentWeaponIndex<0)
+			{
+				CurrentWeaponIndex = PlayerInventory->WeaponInventory.Num()-1;
+			}
+			if(AnimMontageHandleAttack)
+				StopAnimMontage(AnimMontageHandleAttack);
+			//PlayerInventory->OnBulletsEnd.RemoveDynamic(this, &ATDSCharacter::FireOff);
+			CurrentWeapon = SpawnWeapon(CurrentWeaponIndex);
+			//PlayerInventory->OnBulletsEnd.AddDynamic(this, &ATDSCharacter::FireOff);
+			//CurrentWeapon->OnWeaponFire.AddDynamic(this, &ATDSCharacter::DecreaseBulletCount);
+			OnWeaponSwitch.Broadcast();
+		}*/
+	}
+}
+
+void ATDSCharacter::NextWeapon()
+{
+	if(bIsALife)
+	{
+		/*const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
+		if(PlayerInventory->WeaponInventory.Num()> 0 && !GetWorld()->GetTimerManager().IsTimerActive(WeaponReloadTimer))
+		{
+			if(CurrentWeapon)
+			{
+				CurrentWeapon->StopFire();
+				CurrentWeapon->WeaponInfo.WeaponType=EWeaponType::NoWeapon;
+				//CurrentWeapon->OnWeaponFire.RemoveDynamic(this, &ATDSCharacter::DecreaseBulletCount);
+				CurrentWeapon->Destroy();
+			}
+			CurrentWeaponIndex ++;
+			if(CurrentWeaponIndex>=PlayerInventory->WeaponInventory.Num())
+			{
+				CurrentWeaponIndex = 0;
+			}
+			if(AnimMontageHandleAttack)
+				StopAnimMontage(AnimMontageHandleAttack);
+			//PlayerInventory->OnBulletsEnd.RemoveDynamic(this, &ATDSCharacter::FireOff);
+			CurrentWeapon = SpawnWeapon(CurrentWeaponIndex);
+			//PlayerInventory->OnBulletsEnd.AddDynamic(this, &ATDSCharacter::FireOff);
+			//CurrentWeapon->OnWeaponFire.AddDynamic(this, &ATDSCharacter::DecreaseBulletCount);
+			OnWeaponSwitch.Broadcast();
+		}*/
+	}
+}
+
+void ATDSCharacter::FireOn()
+{
+	// if(CurrentWeapon->WeaponCanFire)
+	// {
+	// 	//UE_LOG(LogViewport, Display, TEXT("Command to Weapon - Fire"));
+	// 	CurrentWeapon->Fire();
+	// }
+}
+void ATDSCharacter::FireOff()
+{
+	//UE_LOG(LogViewport, Display, TEXT("Command to Weapon - Stop Fire"));
+	//CurrentWeapon->StopFire();
+}

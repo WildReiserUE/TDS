@@ -104,40 +104,13 @@ struct FProjectileInfo
 	float ProjectileGravity = 0.f;
 };
 
-USTRUCT(BlueprintType, meta = (ExposeOnSpawn))
-struct FItemInfo
-{
-	GENERATED_USTRUCT_BODY()
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int ItemID = 0;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FName ItemName;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	EItemType ItemType;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UStaticMesh* ItemMesh = nullptr;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UTexture2D* ItemIcon = nullptr;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	USoundBase* PickupSound = nullptr;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UParticleSystem* PickupFX = nullptr;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UParticleSystem* DropFX = nullptr;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	bool bIsStackable = false;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="bIsStackable"))
-	int Count = 1;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int Cost = 0;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int Weight = 0;
-};
 
 USTRUCT(BlueprintType, meta = (ExposeOnSpawn))
 struct FWeaponInfo
 {
 	GENERATED_USTRUCT_BODY()
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<ATDSItemBase> BaseClass;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EWeaponType WeaponType;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -168,6 +141,42 @@ struct FArmorInfo
 	float PhysicalDefence = 0.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float MagicalDefence = 0.0f;
+};
+
+USTRUCT(BlueprintType, meta = (ExposeOnSpawn))
+struct FItemInfo
+{
+	GENERATED_USTRUCT_BODY()
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int ItemID = 0;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName ItemName;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	EItemType ItemType;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Weapon", EditConditionHides))
+	FWeaponInfo Weapon;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Armor", EditConditionHides))
+	FArmorInfo Armor;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Projectile", EditConditionHides))
+	FProjectileInfo Projectile;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UStaticMesh* ItemMesh = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UTexture2D* ItemIcon = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	USoundBase* PickupSound = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UParticleSystem* PickupFX = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UParticleSystem* DropFX = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bIsStackable = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="bIsStackable"))
+	int Count = 1;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int Cost = 0;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int Weight = 0;
 };
 
 UCLASS()
@@ -207,14 +216,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")
 	FItemInfo ItemInfo;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")//, meta = (EditCondition="ItemType == EItemType::Weapon", EditConditionHides))
-	FWeaponInfo WeaponInfo;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")//, meta = (EditCondition="ItemType == EItemType::Armor", EditConditionHides))
-	FArmorInfo ArmorInfo;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")//, meta = (EditCondition="ItemType == EItemType::Projectile", EditConditionHides))
-	FProjectileInfo ProjectileInfo;
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")//, meta = (EditCondition="ItemType == EItemType::Weapon", EditConditionHides))
+	// FWeaponInfo WeaponInfo;
+	//
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")//, meta = (EditCondition="ItemType == EItemType::Armor", EditConditionHides))
+	// FArmorInfo ArmorInfo;
+	//
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")//, meta = (EditCondition="ItemType == EItemType::Projectile", EditConditionHides))
+	// FProjectileInfo ProjectileInfo;
 
 	bool bIsClicked = false;
 private:
