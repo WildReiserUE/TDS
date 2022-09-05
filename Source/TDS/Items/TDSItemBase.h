@@ -169,7 +169,7 @@ struct FItemInfo
 	UParticleSystem* PickupFX = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UParticleSystem* DropFX = nullptr;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Weapon || EItemType::Armor", EditConditionHides))
 	bool bIsStackable = false;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="bIsStackable"))
 	int Count = 1;
@@ -216,6 +216,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")
 	FItemInfo ItemInfo;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn))
+	FName SpawnedName;
 	// UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")//, meta = (EditCondition="ItemType == EItemType::Weapon", EditConditionHides))
 	// FWeaponInfo WeaponInfo;
 	//

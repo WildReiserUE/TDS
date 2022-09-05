@@ -53,6 +53,7 @@ public:
 		void InputCameraOut();
 	UFUNCTION()
 		UDecalComponent* GetCursorToWorld();
+	UFUNCTION(BlueprintCallable)
 	ATDSItemBase* SpawnWeapon(int WeaponIndex);
 	void PrevWeapon();
 	void NextWeapon();

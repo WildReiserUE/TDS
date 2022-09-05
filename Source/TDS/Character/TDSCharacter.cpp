@@ -200,7 +200,7 @@ UDecalComponent* ATDSCharacter::GetCursorToWorld(){
 ATDSItemBase* ATDSCharacter::SpawnWeapon(int WeaponIndex)
 {
 	const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
-	if(PlayerInventory)
+	if(PlayerInventory && bIsALife)
 	{
 		if(PlayerInventory->WeaponInventory.Num() > 0)
 		{
@@ -210,15 +210,19 @@ ATDSItemBase* ATDSCharacter::SpawnWeapon(int WeaponIndex)
 			SpawnParams.Instigator = GetInstigator();
 			const FVector Loc(0,0,0);
 			const FRotator Rot(0,0,0);
-
-			ATDSItemBase* MyWeapon = Cast<ATDSItemBase>(GetWorld()->SpawnActor(PlayerInventory->WeaponInventory[WeaponIndex].BaseClass, &Loc, &Rot, SpawnParams));
+			FTransform SpawnTransform = FTransform(Loc);
+			ATDSItemBase* MyWeapon = Cast<ATDSItemBase>(GetWorld()->SpawnActorDeferred<ATDSItemBase>(PlayerInventory->WeaponInventory[WeaponIndex].BaseClass,
+				SpawnTransform, SpawnParams.Owner, SpawnParams.Instigator,SpawnParams.SpawnCollisionHandlingOverride));
+			MyWeapon->SpawnedName = PlayerInventory->Inventory[WeaponIndex].ItemName;
 			MyWeapon->ItemMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-			if (MyWeapon && bIsALife)
+			UGameplayStatics::FinishSpawningActor(MyWeapon,SpawnTransform);
+			if (MyWeapon)
 			{
 				FAttachmentTransformRules Rule(EAttachmentRule::SnapToTarget, false);
 				MyWeapon->AttachToComponent(GetMesh(), Rule, FName("RightHandSocket"));
+				MyWeapon->ChangeSettings();
 			}
+			//UE_LOG(LogTemp, Warning, TEXT("My weapon Name: %s"), *MyWeapon->SpawnedName.ToString());
 			return MyWeapon;
 		}
 	}
