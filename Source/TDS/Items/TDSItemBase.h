@@ -54,7 +54,8 @@ enum class EWeaponClass : uint8
 	Blunt,
 	DualSword,
 	Polearm,
-	Shoting,
+	H2Shoting,
+	H1Shoting,
 	Shield
 };
 
@@ -110,8 +111,6 @@ struct FWeaponInfo
 {
 	GENERATED_USTRUCT_BODY()
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<ATDSItemBase> BaseClass;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EWeaponType WeaponType;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EWeaponClass WeaponClass;
@@ -153,6 +152,8 @@ struct FItemInfo
 	FName ItemName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EItemType ItemType;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<ATDSItemBase> BaseClass;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Weapon", EditConditionHides))
 	FWeaponInfo Weapon;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Armor", EditConditionHides))
@@ -218,16 +219,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn))
 	FName SpawnedName;
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")//, meta = (EditCondition="ItemType == EItemType::Weapon", EditConditionHides))
-	// FWeaponInfo WeaponInfo;
-	//
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")//, meta = (EditCondition="ItemType == EItemType::Armor", EditConditionHides))
-	// FArmorInfo ArmorInfo;
-	//
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")//, meta = (EditCondition="ItemType == EItemType::Projectile", EditConditionHides))
-	// FProjectileInfo ProjectileInfo;
 
 	bool bIsClicked = false;
+	
 private:
 	virtual void BeginPlay() override;
 };

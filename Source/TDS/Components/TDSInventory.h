@@ -22,7 +22,7 @@ public:
 	TArray<FItemInfo> Inventory;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Inventory")
-	TArray<FWeaponInfo> WeaponInventory;
+	TArray<FItemInfo> WeaponInventory;
 	
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Health")
 	FOnPlayerFindItem OnPlayerFindItem;

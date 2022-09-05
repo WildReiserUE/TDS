@@ -88,30 +88,40 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CharacterStateParam")
 	bool bSniperMode = false;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Camera")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player Settings")
 	UDecalComponent* CursorToWorld;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Cursor")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player Settings")
 	UMaterialInterface* CursorMaterial =nullptr;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Cursor")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player Settings")
 	FVector CursorSize=FVector(10.0f,20.0f,20.0f);
 	
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category="Player Settings")
 	TArray<TSubclassOf<UActorComponent>> ComponentList;
 
-	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Components")
+	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Delegate")
 	FOnComponentsAdded ComponentsAdded;
 	
-	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Inventory")
+	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Delegate")
 	FOnWeaponSwitch OnWeaponSwitch;
 	
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="CharacterParams")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Player Settings")
 	FCharacterInfo CharacterInfo;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	ATDSItemBase* CurrentWeapon = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Player Settings")
+	UAnimMontage* AnimMontageHandleAttack = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Player Settings")
+	UAnimMontage* MontageDead = nullptr;
 	
 	float AxisX = 0.0f;
 	float AxisY = 0.0f;
 	bool bSprintAllow = false;
+	int CurrentWeaponIndex = -1;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
@@ -127,4 +137,5 @@ private:
 	float CharAimMoveSpeed = 0.f;
 	bool bSprintActivate = false;
 	bool bIsALife = true;
+	FTimerHandle WeaponReloadTimer;
 };

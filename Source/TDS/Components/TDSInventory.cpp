@@ -58,8 +58,8 @@ void UTDSInventory::AddItem(ATDSItemBase* Item)
 		NewItem = Item->ItemInfo;
 		Inventory.Add(NewItem);
 		if(NewItem.ItemType ==  EItemType::Weapon){
-			FWeaponInfo NewWeaponItem;
-			NewWeaponItem = Item->ItemInfo.Weapon;
+			FItemInfo NewWeaponItem;
+			NewWeaponItem = Item->ItemInfo;
 			WeaponInventory.Add(NewWeaponItem);
 		}
 		OnPlayerFindItem.Broadcast();
@@ -73,8 +73,8 @@ void UTDSInventory::AddItem(ATDSItemBase* Item)
 			NewItem = Item->ItemInfo;
 			Inventory.Add(NewItem);
 			if(NewItem.ItemType ==  EItemType::Weapon){
-				FWeaponInfo NewWeaponItem;
-				NewWeaponItem = Item->ItemInfo.Weapon;
+				FItemInfo NewWeaponItem;
+				NewWeaponItem = Item->ItemInfo;
 				WeaponInventory.Add(NewWeaponItem);
 			}
 		}
