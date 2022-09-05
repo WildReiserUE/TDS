@@ -99,8 +99,8 @@ void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent
 	NewInputComponent->BindAction(TEXT("SniperMode"),IE_Released, this, &ATDSCharacter::SniperModeOff);
 	NewInputComponent->BindAction(TEXT("NextWeapon"),IE_Pressed, this, &ATDSCharacter::NextWeapon);
 	NewInputComponent->BindAction(TEXT("PrevWeapon"),IE_Pressed, this, &ATDSCharacter::PrevWeapon);
-	// NewInputComponent->BindAction(TEXT("Fire"),IE_Pressed,this,&ATDSCharacter::FireOn);
-	// NewInputComponent->BindAction(TEXT("Fire"),IE_Released,this,&ATDSCharacter::FireOff);
+	NewInputComponent->BindAction(TEXT("Fire"),IE_Pressed,this,&ATDSCharacter::FireOn);
+	NewInputComponent->BindAction(TEXT("Fire"),IE_Released,this,&ATDSCharacter::FireOff);
 }
 
 void ATDSCharacter::BeginPlay()
@@ -299,15 +299,16 @@ void ATDSCharacter::NextWeapon()
 }
 
 void ATDSCharacter::FireOn()
-{
-	// if(CurrentWeapon->WeaponCanFire)
-	// {
-	// 	//UE_LOG(LogViewport, Display, TEXT("Command to Weapon - Fire"));
-	// 	CurrentWeapon->Fire();
-	// }
+{		
+	if(	(CurrentWeapon) && (CurrentWeapon->ItemInfo.Weapon.WeaponClass == EWeaponClass::H1Shoting || (CurrentWeapon->ItemInfo.Weapon.WeaponClass == EWeaponClass::H2Shoting)));
+	{
+		UE_LOG(LogViewport, Display, TEXT("Command to Weapon - Fire"));
+		//CurrentWeapon->Fire();
+	}
 }
 void ATDSCharacter::FireOff()
 {
-	//UE_LOG(LogViewport, Display, TEXT("Command to Weapon - Stop Fire"));
+	if(CurrentWeapon)
+		UE_LOG(LogViewport, Display, TEXT("Command to Weapon - Stop Fire"));
 	//CurrentWeapon->StopFire();
 }

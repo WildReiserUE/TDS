@@ -45,15 +45,11 @@ void ATDSItemBase::SpawnSoundHit(USoundBase* NewSound){
 }
 
 void ATDSItemBase::RenderOn(UPrimitiveComponent* pComponent){
-	//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("Item: Switch RenderON"));
-	//UE_LOG(LogViewport, Display, TEXT("Command to RENDER ON"));
 	if(pComponent)
 		pComponent->SetRenderCustomDepth(true);
 }
 
 void ATDSItemBase::RenderOff(UPrimitiveComponent* pComponent){
-	//GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Orange, TEXT("Item: Switch RenderOFF"));
-	//UE_LOG(LogViewport, Display, TEXT("Command to RENDER OFF"));
 	if(!bIsClicked)
 		if (pComponent)pComponent->SetRenderCustomDepth(false);
 }

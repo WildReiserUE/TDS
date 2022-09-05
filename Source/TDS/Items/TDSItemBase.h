@@ -86,8 +86,6 @@ struct FProjectileInfo
 {
 	GENERATED_USTRUCT_BODY()
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	EItemGrade ProjectileGrade;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UParticleSystem* HitFX = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	USoundBase* HitSound = nullptr;
@@ -117,8 +115,6 @@ struct FWeaponInfo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::Shoting", EditConditionHides))
 	TSubclassOf<ATDSItemBase> WeaponProjectile = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	EItemGrade WeaponGrade;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EWeaponAttackSpeed AttackSpeed;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int PhysicalDamage = 0;
@@ -135,8 +131,6 @@ struct FArmorInfo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EArmorPart ArmorPart;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	EItemGrade ArmorGrade;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float PhysicalDefence = 0.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float MagicalDefence = 0.0f;
@@ -152,6 +146,8 @@ struct FItemInfo
 	FName ItemName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EItemType ItemType;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	EItemGrade itemGrade;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<ATDSItemBase> BaseClass;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Weapon", EditConditionHides))
