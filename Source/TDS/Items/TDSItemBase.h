@@ -42,8 +42,7 @@ enum class EWeaponType : uint8
 {
 	RightHand,
 	LeftHand,
-	DoubleHand,
-	Bow
+	DoubleHand
 };
 
 UENUM(BlueprintType, meta = (ExposeOnSpawn))
@@ -108,17 +107,17 @@ USTRUCT(BlueprintType, meta = (ExposeOnSpawn))
 struct FWeaponInfo
 {
 	GENERATED_USTRUCT_BODY()
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting", EditConditionHides))
 	EWeaponType WeaponType;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EWeaponClass WeaponClass;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::Shoting", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting", EditConditionHides))
 	TSubclassOf<ATDSItemBase> WeaponProjectile = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EWeaponAttackSpeed AttackSpeed;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting", EditConditionHides))
 	int PhysicalDamage = 0;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting", EditConditionHides))
 	int MagicalDamage = 0;
 };
 
@@ -147,11 +146,15 @@ struct FItemInfo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EItemType ItemType;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	EItemGrade itemGrade;
+	EItemGrade ItemGrade;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<ATDSItemBase> BaseClass;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Weapon", EditConditionHides))
 	FWeaponInfo Weapon;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Weapon", EditConditionHides))
+	bool bCanFire = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="bCanFire == true", EditConditionHides))
+	int ProjectileId;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Armor", EditConditionHides))
 	FArmorInfo Armor;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Projectile", EditConditionHides))
@@ -166,9 +169,9 @@ struct FItemInfo
 	UParticleSystem* PickupFX = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UParticleSystem* DropFX = nullptr;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Weapon || EItemType::Armor", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Item", EditConditionHides))
 	bool bIsStackable = false;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="bIsStackable"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="bIsStackable == true"))
 	int Count = 1;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int Cost = 0;
