@@ -300,7 +300,7 @@ void ATDSCharacter::NextWeapon()
 
 void ATDSCharacter::FireOn()
 {		
-	if(	(CurrentWeapon) && (CurrentWeapon->ItemInfo.Weapon.WeaponClass == EWeaponClass::H1Shoting || (CurrentWeapon->ItemInfo.Weapon.WeaponClass == EWeaponClass::H2Shoting)));
+	if((CurrentWeapon) && (CurrentWeapon->ItemInfo.Weapon.WeaponClass == EWeaponClass::H1Shoting || (CurrentWeapon->ItemInfo.Weapon.WeaponClass == EWeaponClass::H2Shoting)))
 	{
 		UE_LOG(LogViewport, Display, TEXT("Command to Weapon - Fire"));
 		//CurrentWeapon->Fire();
