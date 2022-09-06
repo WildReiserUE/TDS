@@ -76,7 +76,7 @@ void ATDSCharacter::Tick(float DeltaSeconds){
 		//Character rotation only if Move or Aiming
 		APlayerController* myController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 		if (myController){
-			if (AxisX!=0 || AxisY!=0 || (bSniperMode && CurrentWeapon)){
+			if (AxisX!=0 || AxisY!=0 || (bSniperMode && CurrentWeapon) || bRotateToAttack){
 				FHitResult ResultHit;
 				myController->GetHitResultUnderCursor(ECC_GameTraceChannel1, false, ResultHit);
 				float FindRotaterResultYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), ResultHit.Location).Yaw;
@@ -217,7 +217,6 @@ ATDSItemBase* ATDSCharacter::SpawnWeapon(int WeaponIndex)
 			SpawnParams.Owner = GetOwner();
 			SpawnParams.Instigator = GetInstigator();
 			const FVector Loc(0,0,0);
-			const FRotator Rot(0,0,0);
 			FTransform SpawnTransform = FTransform(Loc);
 			ATDSItemBase* MyWeapon = Cast<ATDSItemBase>(GetWorld()->SpawnActorDeferred<ATDSItemBase>(PlayerInventory->WeaponInventory[WeaponIndex].BaseClass,
 				SpawnTransform, SpawnParams.Owner, SpawnParams.Instigator,SpawnParams.SpawnCollisionHandlingOverride));
@@ -247,9 +246,9 @@ void ATDSCharacter::PrevWeapon()
 		{
 			if(CurrentWeapon)
 			{
-				//CurrentWeapon->StopFire();
+				CurrentWeapon->StopAttack();
 				//CurrentWeapon->ItemInfo.Weapon.WeaponClass == EWeaponClass::Shoting;
-				//CurrentWeapon->OnWeaponFire.RemoveDynamic(this, &ATDSCharacter::DecreaseBulletCount);
+				CurrentWeapon->OnWeaponFire.RemoveDynamic(this, &ATDSCharacter::DecreaseBulletCount);
 				CurrentWeapon->Destroy();
 			}
 			CurrentWeaponIndex --;
@@ -259,10 +258,10 @@ void ATDSCharacter::PrevWeapon()
 			}
 			if(AnimMontageHandleAttack)
 				StopAnimMontage(AnimMontageHandleAttack);
-			//PlayerInventory->OnBulletsEnd.RemoveDynamic(this, &ATDSCharacter::FireOff);
+			PlayerInventory->OnBulletsEnd.RemoveDynamic(this, &ATDSCharacter::FireOff);
 			CurrentWeapon = SpawnWeapon(CurrentWeaponIndex);
-			//PlayerInventory->OnBulletsEnd.AddDynamic(this, &ATDSCharacter::FireOff);
-			//CurrentWeapon->OnWeaponFire.AddDynamic(this, &ATDSCharacter::DecreaseBulletCount);
+			PlayerInventory->OnBulletsEnd.AddDynamic(this, &ATDSCharacter::FireOff);
+			CurrentWeapon->OnWeaponFire.AddDynamic(this, &ATDSCharacter::DecreaseBulletCount);
 			OnWeaponSwitch.Broadcast();
 		}
 	}
@@ -277,9 +276,9 @@ void ATDSCharacter::NextWeapon()
 		{
 			if(CurrentWeapon)
 			{
-				//CurrentWeapon->StopFire();
+				CurrentWeapon->StopAttack();
 				//CurrentWeapon->WeaponInfo.WeaponType=EWeaponType::NoWeapon;
-				//CurrentWeapon->OnWeaponFire.RemoveDynamic(this, &ATDSCharacter::DecreaseBulletCount);
+				CurrentWeapon->OnWeaponFire.RemoveDynamic(this, &ATDSCharacter::DecreaseBulletCount);
 				CurrentWeapon->Destroy();
 			}
 			CurrentWeaponIndex ++;
@@ -289,26 +288,55 @@ void ATDSCharacter::NextWeapon()
 			}
 			if(AnimMontageHandleAttack)
 				StopAnimMontage(AnimMontageHandleAttack);
-			//PlayerInventory->OnBulletsEnd.RemoveDynamic(this, &ATDSCharacter::FireOff);
+			PlayerInventory->OnBulletsEnd.RemoveDynamic(this, &ATDSCharacter::FireOff);
 			CurrentWeapon = SpawnWeapon(CurrentWeaponIndex);
-			//PlayerInventory->OnBulletsEnd.AddDynamic(this, &ATDSCharacter::FireOff);
-			//CurrentWeapon->OnWeaponFire.AddDynamic(this, &ATDSCharacter::DecreaseBulletCount);
+			PlayerInventory->OnBulletsEnd.AddDynamic(this, &ATDSCharacter::FireOff);
+			CurrentWeapon->OnWeaponFire.AddDynamic(this, &ATDSCharacter::DecreaseBulletCount);
 			OnWeaponSwitch.Broadcast();
 		}
+	}
+}
+void ATDSCharacter::DecreaseBulletCount()
+{
+	const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
+	if(PlayerInventory)
+	{		
+		UE_LOG(LogTemp, Warning, TEXT("Command to DECREASE PROJECTILE ID --- %i"), CurrentWeapon->ItemInfo.ProjectileId);
+		PlayerInventory->DecreaseCount(CurrentWeapon->ItemInfo.ProjectileId);
 	}
 }
 
 void ATDSCharacter::FireOn()
 {		
-	if((CurrentWeapon) && (CurrentWeapon->ItemInfo.Weapon.WeaponClass == EWeaponClass::H1Shoting || (CurrentWeapon->ItemInfo.Weapon.WeaponClass == EWeaponClass::H2Shoting)))
+	if(CurrentWeapon)
 	{
-		UE_LOG(LogViewport, Display, TEXT("Command to Weapon - Fire"));
-		//CurrentWeapon->Fire();
+		const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
+		if(PlayerInventory)
+		{
+			bool BulletsAviable = PlayerInventory->CheckCount(CurrentWeapon->ItemInfo.ProjectileId);
+			if(BulletsAviable && CurrentWeapon->ItemInfo.bCanFire)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("BULLET FOUND -- Command to Weapon -Fire-"));
+				bRotateToAttack = true;
+				PlayerInventory->DecreaseCount(CurrentWeapon->ItemInfo.ProjectileId);
+				CurrentWeapon->Attack();
+			}
+			else if (!CurrentWeapon->ItemInfo.bCanFire)
+			{				
+				UE_LOG(LogTemp, Warning, TEXT("MELLEE ATTACK"));
+				bRotateToAttack = true;
+				CurrentWeapon->Attack();
+			}
+		}
 	}
 }
+
 void ATDSCharacter::FireOff()
 {
 	if(CurrentWeapon)
-		UE_LOG(LogViewport, Display, TEXT("Command to Weapon - Stop Fire"));
-	//CurrentWeapon->StopFire();
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Command to Weapon - STOP Fire"));
+		bRotateToAttack = false;
+		CurrentWeapon->StopAttack();
+	}
 }

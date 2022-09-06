@@ -95,3 +95,59 @@ int UTDSInventory::FindItemById(int aId){
 	}
 	return n;
 }
+
+void UTDSInventory::DecreaseCount(int WeaponBulletId)
+{	
+	int i = FindItemById(WeaponBulletId);
+	if (i == INDEX_NONE) //если элемента нет
+		{
+		UE_LOG(LogTemp,Warning,TEXT("DECREASE BULLET ---HET--- COBCEM"));
+		OnBulletsEnd.Broadcast();
+		}
+	else
+	{
+		if(Inventory[i].Count >= 1)
+		{
+			UE_LOG(LogTemp,Warning,TEXT("DECREASE BULLET ---ECTb--- ELAPSED: -- %d  --"), Inventory[i].Count);
+			Inventory[i].Count -= 1;
+			if(Inventory[i].Count == 0)
+			{
+				Inventory.RemoveAt(i);
+				OnBulletsEnd.Broadcast();
+			}
+		}
+		else //по логике сюда не зайдем никогда... но мало ли...
+			{
+			UE_LOG(LogTemp,Warning,TEXT("FIRE BULLET ECTb HO SHOT = 0"));
+			OnBulletsEnd.Broadcast();
+			}
+	}
+}
+
+bool UTDSInventory::CheckCount(int WeaponBulletId)
+{
+	bool BulletAviable = false;
+	int InventoryBulletCount = 0;
+	int i = FindItemById(WeaponBulletId);
+	if (i == INDEX_NONE) //если элемента нет
+		{
+		UE_LOG(LogTemp,Warning,TEXT("CHECK BULLET: --- HET COBCEM ---"));
+		BulletAviable = false;
+		}
+	else
+	{
+		if(Inventory[i].Count >= 1) // рабочий элемент, нашли
+			{
+			UE_LOG(LogTemp,Warning,TEXT("CHECK BULLET: --- ECTb --- %d --- COUNT "), Inventory[i].Count);
+			InventoryBulletCount = Inventory[i].Count;
+			BulletAviable =  true;
+			}
+		else // элемент есть но пустой
+			{
+			//UE_LOG(LogTemp,Warning,TEXT("CHECK BULLET --- ECTb HO COUNT = 0"));
+			BulletAviable = false;
+			InventoryBulletCount = 0;
+			}
+	}
+	return BulletAviable;
+}

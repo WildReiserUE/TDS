@@ -28,8 +28,7 @@ void ATDSItemBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 }
 
 void ATDSItemBase::ChangeSettings(){
-	if(ItemInfo.ItemMesh)
-	{
+	if(ItemInfo.ItemMesh){
 		ItemMeshComponent->SetStaticMesh(ItemInfo.ItemMesh);
 	}
 	else
@@ -60,8 +59,64 @@ void ATDSItemBase::SomeClicked(UPrimitiveComponent* pComponent, FKey pKey){
 	RenderOn(this->ItemMeshComponent);
 }
 
-void ATDSItemBase::BeginPlay(){
+void ATDSItemBase::Attack(){
+	if(!GetWorld()->GetTimerManager().IsTimerActive(AttackTimer)){
+		GetWorld()->GetTimerManager().SetTimer(AttackTimer, this, &ATDSItemBase::SpawnBullet, AttackRate,true,0.f);
+	}
+}
+
+void ATDSItemBase::SpawnBullet()
+{
+	if(ItemInfo.bCanFire){
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		FTransform Trans = GetActorTransform();
+		auto Spawned = GetWorld()->SpawnActorDeferred<ATDSItemBase>(ItemInfo.BaseClass, Trans, this,nullptr, SpawnParams.SpawnCollisionHandlingOverride);
+		Spawned->SpawnedName = TEXT("Capsule");
+		UGameplayStatics::FinishSpawningActor(Spawned,Trans);
+		//FAttachmentTransformRules Rule(EAttachmentRule::KeepWorld, false);
+		//AttachToComponent(ItemMeshComponent, Rule, FName("BulletSocket"));
+		Spawned->ChangeSettings();
+		UE_LOG(LogTemp, Warning, TEXT("ITEM Name: %s"), *Spawned->SpawnedName.ToString());
+		OnWeaponFire.Broadcast();
+	}		
+	else if(ItemInfo.Weapon.WeaponClass == EWeaponClass::Knife){
+		UE_LOG(LogTemp, Warning, TEXT("WEAPON - MELEEE ATTACK !!!"));
+		OnWeaponAttack.Broadcast();
+	}
+}
+
+void ATDSItemBase::StopAttack(){
+	if(GetWorld()->GetTimerManager().IsTimerActive(AttackTimer)){
+		GetWorld()->GetTimerManager().ClearTimer(AttackTimer);
+	}
+}
+
+void ATDSItemBase::BeginPlay()
+{
 	Super::BeginPlay();
-	if(ItemInfo.ItemType == EItemType::Projectile)
-		UE_LOG(LogViewport, Display, TEXT("PROJECTILE INFO"));
+	if(ItemInfo.ItemType == EItemType::Projectile){
+		//ItemMeshComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+		ProjectileMovementComponent->Velocity = ItemInfo.Projectile.ProjectileDirection;
+		ProjectileMovementComponent->InitialSpeed = ItemInfo.Projectile.ProjectileSpeed;
+		ProjectileMovementComponent->MaxSpeed = ItemInfo.Projectile.ProjectileMaxSpeed;
+		ItemMeshComponent->SetSimulatePhysics(true);
+		//UE_LOG(LogTemp, Warning, TEXT("ITEM IS PROJECTILE"));
+	}
+	if(ItemInfo.ItemType == EItemType::Weapon){
+		switch (ItemInfo.Weapon.AttackSpeed)
+		{
+		case EWeaponAttackSpeed::VerySlow:
+			AttackRate = 2.f;break;
+		case EWeaponAttackSpeed::Slow:
+			AttackRate = 1.5f; break;
+		case  EWeaponAttackSpeed::Normal:
+			AttackRate = 1.f; break;	
+		case EWeaponAttackSpeed::Fast:
+        	AttackRate = 0.5f; break;
+		case EWeaponAttackSpeed::VeryFast:
+			AttackRate = 0.25f; break;		
+		default:break;
+		}
+	}
 }

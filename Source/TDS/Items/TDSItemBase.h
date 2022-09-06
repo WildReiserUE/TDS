@@ -5,6 +5,9 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "TDSItemBase.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponFire);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponAttack);
+
 class ATDSItemBase;
 
 UENUM(BlueprintType, meta = (ExposeOnSpawn))
@@ -88,15 +91,15 @@ struct FProjectileInfo
 	UParticleSystem* HitFX = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	USoundBase* HitSound = nullptr;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, meta = (ClampMin="0"))
 	float ProjectileSpeed = 0.f;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, meta = (ClampMin="0"))
 	float ProjectileMaxSpeed = 0.f;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	FVector ProjectileDirection = FVector(0);
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	bool bBounced = false;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, meta = (ClampMin="0"))
 	float ProjectileBouncines = 0.3f;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	float ProjectileGravity = 0.f;
@@ -115,9 +118,9 @@ struct FWeaponInfo
 	TSubclassOf<ATDSItemBase> WeaponProjectile = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EWeaponAttackSpeed AttackSpeed;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="0", EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting", EditConditionHides))
 	int PhysicalDamage = 0;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="0", EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting", EditConditionHides))
 	int MagicalDamage = 0;
 };
 
@@ -129,9 +132,9 @@ struct FArmorInfo
 	EArmorType ArmorType;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EArmorPart ArmorPart;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="0"))
 	float PhysicalDefence = 0.0f;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="0"))
 	float MagicalDefence = 0.0f;
 };
 
@@ -139,7 +142,7 @@ USTRUCT(BlueprintType, meta = (ExposeOnSpawn))
 struct FItemInfo
 {
 	GENERATED_USTRUCT_BODY()
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="0"))
 	int ItemID = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName ItemName;
@@ -153,8 +156,8 @@ struct FItemInfo
 	FWeaponInfo Weapon;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Weapon", EditConditionHides))
 	bool bCanFire = false;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="bCanFire == true", EditConditionHides))
-	int ProjectileId;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="-1", EditCondition="bCanFire == true", EditConditionHides))
+	int ProjectileId = -1;;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Armor", EditConditionHides))
 	FArmorInfo Armor;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Projectile", EditConditionHides))
@@ -171,11 +174,11 @@ struct FItemInfo
 	UParticleSystem* DropFX = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Item", EditConditionHides))
 	bool bIsStackable = false;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="bIsStackable == true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="0", EditCondition="bIsStackable == true"))
 	int Count = 1;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="0"))
 	int Cost = 0;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="0"))
 	int Weight = 0;
 };
 
@@ -206,7 +209,10 @@ public:
 	
 	UFUNCTION()
 	void SomeClicked(UPrimitiveComponent* pComponent, FKey pKey);
-	
+	void Attack();
+	void StopAttack();
+	void SpawnBullet();
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "StaticMesh", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* ItemMeshComponent;
 	
@@ -218,8 +224,16 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn))
 	FName SpawnedName;
+	
+	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Delegate")
+	FOnWeaponFire OnWeaponFire;
+
+	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Delegate")
+	FOnWeaponAttack OnWeaponAttack;
 
 	bool bIsClicked = false;
+	FTimerHandle AttackTimer;
+	float AttackRate = 0.f;
 	
 private:
 	virtual void BeginPlay() override;

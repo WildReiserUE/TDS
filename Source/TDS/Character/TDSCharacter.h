@@ -57,6 +57,8 @@ public:
 	ATDSItemBase* SpawnWeapon(int WeaponIndex);
 	void PrevWeapon();
 	void NextWeapon();
+	UFUNCTION()
+	void DecreaseBulletCount();
 
 	// UFUNCTION(BlueprintCallable)
 	// 	ATDSWeaponBase* GetCurrentWeapon();
@@ -121,6 +123,7 @@ public:
 	float AxisX = 0.0f;
 	float AxisY = 0.0f;
 	bool bSprintAllow = false;
+	bool bRotateToAttack = false;
 	int CurrentWeaponIndex = -1;
 
 private:
