@@ -1,3 +1,5 @@
+// Created WildReiser ©2022
+
 #include "TDSSkillComponent.h"
 
 #include "TDSCharacter.h"

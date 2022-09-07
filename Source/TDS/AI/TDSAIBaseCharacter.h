@@ -1,10 +1,12 @@
-// Created WildReiser @2022
+// Created WildReiser ©2022
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "TDSAIBaseCharacter.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAIComponentsAdded);
 
 UCLASS()
 class TDS_API ATDSAIBaseCharacter : public ACharacter
@@ -26,5 +28,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
-	
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category="AI Settings")
+	TArray<TSubclassOf<UActorComponent>> ComponentList;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAIComponentsAdded OnComponentsAdded;
 };

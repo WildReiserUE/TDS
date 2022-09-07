@@ -1,4 +1,4 @@
-// Created WildReiser @2022
+// Created WildReiser ©2022
 
 #pragma once
 
@@ -8,9 +8,6 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "TDSAIController.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class TDS_API ATDSAIController : public AAIController
 {

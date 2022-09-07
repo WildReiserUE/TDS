@@ -1,4 +1,4 @@
-// Created WildReiser @2022
+// Created WildReiser ©2022
 
 
 #include "TDSPawnSensingComponent.h"

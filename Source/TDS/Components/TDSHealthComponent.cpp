@@ -1,5 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// Created WildReiser ©2022
 
 #include "TDSHealthComponent.h"
 
@@ -58,8 +57,8 @@ void UTDSHealthComponent::HealthChange(float Value){
 void UTDSHealthComponent::TakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser){
 	static ATDSCharacter* PlayerInstig = Cast<ATDSCharacter>(InstigatedBy);
 	static ATDSCharacter* PlayerCauser = Cast<ATDSCharacter>(DamageCauser);
-	
-	if(PlayerInstig || PlayerCauser) return;
+	const auto ComponentOwner = GetOwner();
+	if(PlayerInstig != ComponentOwner || PlayerCauser != ComponentOwner) return;
 	HealthChange(-Damage);
 }
 

@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Created WildReiser ©2022
 
 #pragma once
 

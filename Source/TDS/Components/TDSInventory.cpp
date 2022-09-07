@@ -1,3 +1,5 @@
+// Created WildReiser ©2022
+
 #include "TDSInventory.h"
 #include "Kismet/GameplayStatics.h"
 

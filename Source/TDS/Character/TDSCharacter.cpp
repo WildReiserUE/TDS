@@ -1,3 +1,5 @@
+// Created WildReiser ©2022
+
 #include "TDSCharacter.h"
 
 #include "TDSInventory.h"
@@ -256,8 +258,8 @@ void ATDSCharacter::PrevWeapon()
 			{
 				CurrentWeaponIndex = PlayerInventory->WeaponInventory.Num()-1;
 			}
-			if(AnimMontageHandleAttack)
-				StopAnimMontage(AnimMontageHandleAttack);
+			if(MontageHandleAttack)
+				StopAnimMontage(MontageHandleAttack);
 			PlayerInventory->OnBulletsEnd.RemoveDynamic(this, &ATDSCharacter::FireOff);
 			CurrentWeapon = SpawnWeapon(CurrentWeaponIndex);
 			PlayerInventory->OnBulletsEnd.AddDynamic(this, &ATDSCharacter::FireOff);
@@ -286,8 +288,8 @@ void ATDSCharacter::NextWeapon()
 			{
 				CurrentWeaponIndex = 0;
 			}
-			if(AnimMontageHandleAttack)
-				StopAnimMontage(AnimMontageHandleAttack);
+			if(MontageHandleAttack)
+				StopAnimMontage(MontageHandleAttack);
 			PlayerInventory->OnBulletsEnd.RemoveDynamic(this, &ATDSCharacter::FireOff);
 			CurrentWeapon = SpawnWeapon(CurrentWeaponIndex);
 			PlayerInventory->OnBulletsEnd.AddDynamic(this, &ATDSCharacter::FireOff);
@@ -320,12 +322,14 @@ void ATDSCharacter::FireOn()
 				bRotateToAttack = true;
 				PlayerInventory->DecreaseCount(CurrentWeapon->ItemInfo.ProjectileId);
 				CurrentWeapon->Attack();
+				PlayAnimMontage(Montage2HAttack);
 			}
 			else if (!CurrentWeapon->ItemInfo.bCanFire)
 			{				
 				UE_LOG(LogTemp, Warning, TEXT("MELLEE ATTACK"));
 				bRotateToAttack = true;
 				CurrentWeapon->Attack();
+				PlayAnimMontage(MontageHandleAttack);
 			}
 		}
 	}

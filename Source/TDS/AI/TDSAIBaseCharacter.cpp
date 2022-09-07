@@ -1,4 +1,4 @@
-// Created WildReiser @2022
+// Created WildReiser ©2022
 
 
 #include "TDSAIBaseCharacter.h"
@@ -16,7 +16,14 @@ ATDSAIBaseCharacter::ATDSAIBaseCharacter()
 void ATDSAIBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	if (ComponentList.Num()>0)
+	{
+		const int Comp = ComponentList.Num();
+		for (int i = 0; i < Comp; i++){
+			this->AddComponentByClass(ComponentList[i], false, FTransform(FVector(0)),false);
+		}
+		OnComponentsAdded.Broadcast();
+	}
 }
 
 // Called every frame

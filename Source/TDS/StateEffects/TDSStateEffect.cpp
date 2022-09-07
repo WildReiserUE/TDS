@@ -1,3 +1,5 @@
+// Created WildReiser ©2022
+
 #include "TDSStateEffect.h"
 
 bool UTDSStateEffect::InitObject(APawn* Pawn)

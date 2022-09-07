@@ -1,3 +1,5 @@
+// Created WildReiser ©2022
+
 #include "TDSItemBase.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -98,10 +100,10 @@ void ATDSItemBase::BeginPlay()
 	Super::BeginPlay();
 	if(ItemInfo.ItemType == EItemType::Projectile){
 		ProjectileMovementComponent->ProjectileGravityScale = 1.0f;
-		auto Owner = this->GetOwner();
 		FVector Direction = FVector(0);
-		if(Owner)//ItemMeshComponent->GetSocketRotation(FName("BulletSocket"));
-			Direction = Owner->GetActorRightVector();
+		auto ItemOwner = this->GetOwner();		
+		if(ItemOwner)//ItemMeshComponent->GetSocketRotation(FName("BulletSocket"));
+			Direction = ItemOwner->GetActorRightVector();
 		ProjectileMovementComponent->Velocity = FVector((Direction.X*ItemInfo.Projectile.ProjectileSpeed),(Direction.Y*ItemInfo.Projectile.ProjectileSpeed), 0);//ItemInfo.Projectile.ProjectileDirection;
 		UE_LOG(LogTemp, Warning, TEXT("PROJECTILE VELOCITY = %f"), ProjectileMovementComponent->Velocity.Y);
 		ProjectileMovementComponent->InitialSpeed = ItemInfo.Projectile.ProjectileSpeed;

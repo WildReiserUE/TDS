@@ -1,5 +1,4 @@
-/// h File
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+// Created WildReiser ©2022
 
 #pragma once
 
@@ -54,7 +53,7 @@ public:
 	UFUNCTION()
 		UDecalComponent* GetCursorToWorld();
 	UFUNCTION(BlueprintCallable)
-	ATDSItemBase* SpawnWeapon(int WeaponIndex);
+		ATDSItemBase* SpawnWeapon(int WeaponIndex);
 	void PrevWeapon();
 	void NextWeapon();
 	UFUNCTION()
@@ -115,7 +114,13 @@ public:
 	ATDSItemBase* CurrentWeapon = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Player Settings")
-	UAnimMontage* AnimMontageHandleAttack = nullptr;
+	UAnimMontage* MontageHandleAttack = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Player Settings")
+	UAnimMontage* Montage2HAttack = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Player Settings")
+	UAnimMontage* Montage2HReload = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Player Settings")
 	UAnimMontage* MontageDead = nullptr;
