@@ -249,7 +249,6 @@ void ATDSCharacter::PrevWeapon()
 			if(CurrentWeapon)
 			{
 				CurrentWeapon->StopAttack();
-				//CurrentWeapon->ItemInfo.Weapon.WeaponClass == EWeaponClass::Shoting;
 				CurrentWeapon->OnWeaponFire.RemoveDynamic(this, &ATDSCharacter::DecreaseBulletCount);
 				CurrentWeapon->Destroy();
 			}
@@ -279,7 +278,6 @@ void ATDSCharacter::NextWeapon()
 			if(CurrentWeapon)
 			{
 				CurrentWeapon->StopAttack();
-				//CurrentWeapon->WeaponInfo.WeaponType=EWeaponType::NoWeapon;
 				CurrentWeapon->OnWeaponFire.RemoveDynamic(this, &ATDSCharacter::DecreaseBulletCount);
 				CurrentWeapon->Destroy();
 			}
@@ -304,7 +302,7 @@ void ATDSCharacter::DecreaseBulletCount()
 	if(PlayerInventory)
 	{		
 		UE_LOG(LogTemp, Warning, TEXT("Command to DECREASE PROJECTILE ID --- %i"), CurrentWeapon->ItemInfo.ProjectileId);
-		PlayerInventory->DecreaseCount(CurrentWeapon->ItemInfo.ProjectileId);
+		//PlayerInventory->DecreaseCount(CurrentWeapon->ItemInfo.ProjectileId);
 	}
 }
 

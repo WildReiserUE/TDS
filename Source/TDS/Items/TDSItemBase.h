@@ -97,8 +97,8 @@ struct FProjectileInfo
 	float ProjectileSpeed = 0.f;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, meta = (ClampMin="0"))
 	float ProjectileMaxSpeed = 0.f;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
-	FVector ProjectileDirection = FVector(0);
+	// UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	// FVector ProjectileDirection = FVector(0);
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	bool bBounced = false;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, meta = (ClampMin="0"))
@@ -118,6 +118,8 @@ struct FWeaponInfo
 	EWeaponClass WeaponClass;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting", EditConditionHides))
 	TSubclassOf<ATDSItemBase> WeaponProjectile = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting", EditConditionHides))
+	FName ProjectileName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EWeaponAttackSpeed AttackSpeed;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="0", EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting", EditConditionHides))

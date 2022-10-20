@@ -74,13 +74,13 @@ void ATDSItemBase::SpawnBullet()
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		FTransform Trans = this->ItemMeshComponent->GetSocketTransform(FName("BulletSocket"),ERelativeTransformSpace::RTS_World);
 		//FTransform Trans = WeaponRotator;
-		auto Spawned = GetWorld()->SpawnActorDeferred<ATDSItemBase>(ItemInfo.BaseClass, Trans, this,nullptr, SpawnParams.SpawnCollisionHandlingOverride);
-		Spawned->SpawnedName = TEXT("Capsule");
+		auto Spawned = GetWorld()->SpawnActorDeferred<ATDSItemBase>(ItemInfo.Weapon.WeaponProjectile, Trans, this,nullptr, SpawnParams.SpawnCollisionHandlingOverride);
+		Spawned->SpawnedName = ItemInfo.Weapon.ProjectileName;
 		UGameplayStatics::FinishSpawningActor(Spawned,Trans);
 		//FAttachmentTransformRules Rule(EAttachmentRule::KeepWorld, false);
 		//AttachToComponent(ItemMeshComponent, Rule, FName("BulletSocket"));
 		Spawned->ChangeSettings();
-		UE_LOG(LogTemp, Warning, TEXT("ITEM Name: %s"), *Spawned->SpawnedName.ToString());
+		UE_LOG(LogTemp, Warning, TEXT("PROJECTILE Name: %s"), *Spawned->SpawnedName.ToString());
 		OnWeaponFire.Broadcast();
 	}		
 	else if(ItemInfo.Weapon.WeaponClass == EWeaponClass::Knife){
@@ -99,7 +99,7 @@ void ATDSItemBase::BeginPlay()
 {
 	Super::BeginPlay();
 	if(ItemInfo.ItemType == EItemType::Projectile){
-		ProjectileMovementComponent->ProjectileGravityScale = 1.0f;
+		ProjectileMovementComponent->ProjectileGravityScale = ItemInfo.Projectile.ProjectileGravity;
 		FVector Direction = FVector(0);
 		auto ItemOwner = this->GetOwner();		
 		if(ItemOwner)//ItemMeshComponent->GetSocketRotation(FName("BulletSocket"));

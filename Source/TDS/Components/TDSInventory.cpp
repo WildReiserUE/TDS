@@ -103,14 +103,14 @@ void UTDSInventory::DecreaseCount(int WeaponBulletId)
 	int i = FindItemById(WeaponBulletId);
 	if (i == INDEX_NONE) //если элемента нет
 		{
-		UE_LOG(LogTemp,Warning,TEXT("DECREASE BULLET ---HET--- COBCEM"));
+		UE_LOG(LogTemp,Warning,TEXT("TRY DECREASE BULLET ---HET--- COBCEM"));
 		OnBulletsEnd.Broadcast();
 		}
 	else
 	{
 		if(Inventory[i].Count >= 1)
 		{
-			UE_LOG(LogTemp,Warning,TEXT("DECREASE BULLET ---ECTb--- ELAPSED: -- %d  --"), Inventory[i].Count);
+			UE_LOG(LogTemp,Warning,TEXT("TRY DECREASE BULLET ---OK--- ELAPSED: -- %d  --"), Inventory[i].Count);
 			Inventory[i].Count -= 1;
 			if(Inventory[i].Count == 0)
 			{
