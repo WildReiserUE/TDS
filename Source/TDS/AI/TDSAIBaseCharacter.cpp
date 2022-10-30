@@ -16,13 +16,14 @@ ATDSAIBaseCharacter::ATDSAIBaseCharacter()
 void ATDSAIBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	if (ComponentList.Num()>0)
+	if (NPCData.ComponentList.Num()>0)
 	{
-		const int Comp = ComponentList.Num();
+		const int Comp = NPCData.ComponentList.Num();
 		for (int i = 0; i < Comp; i++){
-			this->AddComponentByClass(ComponentList[i], false, FTransform(FVector(0)),false);
+			this->AddOwnedComponent(NPCData.ComponentList[i]);
 		}
 		OnComponentsAdded.Broadcast();
+		UE_LOG(LogTemp,Log,TEXT("ADDED COMPONENTS TO NPC --- %i"), NPCData.ComponentList.Num());
 	}
 }
 

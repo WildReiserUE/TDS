@@ -35,11 +35,10 @@ public:
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
-	/** Returns TopDownCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetCharacterCameraComponent() const { return CharacterCameraComponent; }
-	/** Returns CameraBoom subobject **/
+
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraArm; }
-	/** Returns CursorToWorld subobject **/
+
 	UFUNCTION()
     	void InitParams();
 	UFUNCTION()
@@ -58,11 +57,6 @@ public:
 	void NextWeapon();
 	UFUNCTION()
 	void DecreaseBulletCount();
-
-	// UFUNCTION(BlueprintCallable)
-	// 	ATDSWeaponBase* GetCurrentWeapon();
-	// UFUNCTION(BlueprintCallable)
-	// 	void SetCurrentWeapon(ATDSWeaponBase* CurWeapon);
 	
 	UFUNCTION(BlueprintCallable)
 		void FireOn();
