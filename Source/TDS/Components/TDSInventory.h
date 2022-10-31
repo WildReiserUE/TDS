@@ -7,8 +7,9 @@
 #include "Components/ActorComponent.h"
 #include "TDSInventory.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerFindItem);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerFindItem,FItemInfo, ItemInfo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBulletsEnd);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBulletsChanged,int,Count);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TDS_API UTDSInventory : public UActorComponent
@@ -27,11 +28,14 @@ public:
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Inventory")
 	TArray<FItemInfo> WeaponInventory;
 	
-	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Inventory")
+	UPROPERTY(BlueprintAssignable)
 	FOnPlayerFindItem OnPlayerFindItem;
 	
-	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Inventory")
+	UPROPERTY(BlueprintAssignable)
 	FOnBulletsEnd OnBulletsEnd;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnBulletsChanged OnBulletsChanged;
 
 	UFUNCTION()
 	void OverlapItem(AActor* OverlappedActor, AActor* OtherActor);

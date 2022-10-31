@@ -9,9 +9,9 @@
 #include "TDSCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComponentsAdded);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponSwitch);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponSwitch,FItemInfo,WeaponInfo);
 
-USTRUCT(BlueprintType)
+USTRUCT(BlueprintType) //Структура с настройками Игрока
 struct FCharacterInfo
 {
 	GENERATED_BODY()
@@ -55,8 +55,7 @@ public:
 		ATDSItemBase* SpawnWeapon(int WeaponIndex);
 	void PrevWeapon();
 	void NextWeapon();
-	UFUNCTION()
-	void DecreaseBulletCount();
+	int Some();
 	
 	UFUNCTION(BlueprintCallable)
 		void FireOn();

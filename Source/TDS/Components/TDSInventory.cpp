@@ -58,30 +58,30 @@ void UTDSInventory::AddItem(ATDSItemBase* Item)
 	if (i == INDEX_NONE){
 		FItemInfo NewItem;
 		NewItem = Item->ItemInfo;
-		Inventory.Add(NewItem);
+		Inventory.Add(NewItem);							//добавляем в общий инвентарь
 		if(NewItem.ItemType ==  EItemType::Weapon){
 			FItemInfo NewWeaponItem;
 			NewWeaponItem = Item->ItemInfo;
-			WeaponInventory.Add(NewWeaponItem);
+			WeaponInventory.Add(NewWeaponItem);			//если оружие добавляем в список оружия
 		}
-		OnPlayerFindItem.Broadcast();
+		//OnPlayerFindItem.Broadcast(Item->ItemInfo); 
 	}
 	else{
 		if (Item->ItemInfo.bIsStackable){
-			Inventory[i].Count += Item->ItemInfo.Count;
+			Inventory[i].Count += Item->ItemInfo.Count;	//складываем если такой предмет есть и пачкуется
 		}
 		else{
 			FItemInfo NewItem;
 			NewItem = Item->ItemInfo;
-			Inventory.Add(NewItem);
+			Inventory.Add(NewItem);						//добавляем в общий инвентарь если не пачкуется
 			if(NewItem.ItemType ==  EItemType::Weapon){
 				FItemInfo NewWeaponItem;
 				NewWeaponItem = Item->ItemInfo;
-				WeaponInventory.Add(NewWeaponItem);
+				WeaponInventory.Add(NewWeaponItem);		//если оружие добавляем в список оружия
 			}
 		}
 	}
-	OnPlayerFindItem.Broadcast();
+	OnPlayerFindItem.Broadcast(Item->ItemInfo);			//сообщаем что нашли новый предмет
 	Item->Destroy();
 }
 
@@ -103,8 +103,8 @@ void UTDSInventory::DecreaseCount(int WeaponBulletId)
 	int i = FindItemById(WeaponBulletId);
 	if (i == INDEX_NONE) //если элемента нет
 		{
-		UE_LOG(LogTemp,Warning,TEXT("TRY DECREASE BULLET ---HET--- COBCEM"));
-		OnBulletsEnd.Broadcast();
+			UE_LOG(LogTemp,Warning,TEXT("TRY DECREASE BULLET ---HET--- COBCEM"));
+			OnBulletsEnd.Broadcast();
 		}
 	else
 	{
@@ -119,10 +119,11 @@ void UTDSInventory::DecreaseCount(int WeaponBulletId)
 			}
 		}
 		else //по логике сюда не зайдем никогда... но мало ли...
-			{
+		{
 			UE_LOG(LogTemp,Warning,TEXT("FIRE BULLET ECTb HO SHOT = 0"));
 			OnBulletsEnd.Broadcast();
-			}
+		}
+		OnBulletsChanged.Broadcast(Inventory[i].Count);
 	}
 }
 

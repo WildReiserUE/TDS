@@ -221,7 +221,7 @@ public:
 	
 	UFUNCTION()
 	void SomeClicked(UPrimitiveComponent* pComponent, FKey pKey);
-	//void Attack();
+	
 	void StopAttack();
 	void SpawnBullet();
 

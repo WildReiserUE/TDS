@@ -249,7 +249,6 @@ void ATDSCharacter::PrevWeapon()
 			if(CurrentWeapon)
 			{
 				CurrentWeapon->StopAttack();
-				CurrentWeapon->OnWeaponFire.RemoveDynamic(this, &ATDSCharacter::DecreaseBulletCount);
 				CurrentWeapon->Destroy();
 			}
 			CurrentWeaponIndex --;
@@ -262,8 +261,7 @@ void ATDSCharacter::PrevWeapon()
 			PlayerInventory->OnBulletsEnd.RemoveDynamic(this, &ATDSCharacter::FireOff);
 			CurrentWeapon = SpawnWeapon(CurrentWeaponIndex);
 			PlayerInventory->OnBulletsEnd.AddDynamic(this, &ATDSCharacter::FireOff);
-			CurrentWeapon->OnWeaponFire.AddDynamic(this, &ATDSCharacter::DecreaseBulletCount);
-			OnWeaponSwitch.Broadcast();
+			OnWeaponSwitch.Broadcast(CurrentWeapon->ItemInfo);
 		}
 	}
 }
@@ -278,7 +276,6 @@ void ATDSCharacter::NextWeapon()
 			if(CurrentWeapon)
 			{
 				CurrentWeapon->StopAttack();
-				CurrentWeapon->OnWeaponFire.RemoveDynamic(this, &ATDSCharacter::DecreaseBulletCount);
 				CurrentWeapon->Destroy();
 			}
 			CurrentWeaponIndex ++;
@@ -291,19 +288,14 @@ void ATDSCharacter::NextWeapon()
 			PlayerInventory->OnBulletsEnd.RemoveDynamic(this, &ATDSCharacter::FireOff);
 			CurrentWeapon = SpawnWeapon(CurrentWeaponIndex);
 			PlayerInventory->OnBulletsEnd.AddDynamic(this, &ATDSCharacter::FireOff);
-			CurrentWeapon->OnWeaponFire.AddDynamic(this, &ATDSCharacter::DecreaseBulletCount);
-			OnWeaponSwitch.Broadcast();
+			OnWeaponSwitch.Broadcast(CurrentWeapon->ItemInfo);
 		}
 	}
 }
-void ATDSCharacter::DecreaseBulletCount()
+
+int ATDSCharacter::Some()
 {
-	const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
-	if(PlayerInventory)
-	{		
-		UE_LOG(LogTemp, Warning, TEXT("Command to DECREASE PROJECTILE ID --- %i"), CurrentWeapon->ItemInfo.Weapon.ProjectileId);
-		//PlayerInventory->DecreaseCount(CurrentWeapon->ItemInfo.ProjectileId);
-	}
+	return 0;
 }
 
 void ATDSCharacter::FireOn()
@@ -317,18 +309,17 @@ void ATDSCharacter::FireOn()
 			if(BulletsAviable && CurrentWeapon->ItemInfo.Weapon.bCanFire)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("BULLET FOUND -- Command to Weapon -Fire-"));
-				bRotateToAttack = true;{
-					if(!GetWorld()->GetTimerManager().IsTimerActive(CurrentWeapon->AttackTimer)){
-						GetWorld()->GetTimerManager().SetTimer(CurrentWeapon->AttackTimer, this, &ATDSCharacter::StartFire, CurrentWeapon->AttackRate,true,0.f);
-					}
-					else if (!CurrentWeapon->ItemInfo.Weapon.bCanFire)
-					{				
-						UE_LOG(LogTemp, Warning, TEXT("MELLEE ATTACK"));
-						bRotateToAttack = true;
-						CurrentWeapon->SpawnBullet();
-						PlayAnimMontage(MontageHandleAttack);
-					}
+				bRotateToAttack = true;
+				if(!GetWorld()->GetTimerManager().IsTimerActive(CurrentWeapon->AttackTimer)){
+					GetWorld()->GetTimerManager().SetTimer(CurrentWeapon->AttackTimer, this, &ATDSCharacter::StartFire, CurrentWeapon->AttackRate,true,0.f);
 				}
+			}
+			else if (!CurrentWeapon->ItemInfo.Weapon.bCanFire)
+			{				
+				UE_LOG(LogTemp, Warning, TEXT("MELLEE ATTACK"));
+				bRotateToAttack = true;
+				CurrentWeapon->SpawnBullet();
+				PlayAnimMontage(MontageHandleAttack);
 			}
 		}
 	}
