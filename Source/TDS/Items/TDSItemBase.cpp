@@ -61,29 +61,21 @@ void ATDSItemBase::SomeClicked(UPrimitiveComponent* pComponent, FKey pKey){
 	RenderOn(this->ItemMeshComponent);
 }
 
-void ATDSItemBase::Attack(){
-	if(!GetWorld()->GetTimerManager().IsTimerActive(AttackTimer)){
-		GetWorld()->GetTimerManager().SetTimer(AttackTimer, this, &ATDSItemBase::SpawnBullet, AttackRate,true,0.f);
-	}
-}
-
 void ATDSItemBase::SpawnBullet()
 {
-	if(ItemInfo.bCanFire){
+	if(ItemInfo.Weapon.bCanFire){
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		FTransform Trans = this->ItemMeshComponent->GetSocketTransform(FName("BulletSocket"),ERelativeTransformSpace::RTS_World);
-		//FTransform Trans = WeaponRotator;
-		auto Spawned = GetWorld()->SpawnActorDeferred<ATDSItemBase>(ItemInfo.Weapon.WeaponProjectile, Trans, this,nullptr, SpawnParams.SpawnCollisionHandlingOverride);
-		Spawned->SpawnedName = ItemInfo.Weapon.ProjectileName;
-		UGameplayStatics::FinishSpawningActor(Spawned,Trans);
-		//FAttachmentTransformRules Rule(EAttachmentRule::KeepWorld, false);
-		//AttachToComponent(ItemMeshComponent, Rule, FName("BulletSocket"));
-		Spawned->ChangeSettings();
-		UE_LOG(LogTemp, Warning, TEXT("PROJECTILE Name: %s"), *Spawned->SpawnedName.ToString());
-		OnWeaponFire.Broadcast();
+		FVector SocketLocation = this->ItemMeshComponent->GetSocketLocation(FName("BulletSocket"));
+        FTransform SpawnPoint = FTransform(FRotator(0),SocketLocation,FVector(1));
+        auto Spawned = GetWorld()->SpawnActorDeferred<ATDSItemBase>(ItemInfo.Weapon.WeaponProjectile, SpawnPoint, this,nullptr, SpawnParams.SpawnCollisionHandlingOverride);
+        Spawned->SpawnedName = ItemInfo.Weapon.ProjectileName;
+        UGameplayStatics::FinishSpawningActor(Spawned,SpawnPoint);
+        Spawned->ChangeSettings();
+        UE_LOG(LogTemp, Warning, TEXT("PROJECTILE OWNER IS: %s"), *Spawned->GetOwner()->GetName());
+        OnWeaponFire.Broadcast();
 	}		
-	else if(ItemInfo.Weapon.WeaponClass == EWeaponClass::Knife){
+	else if(ItemInfo.Weapon.WeaponClass == EWeaponClass::Handle){
 		UE_LOG(LogTemp, Warning, TEXT("WEAPON - MELEEE ATTACK !!!"));
 		OnWeaponAttack.Broadcast();
 	}
@@ -98,17 +90,23 @@ void ATDSItemBase::StopAttack(){
 void ATDSItemBase::BeginPlay()
 {
 	Super::BeginPlay();
-	if(ItemInfo.ItemType == EItemType::Projectile){
+	if(ItemInfo.ItemType == EItemType::Projectile)
+	{
 		ProjectileMovementComponent->ProjectileGravityScale = ItemInfo.Projectile.ProjectileGravity;
+		ProjectileMovementComponent->bRotationFollowsVelocity = true;
 		FVector Direction = FVector(0);
-		auto ItemOwner = this->GetOwner();		
-		if(ItemOwner)//ItemMeshComponent->GetSocketRotation(FName("BulletSocket"));
-			Direction = ItemOwner->GetActorRightVector();
-		ProjectileMovementComponent->Velocity = FVector((Direction.X*ItemInfo.Projectile.ProjectileSpeed),(Direction.Y*ItemInfo.Projectile.ProjectileSpeed), 0);//ItemInfo.Projectile.ProjectileDirection;
-		UE_LOG(LogTemp, Warning, TEXT("PROJECTILE VELOCITY = %f"), ProjectileMovementComponent->Velocity.Y);
-		ProjectileMovementComponent->InitialSpeed = ItemInfo.Projectile.ProjectileSpeed;
-		ProjectileMovementComponent->MaxSpeed = ItemInfo.Projectile.ProjectileMaxSpeed;
-		//ItemMeshComponent->SetSimulatePhysics(true);
+		auto PC = GetWorld()->GetFirstPlayerController();
+		if(PC)
+		{
+			auto Player = PC->GetPawn(); //player
+			{
+				Direction = Player->GetActorForwardVector();
+				ProjectileMovementComponent->Velocity = FVector((Direction.X*ItemInfo.Projectile.ProjectileSpeed),(Direction.Y*ItemInfo.Projectile.ProjectileSpeed), 0);
+                UE_LOG(LogTemp, Warning, TEXT("PROJECTILE VELOCITY = %f"), ProjectileMovementComponent->Velocity.Y);
+                ProjectileMovementComponent->InitialSpeed = ItemInfo.Projectile.ProjectileSpeed;
+                ProjectileMovementComponent->MaxSpeed = ItemInfo.Projectile.ProjectileMaxSpeed;
+			}
+		}
 	}
 	if(ItemInfo.ItemType == EItemType::Weapon){
 		switch (ItemInfo.Weapon.AttackSpeed)

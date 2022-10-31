@@ -301,7 +301,7 @@ void ATDSCharacter::DecreaseBulletCount()
 	const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
 	if(PlayerInventory)
 	{		
-		UE_LOG(LogTemp, Warning, TEXT("Command to DECREASE PROJECTILE ID --- %i"), CurrentWeapon->ItemInfo.ProjectileId);
+		UE_LOG(LogTemp, Warning, TEXT("Command to DECREASE PROJECTILE ID --- %i"), CurrentWeapon->ItemInfo.Weapon.ProjectileId);
 		//PlayerInventory->DecreaseCount(CurrentWeapon->ItemInfo.ProjectileId);
 	}
 }
@@ -313,31 +313,44 @@ void ATDSCharacter::FireOn()
 		const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
 		if(PlayerInventory)
 		{
-			bool BulletsAviable = PlayerInventory->CheckCount(CurrentWeapon->ItemInfo.ProjectileId);
-			if(BulletsAviable && CurrentWeapon->ItemInfo.bCanFire)
+			bool BulletsAviable = PlayerInventory->CheckCount(CurrentWeapon->ItemInfo.Weapon.ProjectileId);
+			if(BulletsAviable && CurrentWeapon->ItemInfo.Weapon.bCanFire)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("BULLET FOUND -- Command to Weapon -Fire-"));
-				bRotateToAttack = true;
-				PlayerInventory->DecreaseCount(CurrentWeapon->ItemInfo.ProjectileId);
-				CurrentWeapon->Attack();
-				PlayAnimMontage(Montage2HAttack);
-			}
-			else if (!CurrentWeapon->ItemInfo.bCanFire)
-			{				
-				UE_LOG(LogTemp, Warning, TEXT("MELLEE ATTACK"));
-				bRotateToAttack = true;
-				CurrentWeapon->Attack();
-				PlayAnimMontage(MontageHandleAttack);
+				bRotateToAttack = true;{
+					if(!GetWorld()->GetTimerManager().IsTimerActive(CurrentWeapon->AttackTimer)){
+						GetWorld()->GetTimerManager().SetTimer(CurrentWeapon->AttackTimer, this, &ATDSCharacter::StartFire, CurrentWeapon->AttackRate,true,0.f);
+					}
+					else if (!CurrentWeapon->ItemInfo.Weapon.bCanFire)
+					{				
+						UE_LOG(LogTemp, Warning, TEXT("MELLEE ATTACK"));
+						bRotateToAttack = true;
+						CurrentWeapon->SpawnBullet();
+						PlayAnimMontage(MontageHandleAttack);
+					}
+				}
 			}
 		}
 	}
 }
-
+		
+void ATDSCharacter::StartFire()
+{
+	const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
+	if(PlayerInventory)
+	{
+		PlayerInventory->DecreaseCount(CurrentWeapon->ItemInfo.Weapon.ProjectileId);
+		CurrentWeapon->SpawnBullet();
+		PlayAnimMontage(Montage2HAttack);
+	}
+}
+	
 void ATDSCharacter::FireOff()
 {
-	if(CurrentWeapon)
+	if(CurrentWeapon && GetWorld()->GetTimerManager().IsTimerActive(CurrentWeapon->AttackTimer))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Command to Weapon - STOP Fire"));
+		GetWorld()->GetTimerManager().ClearTimer(CurrentWeapon->AttackTimer);		
 		bRotateToAttack = false;
 		CurrentWeapon->StopAttack();
 	}

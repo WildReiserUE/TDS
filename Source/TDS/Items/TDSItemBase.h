@@ -43,7 +43,7 @@ enum class EArmorPart : uint8
 };
 
 UENUM(BlueprintType, meta = (ExposeOnSpawn))
-enum class EWeaponType : uint8
+enum class EWeaponLocation : uint8
 {
 	RightHand,
 	LeftHand,
@@ -51,17 +51,25 @@ enum class EWeaponType : uint8
 };
 
 UENUM(BlueprintType, meta = (ExposeOnSpawn))
-enum class EWeaponClass : uint8
+enum class EWeaponHandSubClass : uint8
 {
 	Knife,
 	Sword,
 	Blunt,
 	DualSword,
 	Polearm,
+	Shield
+};
+
+UENUM(BlueprintType, meta = (ExposeOnSpawn))
+enum class EWeaponClass : uint8
+{
+	Handle,
 	H2Shoting,
 	H1Shoting,
 	Shield
 };
+
 
 UENUM(BlueprintType, meta = (ExposeOnSpawn))
 enum class EWeaponAttackSpeed : uint8
@@ -97,8 +105,6 @@ struct FProjectileInfo
 	float ProjectileSpeed = 0.f;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, meta = (ClampMin="0"))
 	float ProjectileMaxSpeed = 0.f;
-	// UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
-	// FVector ProjectileDirection = FVector(0);
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	bool bBounced = false;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, meta = (ClampMin="0"))
@@ -112,19 +118,25 @@ USTRUCT(BlueprintType, meta = (ExposeOnSpawn))
 struct FWeaponInfo
 {
 	GENERATED_USTRUCT_BODY()
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting", EditConditionHides))
-	EWeaponType WeaponType;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass != EWeaponClass::H2Shoting"))
+	EWeaponLocation WeaponLocation;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EWeaponClass WeaponClass;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::Handle"))
+	EWeaponHandSubClass WeaponHandSubClass;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting"))
 	TSubclassOf<ATDSItemBase> WeaponProjectile = nullptr;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting"))
 	FName ProjectileName;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting"))
+	bool bCanFire = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="-1", EditCondition="bCanFire == true"))
+	int ProjectileId = -1;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EWeaponAttackSpeed AttackSpeed;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="0", EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int PhysicalDamage = 0;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="0", EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int MagicalDamage = 0;
 };
 
@@ -158,10 +170,6 @@ struct FItemInfo
 	TSubclassOf<ATDSItemBase> BaseClass;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Weapon", EditConditionHides))
 	FWeaponInfo Weapon;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Weapon", EditConditionHides))
-	bool bCanFire = false;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="-1", EditCondition="bCanFire == true", EditConditionHides))
-	int ProjectileId = -1;;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Armor", EditConditionHides))
 	FArmorInfo Armor;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Projectile", EditConditionHides))
@@ -213,7 +221,7 @@ public:
 	
 	UFUNCTION()
 	void SomeClicked(UPrimitiveComponent* pComponent, FKey pKey);
-	void Attack();
+	//void Attack();
 	void StopAttack();
 	void SpawnBullet();
 

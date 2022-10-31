@@ -60,6 +60,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 		void FireOn();
+	UFUNCTION()
+		void StartFire();
 	UFUNCTION(BlueprintCallable)
 		void FireOff();
 
