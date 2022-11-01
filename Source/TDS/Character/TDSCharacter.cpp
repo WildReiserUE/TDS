@@ -116,10 +116,17 @@ void ATDSCharacter::BeginPlay()
 	if (ComponentList.Num()>0)
 	{
 		const int Comp = ComponentList.Num();
-		for (int i = 0; i < Comp; i++){
-			this->AddComponentByClass(ComponentList[i], false, FTransform(FVector(0)),false);
+		for (int i = 0; i < Comp; i++)
+		{
+			this->AddComponentByClass(ComponentList[i], false, FTransform(FVector(0)),true);
+			FinishAddComponent(GetComponentByClass(ComponentList[i]),false,FTransform(FVector(0)));
 		}
+		UE_LOG(LogTemp,Log,TEXT("ADDED COMPONENTS TO PLAYER --- %i"), ComponentList.Num());
 		ComponentsAdded.Broadcast();
+	}
+	else
+	{
+		UE_LOG(LogTemp,Log,TEXT("ADDED COMPONENTS TO PLAYER --- HOJlb"));
 	}
 	InitParams();
 	

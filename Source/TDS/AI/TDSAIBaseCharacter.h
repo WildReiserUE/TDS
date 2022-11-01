@@ -21,7 +21,7 @@ struct FNPCData
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<UAnimInstance> NPC_AnimInstance;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TArray<UActorComponent*> ComponentList;
+	TArray<TSubclassOf<UActorComponent>> ComponentList;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	float Mana;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
@@ -30,7 +30,7 @@ struct FNPCData
 	float RunSpeed;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	bool bCanUseShield = false;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,meta=(EditCondition="bCanUseShield == false", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,meta=(EditCondition="bCanUseShield == true"))
 	float MaxShield;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	float MaxHealth;

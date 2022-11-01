@@ -1,6 +1,10 @@
 // Created WildReiser ©2022
 
 #include "TDSItemBase.h"
+
+#include <string>
+
+#include "TDSCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
 ATDSItemBase::ATDSItemBase()
@@ -13,6 +17,9 @@ ATDSItemBase::ATDSItemBase()
 	ItemMeshComponent->OnClicked.AddUniqueDynamic(this, &ATDSItemBase::SomeClicked);
 	ItemMeshComponent->OnBeginCursorOver.AddUniqueDynamic(this, &ATDSItemBase::RenderOn);
 	ItemMeshComponent->OnEndCursorOver.AddUniqueDynamic(this, &ATDSItemBase::RenderOff);
+	NiagaraFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
+	NiagaraFX->bAutoActivate = false;
+	NiagaraFX->SetupAttachment(RootComponent);
 	ProjectileMovementComponent=CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 	ProjectileMovementComponent->SetUpdatedComponent(RootComponent);
 	ProjectileMovementComponent->Velocity = FVector (0);
@@ -72,7 +79,7 @@ void ATDSItemBase::SpawnBullet()
         Spawned->SpawnedName = ItemInfo.Weapon.ProjectileName;
         UGameplayStatics::FinishSpawningActor(Spawned,SpawnPoint);
         Spawned->ChangeSettings();
-        UE_LOG(LogTemp, Warning, TEXT("PROJECTILE OWNER IS: %s"), *Spawned->GetOwner()->GetName());
+       // UE_LOG(LogTemp, Warning, TEXT("PROJECTILE OWNER IS: %s"), *Spawned->GetOwner()->GetName());
         OnWeaponFire.Broadcast();
 	}		
 	else if(ItemInfo.Weapon.WeaponClass == EWeaponClass::Handle){
@@ -92,6 +99,7 @@ void ATDSItemBase::BeginPlay()
 	Super::BeginPlay();
 	if(ItemInfo.ItemType == EItemType::Projectile)
 	{
+		ItemMeshComponent->OnComponentHit.AddDynamic(this, &ATDSItemBase::ProjectileHit);
 		ProjectileMovementComponent->ProjectileGravityScale = ItemInfo.Projectile.ProjectileGravity;
 		ProjectileMovementComponent->bRotationFollowsVelocity = true;
 		FVector Direction = FVector(0);
@@ -102,26 +110,76 @@ void ATDSItemBase::BeginPlay()
 			{
 				Direction = Player->GetActorForwardVector();
 				ProjectileMovementComponent->Velocity = FVector((Direction.X*ItemInfo.Projectile.ProjectileSpeed),(Direction.Y*ItemInfo.Projectile.ProjectileSpeed), 0);
-                UE_LOG(LogTemp, Warning, TEXT("PROJECTILE VELOCITY = %f"), ProjectileMovementComponent->Velocity.Y);
+                //UE_LOG(LogTemp, Warning, TEXT("PROJECTILE VELOCITY = %f"), ProjectileMovementComponent->Velocity.Y);
                 ProjectileMovementComponent->InitialSpeed = ItemInfo.Projectile.ProjectileSpeed;
                 ProjectileMovementComponent->MaxSpeed = ItemInfo.Projectile.ProjectileMaxSpeed;
 			}
 		}
 	}
-	if(ItemInfo.ItemType == EItemType::Weapon){
+	if(ItemInfo.ItemType == EItemType::Weapon)
+	{
 		switch (ItemInfo.Weapon.AttackSpeed)
 		{
-		case EWeaponAttackSpeed::VerySlow:
-			AttackRate = 2.f;break;
-		case EWeaponAttackSpeed::Slow:
-			AttackRate = 1.5f; break;
-		case  EWeaponAttackSpeed::Normal:
-			AttackRate = 1.f; break;
-		case EWeaponAttackSpeed::Fast:
-        	AttackRate = 0.5f; break;
-		case EWeaponAttackSpeed::VeryFast:
-			AttackRate = 0.25f; break;
-		default:break;
+			case EWeaponAttackSpeed::VerySlow:
+				AttackRate = 1.5f;break;
+			case EWeaponAttackSpeed::Slow:
+				AttackRate = 0.75f; break;
+			case  EWeaponAttackSpeed::Normal:
+				AttackRate = 0.5f; break;
+			case EWeaponAttackSpeed::Fast:
+        		AttackRate = 0.25f; break;
+			case EWeaponAttackSpeed::VeryFast:
+				AttackRate = 0.125f; break;
+			default:break;
 		}
 	}
+}
+
+void ATDSItemBase::ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse, const FHitResult& Hit)
+{
+	UGameplayStatics::SpawnEmitterAtLocation(this,ItemInfo.Projectile.HitParticle,Hit.Location);
+	UGameplayStatics::SpawnSoundAtLocation(this,ItemInfo.Projectile.HitSound,Hit.Location);
+
+	auto Player = Cast<ATDSCharacter>(OtherActor);	
+	auto Info = Cast<ATDSItemBase>(this->GetOwner());
+	if(!Player || Info)
+	{
+		switch (Info->GetItemInfo().Weapon.ProjectileTypeDamage)
+		{
+		case EProjectileTypeDamage::Point:
+			UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = POINT DAMAGE FROM WEAPON %f"), Info->GetItemInfo().Weapon.PhysicalDamage);
+			UGameplayStatics::ApplyDamage(OtherActor,Info->ItemInfo.Weapon.PhysicalDamage,nullptr,this,UDamageType::StaticClass());
+			break;
+			
+		case EProjectileTypeDamage::Radial:
+			UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = RADIAL DAMAGE FROM WEAPON %f"), Info->GetItemInfo().Weapon.PhysicalDamage);
+			UGameplayStatics::ApplyRadialDamage(OtherActor,
+				Info->ItemInfo.Weapon.PhysicalDamage,
+				Hit.Location,
+				Info->ItemInfo.Weapon.DamageRadius,
+				UDamageType::StaticClass(),
+				Info->ItemInfo.Weapon.IgnoredActors,
+				Info);
+			break;
+			
+		case EProjectileTypeDamage::Visible:
+			UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = VISIBLE DAMAGE FROM WEAPON %f"), Info->GetItemInfo().Weapon.PhysicalDamage);
+			UGameplayStatics::ApplyRadialDamage(OtherActor,
+				Info->ItemInfo.Weapon.PhysicalDamage,
+				Hit.Location,
+				Info->ItemInfo.Weapon.DamageRadius,
+				UDamageType::StaticClass(),
+				Info->ItemInfo.Weapon.IgnoredActors,
+				Info,
+				nullptr,
+				true,
+				ECollisionChannel::ECC_Visibility);
+			break;
+			
+		default:break;
+		}		
+	}
+	
+	Destroy();
 }

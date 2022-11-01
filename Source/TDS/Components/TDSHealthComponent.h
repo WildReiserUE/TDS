@@ -8,15 +8,15 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChange, float, Health, float, MaxHealth);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnShieldChange, float, Shield, float, MaxShield);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayerDeath);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOwnerDeath);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAIDeath);
 
 USTRUCT(BlueprintType)
-struct FHealthSettings
+struct FHealthSettings //Структура с настройками нужно перенести куда-нить))
 {
 	GENERATED_BODY()
-	float Health = 100.0f;
-	float Shield = 50.0f;
+	float Health = 1000.0f;
+	float Shield = 1000.0f;
 	float ShieldStartDelay = 2.0f;
 	float ShieldRecoveryValue = 1.0f;
 	float ShieldRecoveryTick = 0.1f;
@@ -30,17 +30,14 @@ class TDS_API UTDSHealthComponent : public UActorComponent
 public:	
 	UTDSHealthComponent();
 
-	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Health")
+	UPROPERTY(BlueprintAssignable, Category="Health")
 	FOnHealthChange OnHealthChange;
 	
-	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Health")
+	UPROPERTY(BlueprintAssignable, Category="Health")
 	FOnShieldChange OnShieldChange;
 	
-	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Health")
-	FOnPlayerDeath OnPlayerDeath;
-
-	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Health")
-	FOnAIDeath OnAIDeath;
+	UPROPERTY(BlueprintAssignable, Category="Health")
+	FOnOwnerDeath OnOwnerDeath;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	FHealthSettings PlayerHealthSettings;
@@ -54,6 +51,7 @@ public:
 	void TakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 	void ShieldRecovery();
 	void ShieldRecoveryStart();
+	AActor* ComponentOwner();
 	void InitParams();
 
 protected:

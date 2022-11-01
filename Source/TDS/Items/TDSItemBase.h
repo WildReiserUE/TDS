@@ -5,12 +5,16 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "NiagaraComponent.h"
 #include "TDSItemBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponFire);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponAttack);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnProjectileHit);
 
 class ATDSItemBase;
+class UNiagaraSystem;
+class UNiagaraComponent;
 
 UENUM(BlueprintType, meta = (ExposeOnSpawn))
 enum class EItemType : uint8
@@ -93,12 +97,22 @@ enum class EItemGrade : uint8
 	S84Grade
 };
 
+UENUM(BlueprintType, meta = (ExposeOnSpawn))
+enum class EProjectileTypeDamage : uint8
+{
+	Point,
+	Radial,
+	Visible
+};
+
 USTRUCT(BlueprintType, meta = (ExposeOnSpawn))
 struct FProjectileInfo
 {
 	GENERATED_USTRUCT_BODY()
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UParticleSystem* HitFX = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="HitNiagara == nullptr", EditConditionHides))
+	UParticleSystem* HitParticle = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="HitParticle == nullptr ", EditConditionHides))
+	UNiagaraSystem* HitNiagara = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	USoundBase* HitSound = nullptr;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, meta = (ClampMin="0"))
@@ -127,6 +141,8 @@ struct FWeaponInfo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting"))
 	TSubclassOf<ATDSItemBase> WeaponProjectile = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting"))
+	EProjectileTypeDamage ProjectileTypeDamage;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting"))
 	FName ProjectileName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting"))
 	bool bCanFire = false;
@@ -135,9 +151,13 @@ struct FWeaponInfo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EWeaponAttackSpeed AttackSpeed;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int PhysicalDamage = 0;
+	float PhysicalDamage = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ProjectileTypeDamage != EProjectileTypeDamage::Point"))
+	float DamageRadius = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ProjectileTypeDamage != EProjectileTypeDamage::Point"))
+	TArray<AActor*> IgnoredActors;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int MagicalDamage = 0;
+	float MagicalDamage = 0.f;
 };
 
 USTRUCT(BlueprintType, meta = (ExposeOnSpawn))
@@ -201,9 +221,7 @@ class TDS_API ATDSItemBase : public AActor
 	
 public:
 	ATDSItemBase();
-
-	// UFUNCTION()
-	// void ArrowHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	
 	void SpawnParticleFx(UParticleSystem* NewParticle);
 	void SpawnSoundHit(USoundBase* NewSound);
 
@@ -227,18 +245,26 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "StaticMesh", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* ItemMeshComponent;
-	
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, Category="FX")
+	UNiagaraComponent* NiagaraFX;
+
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	UProjectileMovementComponent* ProjectileMovementComponent;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")
 	FItemInfo ItemInfo;
 
+	FORCEINLINE FItemInfo GetItemInfo(){return ItemInfo;};
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn))
 	FName SpawnedName;
 	
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Delegate")
 	FOnWeaponFire OnWeaponFire;
+	
+	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Delegate")
+	FOnProjectileHit OnProjectileHit;
 
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Delegate")
 	FOnWeaponAttack OnWeaponAttack;
@@ -246,7 +272,10 @@ public:
 	bool bIsClicked = false;
 	FTimerHandle AttackTimer;
 	float AttackRate = 0.f;
-	
+
 private:
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 };

@@ -19,11 +19,17 @@ void ATDSAIBaseCharacter::BeginPlay()
 	if (NPCData.ComponentList.Num()>0)
 	{
 		const int Comp = NPCData.ComponentList.Num();
-		for (int i = 0; i < Comp; i++){
-			this->AddOwnedComponent(NPCData.ComponentList[i]);
+		for (int i = 0; i < Comp; i++)
+		{			
+			this->AddComponentByClass(NPCData.ComponentList[i],false, FTransform(FVector(0)),true);
+			FinishAddComponent(GetComponentByClass(NPCData.ComponentList[i]),false,FTransform(FVector(0)));
 		}
-		OnComponentsAdded.Broadcast();
 		UE_LOG(LogTemp,Log,TEXT("ADDED COMPONENTS TO NPC --- %i"), NPCData.ComponentList.Num());
+		OnComponentsAdded.Broadcast();
+	}
+	else
+	{
+		UE_LOG(LogTemp,Log,TEXT("ADDED COMPONENTS TO NPC --- HOJlb"));
 	}
 }
 

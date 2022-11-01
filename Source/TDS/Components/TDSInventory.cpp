@@ -64,7 +64,6 @@ void UTDSInventory::AddItem(ATDSItemBase* Item)
 			NewWeaponItem = Item->ItemInfo;
 			WeaponInventory.Add(NewWeaponItem);			//если оружие добавляем в список оружия
 		}
-		//OnPlayerFindItem.Broadcast(Item->ItemInfo); 
 	}
 	else{
 		if (Item->ItemInfo.bIsStackable){
@@ -102,10 +101,10 @@ void UTDSInventory::DecreaseCount(int WeaponBulletId)
 {	
 	int i = FindItemById(WeaponBulletId);
 	if (i == INDEX_NONE) //если элемента нет
-		{
-			UE_LOG(LogTemp,Warning,TEXT("TRY DECREASE BULLET ---HET--- COBCEM"));
-			OnBulletsEnd.Broadcast();
-		}
+	{
+		UE_LOG(LogTemp,Warning,TEXT("TRY DECREASE BULLET ---HET--- COBCEM"));
+		OnBulletsEnd.Broadcast();
+	}
 	else
 	{
 		if(Inventory[i].Count >= 1)
@@ -133,24 +132,24 @@ bool UTDSInventory::CheckCount(int WeaponBulletId)
 	int InventoryBulletCount = 0;
 	int i = FindItemById(WeaponBulletId);
 	if (i == INDEX_NONE) //если элемента нет
-		{
+	{
 		UE_LOG(LogTemp,Warning,TEXT("CHECK BULLET: --- HET COBCEM ---"));
 		BulletAviable = false;
-		}
+	}
 	else
 	{
 		if(Inventory[i].Count >= 1) // рабочий элемент, нашли
-			{
+		{
 			UE_LOG(LogTemp,Warning,TEXT("CHECK BULLET: --- ECTb --- %d --- COUNT "), Inventory[i].Count);
 			InventoryBulletCount = Inventory[i].Count;
 			BulletAviable =  true;
-			}
+		}
 		else // элемент есть но пустой
-			{
-			//UE_LOG(LogTemp,Warning,TEXT("CHECK BULLET --- ECTb HO COUNT = 0"));
+		{
+		//UE_LOG(LogTemp,Warning,TEXT("CHECK BULLET --- ECTb HO COUNT = 0"));
 			BulletAviable = false;
 			InventoryBulletCount = 0;
-			}
+		}
 	}
 	return BulletAviable;
 }

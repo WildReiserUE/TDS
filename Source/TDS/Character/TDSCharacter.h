@@ -11,7 +11,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComponentsAdded);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponSwitch,FItemInfo,WeaponInfo);
 
-USTRUCT(BlueprintType) //Структура с настройками Игрока
+USTRUCT(BlueprintType) //Структура с настройками Игрока нужно перенести куда-нить))
 struct FCharacterInfo
 {
 	GENERATED_BODY()
