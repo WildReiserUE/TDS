@@ -79,26 +79,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player Settings")
 	FVector CursorSize=FVector(10.0f,20.0f,20.0f);
 	
-	UPROPERTY(BlueprintAssignable)
-	FOnComponentsAdded ComponentsAdded;
-	
-	UPROPERTY(BlueprintAssignable)
-	FOnWeaponSwitch OnWeaponSwitch;
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	ATDSItemBase* CurrentWeapon = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Player Settings")
-	UAnimMontage* MontageHandleAttack = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Player Settings")
 	UAnimMontage* Montage2HAttack = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Player Settings")
 	UAnimMontage* Montage2HReload = nullptr;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Player Settings")
-	UAnimMontage* MontageDead = nullptr;
 	
 	float AxisX = 0.0f;
 	float AxisY = 0.0f;
@@ -112,6 +100,12 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraArm;	
+
+	UPROPERTY(BlueprintAssignable)
+	FOnComponentsAdded ComponentsAdded;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnWeaponSwitch OnWeaponSwitch;
 	
 	bool bSprintActivate = false;
 	bool bIsALife = true;

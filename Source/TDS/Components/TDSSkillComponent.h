@@ -9,7 +9,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSprint, float, CurrentSprintValue, float, MaxSprintValue);
 
 USTRUCT(BlueprintType)
-struct FSprintSettings //ещё одна структура, которую тоже надо вынести
+struct FSprintSettings //Структура с настройками нужно перенести куда-нить
 {
 	GENERATED_BODY()
 	float SprintPoint = 100.0f;
@@ -44,6 +44,7 @@ public:
 	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
+	AActor* ComponentOwner();
 	void InitSprint();	
 	void StartSprint();	
 	void DecreaseStamina();

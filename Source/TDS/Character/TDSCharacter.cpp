@@ -253,8 +253,7 @@ void ATDSCharacter::PrevWeapon()
 			{
 				CurrentWeaponIndex = PlayerInventory->WeaponInventory.Num()-1;
 			}
-			if(MontageHandleAttack)
-				StopAnimMontage(MontageHandleAttack);
+			StopAnimMontage();
 			PlayerInventory->OnBulletsEnd.RemoveDynamic(this, &ATDSCharacter::FireOff);
 			CurrentWeapon = SpawnWeapon(CurrentWeaponIndex);
 			PlayerInventory->OnBulletsEnd.AddDynamic(this, &ATDSCharacter::FireOff);
@@ -280,8 +279,7 @@ void ATDSCharacter::NextWeapon()
 			{
 				CurrentWeaponIndex = 0;
 			}
-			if(MontageHandleAttack)
-				StopAnimMontage(MontageHandleAttack);
+			StopAnimMontage();
 			PlayerInventory->OnBulletsEnd.RemoveDynamic(this, &ATDSCharacter::FireOff);
 			CurrentWeapon = SpawnWeapon(CurrentWeaponIndex);
 			PlayerInventory->OnBulletsEnd.AddDynamic(this, &ATDSCharacter::FireOff);
@@ -316,7 +314,11 @@ void ATDSCharacter::FireOn()
 				UE_LOG(LogTemp, Warning, TEXT("MELLEE ATTACK"));
 				bRotateToAttack = true;
 				CurrentWeapon->SpawnBullet();
-				PlayAnimMontage(MontageHandleAttack);
+				if(CharacterInfo.MontageHandleAttack.Num()>0)
+				{
+					int RndMontage = UKismetMathLibrary::RandomIntegerInRange(0,CharacterInfo.MontageHandleAttack.Num()-1);
+					PlayAnimMontage(CharacterInfo.MontageHandleAttack[RndMontage]);
+				}					
 			}
 		}
 	}

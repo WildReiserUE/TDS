@@ -9,7 +9,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComponentsAdded);
 
-USTRUCT(BlueprintType) //Структура с настройками
+USTRUCT(BlueprintType)
 struct FBaseData
 {
 	GENERATED_BODY()
@@ -53,7 +53,9 @@ struct FBaseHumanoidData : public FTableRowBase
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, meta=(ClampMin="0"))
 	int Experience;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
-	TArray<UAnimMontage*>AnimMontageArray;
+	TArray<UAnimMontage*>MontageHandleAttack;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TArray<UAnimMontage*>MontageDead;
 };
 
 UCLASS()

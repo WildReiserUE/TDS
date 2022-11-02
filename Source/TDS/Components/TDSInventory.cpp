@@ -1,6 +1,7 @@
 // Created WildReiser ©2022
 
 #include "TDSInventory.h"
+
 #include "Kismet/GameplayStatics.h"
 
 UTDSInventory::UTDSInventory(){
@@ -9,10 +10,9 @@ UTDSInventory::UTDSInventory(){
 
 void UTDSInventory::BeginPlay(){
 	Super::BeginPlay();
-	const auto ComponentOwner = GetOwner();
-	if (!ComponentOwner) return;
-	ComponentOwner->OnActorBeginOverlap.AddDynamic(this, &UTDSInventory::OverlapItem);
-	ComponentOwner->OnActorEndOverlap.AddDynamic(this, &UTDSInventory::EndOverlapItem);
+	if (!ComponentOwner()) return;
+	ComponentOwner()->OnActorBeginOverlap.AddDynamic(this, &UTDSInventory::OverlapItem);
+	ComponentOwner()->OnActorEndOverlap.AddDynamic(this, &UTDSInventory::EndOverlapItem);
 }
 
 void UTDSInventory::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -20,11 +20,17 @@ void UTDSInventory::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+AActor* UTDSInventory::ComponentOwner()
+{
+	const auto ComponentOwner = this->GetOwner();
+	return ComponentOwner ? (ComponentOwner) : nullptr;
+}
+
 void UTDSInventory::OverlapItem(AActor* OverlappedActor, AActor* OtherActor){
 	if(OverlappedActor)
 	{
 		ATDSItemBase* BaseItem = Cast<ATDSItemBase>(OtherActor);
-		if(BaseItem->ItemInfo.ItemType != EItemType::Projectile)
+		if(BaseItem && BaseItem->ItemInfo.ItemType != EItemType::Projectile)
 		{
 			FoundAround=true;
 			AddItem(BaseItem);
@@ -65,7 +71,7 @@ void UTDSInventory::AddItem(ATDSItemBase* Item)
 	{
 		FItemInfo NewWeaponItem;
 		NewWeaponItem = Item->ItemInfo;
-		WeaponInventory.Add(NewWeaponItem);				
+		WeaponInventory.Add(NewWeaponItem);
 	}
 	OnPlayerFindItem.Broadcast(Item->ItemInfo);		//сообщаем что нашли новый предмет
 	Item->Destroy();
@@ -103,19 +109,20 @@ void UTDSInventory::DecreaseCount(int WeaponBulletId)
 				Inventory.RemoveAt(i);
 				OnBulletsEnd.Broadcast();
 			}
+			else
+				OnBulletsChanged.Broadcast(Inventory[i].Count);
 		}
 		else //по логике сюда не зайдем никогда... но мало ли...
 		{
 			UE_LOG(LogTemp,Warning,TEXT("FIRE BULLET ECTb HO SHOT = 0"));
 			OnBulletsEnd.Broadcast();
-		}
-		OnBulletsChanged.Broadcast(Inventory[i].Count);
+		}		
 	}
 }
 
 bool UTDSInventory::CheckCount(int WeaponBulletId)
 {
-	bool BulletAviable = false;
+	bool BulletAviable;// = false;
 	//int InventoryBulletCount = 0;
 	int i = FindItemById(WeaponBulletId);
 	if (i == INDEX_NONE) //если элемента нет
@@ -128,7 +135,6 @@ bool UTDSInventory::CheckCount(int WeaponBulletId)
 		if(Inventory[i].Count >= 1) // рабочий элемент, нашли
 		{
 			UE_LOG(LogTemp,Warning,TEXT("CHECK BULLET: --- ECTb --- %d --- COUNT "), Inventory[i].Count);
-			//InventoryBulletCount = Inventory[i].Count;
 			BulletAviable =  true;
 		}
 		else // элемент есть но пустой

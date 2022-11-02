@@ -43,6 +43,7 @@ public:
 	UFUNCTION()
 	void EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor);
 
+	AActor* ComponentOwner();
 	void AddItem(ATDSItemBase* Item);
 	int FindItemById(int aId);
 	void DecreaseCount(int WeaponBulletId);
