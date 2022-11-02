@@ -24,19 +24,10 @@ void UTDSInventory::OverlapItem(AActor* OverlappedActor, AActor* OtherActor){
 	if(OverlappedActor)
 	{
 		ATDSItemBase* BaseItem = Cast<ATDSItemBase>(OtherActor);
-		if(BaseItem){
+		if(BaseItem->ItemInfo.ItemType != EItemType::Projectile)
+		{
 			FoundAround=true;
-			switch (BaseItem->ItemInfo.ItemType)
-			{
-			case EItemType::Item:
-				AddItem(BaseItem);break;
-			case EItemType::Weapon:
-				AddItem(BaseItem);break;
-			case EItemType::Armor:
-				AddItem(BaseItem);break;
-			default:
-				break;
-			}
+			AddItem(BaseItem);
 		}
 	}
 }
@@ -55,32 +46,28 @@ void UTDSInventory::EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor)
 void UTDSInventory::AddItem(ATDSItemBase* Item)
 {
 	const int i = FindItemById(Item->ItemInfo.ItemID);
-	if (i == INDEX_NONE){
-		FItemInfo NewItem;
-		NewItem = Item->ItemInfo;
-		Inventory.Add(NewItem);							//добавляем в общий инвентарь
-		if(NewItem.ItemType ==  EItemType::Weapon){
-			FItemInfo NewWeaponItem;
-			NewWeaponItem = Item->ItemInfo;
-			WeaponInventory.Add(NewWeaponItem);			//если оружие добавляем в список оружия
+	if (i == INDEX_NONE)								//если такого предмета нет
+	{								
+		Inventory.Add(Item->ItemInfo);					//добавляем в общий инвентарь
+	}
+	else
+	{													//если такой предмет есть
+		if (Item->ItemInfo.bIsStackable)
+		{
+			Inventory[i].Count += Item->ItemInfo.Count;	//складываем если пачкуется
+		}
+		else
+		{
+			Inventory.Add(Item->ItemInfo);				//добавляем в общий инвентарь			 если не пачкуется			
 		}
 	}
-	else{
-		if (Item->ItemInfo.bIsStackable){
-			Inventory[i].Count += Item->ItemInfo.Count;	//складываем если такой предмет есть и пачкуется
-		}
-		else{
-			FItemInfo NewItem;
-			NewItem = Item->ItemInfo;
-			Inventory.Add(NewItem);						//добавляем в общий инвентарь если не пачкуется
-			if(NewItem.ItemType ==  EItemType::Weapon){
-				FItemInfo NewWeaponItem;
-				NewWeaponItem = Item->ItemInfo;
-				WeaponInventory.Add(NewWeaponItem);		//если оружие добавляем в список оружия
-			}
-		}
+	if(Item->ItemInfo.ItemType ==  EItemType::Weapon)	//если оружие добавляем в список оружия
+	{
+		FItemInfo NewWeaponItem;
+		NewWeaponItem = Item->ItemInfo;
+		WeaponInventory.Add(NewWeaponItem);				
 	}
-	OnPlayerFindItem.Broadcast(Item->ItemInfo);			//сообщаем что нашли новый предмет
+	OnPlayerFindItem.Broadcast(Item->ItemInfo);		//сообщаем что нашли новый предмет
 	Item->Destroy();
 }
 
@@ -129,7 +116,7 @@ void UTDSInventory::DecreaseCount(int WeaponBulletId)
 bool UTDSInventory::CheckCount(int WeaponBulletId)
 {
 	bool BulletAviable = false;
-	int InventoryBulletCount = 0;
+	//int InventoryBulletCount = 0;
 	int i = FindItemById(WeaponBulletId);
 	if (i == INDEX_NONE) //если элемента нет
 	{
@@ -141,14 +128,13 @@ bool UTDSInventory::CheckCount(int WeaponBulletId)
 		if(Inventory[i].Count >= 1) // рабочий элемент, нашли
 		{
 			UE_LOG(LogTemp,Warning,TEXT("CHECK BULLET: --- ECTb --- %d --- COUNT "), Inventory[i].Count);
-			InventoryBulletCount = Inventory[i].Count;
+			//InventoryBulletCount = Inventory[i].Count;
 			BulletAviable =  true;
 		}
 		else // элемент есть но пустой
 		{
 		//UE_LOG(LogTemp,Warning,TEXT("CHECK BULLET --- ECTb HO COUNT = 0"));
 			BulletAviable = false;
-			InventoryBulletCount = 0;
 		}
 	}
 	return BulletAviable;

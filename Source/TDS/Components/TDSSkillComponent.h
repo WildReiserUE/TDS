@@ -9,7 +9,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSprint, float, CurrentSprintValue, float, MaxSprintValue);
 
 USTRUCT(BlueprintType)
-struct FSprintSettings
+struct FSprintSettings //ещё одна структура, которую тоже надо вынести
 {
 	GENERATED_BODY()
 	float SprintPoint = 100.0f;
@@ -25,8 +25,7 @@ class TDS_API UTDSSkillComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
-	// Sets default values for this component's properties
+public:
 	UTDSSkillComponent();
 	
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Sprint")
@@ -42,10 +41,10 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, BlueprintReadWrite, Category="Sprint")
 	bool bSprintStart = false;
-
-	UFUNCTION()
-	void InitSprint();
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;	
+	
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	void InitSprint();	
 	void StartSprint();	
 	void DecreaseStamina();
 	void StopSprint();
@@ -59,7 +58,6 @@ public:
 	float SprintCoef;
 	
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 };

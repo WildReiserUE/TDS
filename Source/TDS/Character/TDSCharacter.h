@@ -3,28 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TDSHealthComponent.h"
+#include "BaseCharacter.h"
 #include "TDSItemBase.h"
 #include "GameFramework/Character.h"
 #include "TDSCharacter.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComponentsAdded);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponSwitch,FItemInfo,WeaponInfo);
 
-USTRUCT(BlueprintType) //Структура с настройками Игрока нужно перенести куда-нить))
-struct FCharacterInfo
-{
-	GENERATED_BODY()
-	float CameraMaxLenght = 1500.f;
-	float CameraMinLenght = 300.f;
-	float CameraChangeStep = 75.f;
-	//TODO: Move to SkillComponent
-	float BaseMoveSpeed = 600.f;
-	float AimMoveSpeed = 200.f;
-};
-
 UCLASS()
-class ATDSCharacter : public ACharacter
+class ATDSCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -38,42 +26,40 @@ public:
 	FORCEINLINE class UCameraComponent* GetCharacterCameraComponent() const { return CharacterCameraComponent; }
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraArm; }
-
+	
 	UFUNCTION()
-    	void InitParams();
+	void InputAxisY(float Value);
 	UFUNCTION()
-		void InputAxisY(float Value);
+	void InputAxisX(float Value);
 	UFUNCTION()
-		void InputAxisX(float Value);
+	void InputCameraIn();
 	UFUNCTION()
-		void InputCameraIn();
+	void InputCameraOut();
 	UFUNCTION()
-		void InputCameraOut();
-	UFUNCTION()
-		UDecalComponent* GetCursorToWorld();
+	UDecalComponent* GetCursorToWorld();
 	UFUNCTION(BlueprintCallable)
-		ATDSItemBase* SpawnWeapon(int WeaponIndex);
+	ATDSItemBase* SpawnWeapon(int WeaponIndex);
 	void PrevWeapon();
 	void NextWeapon();
 	int Some();
 	
 	UFUNCTION(BlueprintCallable)
-		void FireOn();
+	void FireOn();
 	UFUNCTION()
-		void StartFire();
+	void StartFire();
 	UFUNCTION(BlueprintCallable)
-		void FireOff();
+	void FireOff();
 
 	void CalculateAllowSprint();
 
 	UFUNCTION()
-		void ActivateSprint();
+	void ActivateSprint();
 	UFUNCTION()
-		void DeActivateSprint();
+	void DeActivateSprint();
 	UFUNCTION()
-		void SniperModeOn();
+	void SniperModeOn();
 	UFUNCTION()
-		void SniperModeOff();
+	void SniperModeOff();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CharacterDirection")
 	float MeshDirection = 0.0f;
@@ -93,17 +79,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player Settings")
 	FVector CursorSize=FVector(10.0f,20.0f,20.0f);
 	
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category="Player Settings")
-	TArray<TSubclassOf<UActorComponent>> ComponentList;
-
-	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Delegate")
+	UPROPERTY(BlueprintAssignable)
 	FOnComponentsAdded ComponentsAdded;
 	
-	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Delegate")
+	UPROPERTY(BlueprintAssignable)
 	FOnWeaponSwitch OnWeaponSwitch;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Player Settings")
-	FCharacterInfo CharacterInfo;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	ATDSItemBase* CurrentWeapon = nullptr;
@@ -132,12 +112,7 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraArm;	
-
-	float MaxCameraLenght = 0.f;
-	float MinCameraLenght = 0.f;
-	float CameraChangeStep = 0.f;
-	float CharBaseMoveSpeed = 0.f;
-	float CharAimMoveSpeed = 0.f;
+	
 	bool bSprintActivate = false;
 	bool bIsALife = true;
 	FTimerHandle WeaponReloadTimer;

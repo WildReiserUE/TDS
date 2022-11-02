@@ -9,10 +9,9 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChange, float, Health, float, MaxHealth);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnShieldChange, float, Shield, float, MaxShield);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOwnerDeath);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAIDeath);
 
 USTRUCT(BlueprintType)
-struct FHealthSettings //Структура с настройками нужно перенести куда-нить))
+struct FHealthSettings //Структура с настройками нужно перенести куда-нить
 {
 	GENERATED_BODY()
 	float Health = 1000.0f;

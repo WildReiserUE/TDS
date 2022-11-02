@@ -80,6 +80,7 @@ void ATDSItemBase::SpawnBullet()
         UGameplayStatics::FinishSpawningActor(Spawned,SpawnPoint);
         Spawned->ChangeSettings();
        // UE_LOG(LogTemp, Warning, TEXT("PROJECTILE OWNER IS: %s"), *Spawned->GetOwner()->GetName());
+		UGameplayStatics::SpawnSoundAtLocation(this,ItemInfo.Weapon.ShootSound,GetActorLocation());
         OnWeaponFire.Broadcast();
 	}		
 	else if(ItemInfo.Weapon.WeaponClass == EWeaponClass::Handle){

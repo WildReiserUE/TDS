@@ -108,36 +108,26 @@ void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent
 void ATDSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	ChangeSettings();  //apply datatable info
 	if (CursorMaterial){
 		CursorToWorld = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CursorMaterial,CursorSize,FVector(0));
 	}
 
-	if (ComponentList.Num()>0)
+	if (CharacterInfo.ComponentList.Num()>0)
 	{
-		const int Comp = ComponentList.Num();
+		const int Comp = CharacterInfo.ComponentList.Num();
 		for (int i = 0; i < Comp; i++)
 		{
-			this->AddComponentByClass(ComponentList[i], false, FTransform(FVector(0)),true);
-			FinishAddComponent(GetComponentByClass(ComponentList[i]),false,FTransform(FVector(0)));
+			this->AddComponentByClass(CharacterInfo.ComponentList[i], false, FTransform(FVector(0)),true);
+			FinishAddComponent(GetComponentByClass(CharacterInfo.ComponentList[i]),false,FTransform(FVector(0)));
 		}
-		UE_LOG(LogTemp,Log,TEXT("ADDED COMPONENTS TO PLAYER --- %i"), ComponentList.Num());
+		UE_LOG(LogTemp,Log,TEXT("ADDED COMPONENTS TO PLAYER --- %i"), CharacterInfo.ComponentList.Num());
 		ComponentsAdded.Broadcast();
 	}
 	else
 	{
 		UE_LOG(LogTemp,Log,TEXT("ADDED COMPONENTS TO PLAYER --- HOJlb"));
-	}
-	InitParams();
-	
-}
-
-void ATDSCharacter::InitParams(){
-	MaxCameraLenght = CharacterInfo.CameraMaxLenght;
-	MinCameraLenght = CharacterInfo.CameraMinLenght;
-	CameraChangeStep = CharacterInfo.CameraChangeStep;
-	CharBaseMoveSpeed = CharacterInfo.BaseMoveSpeed;
-	CharAimMoveSpeed = CharacterInfo.AimMoveSpeed;
+	}	
 }
 
 void ATDSCharacter::InputAxisY(float Value){
@@ -149,24 +139,24 @@ void ATDSCharacter::InputAxisX(float Value){
 }
 
 void ATDSCharacter::InputCameraIn(){
-	if(CameraArm->TargetArmLength <= MinCameraLenght){
+	if(CameraArm->TargetArmLength <= BaseInfo.CameraMinLenght){
 	}
 	else
-		CameraArm->TargetArmLength -= CameraChangeStep;
+		CameraArm->TargetArmLength -= BaseInfo.CameraChangeStep;
 }
 
 void ATDSCharacter::InputCameraOut(){
-	if(CameraArm->TargetArmLength >= MaxCameraLenght){
+	if(CameraArm->TargetArmLength >= BaseInfo.CameraMaxLenght){
 	}
 	else
-		CameraArm->TargetArmLength += CameraChangeStep;
+		CameraArm->TargetArmLength += BaseInfo.CameraChangeStep;
 }
 
 void ATDSCharacter::ActivateSprint(){
 	const auto SkillComponent = FindComponentByClass<UTDSSkillComponent>();
 	if (SkillComponent && !bSniperMode){
 		if (SkillComponent->SprintPoint > SkillComponent->SprintSettings.SprintLosePoint){
-			GetCharacterMovement()->MaxWalkSpeed = CharBaseMoveSpeed*SkillComponent->SprintCoef;
+			GetCharacterMovement()->MaxWalkSpeed = CharacterInfo.RunSpeed*SkillComponent->SprintCoef;
 			SkillComponent->StartSprint();
 			bSprintActivate=true;
 		}
@@ -178,7 +168,7 @@ void ATDSCharacter::DeActivateSprint(){
 	if (SkillComponent && !bSniperMode){
 		SkillComponent->StopSprint();
 		bSprintActivate=false;
-		GetCharacterMovement()->MaxWalkSpeed = CharBaseMoveSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = CharacterInfo.RunSpeed;
 	}
 }
 
@@ -198,7 +188,7 @@ void ATDSCharacter::SniperModeOn(){
 		if(bSprintActivate)
      		DeActivateSprint();
 		bSniperMode = true;
-		GetCharacterMovement()->MaxWalkSpeed = CharAimMoveSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = CharacterInfo.AimMoveSpeed;
 	}
 }
 
@@ -206,7 +196,7 @@ void ATDSCharacter::SniperModeOff(){
 	if(bSniperMode)
 	{
 		bSniperMode = false;
-		GetCharacterMovement()->MaxWalkSpeed = CharBaseMoveSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = CharacterInfo.RunSpeed;
 	}
 }
 
@@ -229,7 +219,7 @@ ATDSItemBase* ATDSCharacter::SpawnWeapon(int WeaponIndex)
 			FTransform SpawnTransform = FTransform(Loc);
 			ATDSItemBase* MyWeapon = Cast<ATDSItemBase>(GetWorld()->SpawnActorDeferred<ATDSItemBase>(PlayerInventory->WeaponInventory[WeaponIndex].BaseClass,
 				SpawnTransform, SpawnParams.Owner, SpawnParams.Instigator,SpawnParams.SpawnCollisionHandlingOverride));
-			MyWeapon->SpawnedName = PlayerInventory->WeaponInventory[WeaponIndex].ItemName;
+			MyWeapon->SpawnedName = PlayerInventory->WeaponInventory[WeaponIndex].DTItemName;
 			MyWeapon->ItemMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			UGameplayStatics::FinishSpawningActor(MyWeapon,SpawnTransform);
 			if (MyWeapon)

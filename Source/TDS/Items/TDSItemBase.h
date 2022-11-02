@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "NiagaraComponent.h"
+#include "Engine/DataTable.h"
 #include "TDSItemBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponFire);
@@ -143,6 +144,8 @@ struct FWeaponInfo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting"))
 	EProjectileTypeDamage ProjectileTypeDamage;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting"))
+	USoundBase* ShootSound = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting"))
 	FName ProjectileName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting"))
 	bool bCanFire = false;
@@ -175,13 +178,13 @@ struct FArmorInfo
 };
 
 USTRUCT(BlueprintType, meta = (ExposeOnSpawn))
-struct FItemInfo
+struct FItemInfo : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="0"))
 	int ItemID = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FName ItemName;
+	FName DTItemName;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EItemType ItemType;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
