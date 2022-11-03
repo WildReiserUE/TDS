@@ -68,9 +68,10 @@ void ATDSItemBase::SomeClicked(UPrimitiveComponent* pComponent, FKey pKey){
 	RenderOn(this->ItemMeshComponent);
 }
 
-void ATDSItemBase::SpawnBullet()
+void ATDSItemBase::StartSpawnBullet()
 {
-	if(ItemInfo.Weapon.bCanFire){
+	if(ItemInfo.Weapon.bCanFire)
+	{
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		FVector SocketLocation = this->ItemMeshComponent->GetSocketLocation(FName("BulletSocket"));
@@ -79,7 +80,7 @@ void ATDSItemBase::SpawnBullet()
         Spawned->SpawnedName = ItemInfo.Weapon.ProjectileName;
         UGameplayStatics::FinishSpawningActor(Spawned,SpawnPoint);
         Spawned->ChangeSettings();
-       // UE_LOG(LogTemp, Warning, TEXT("PROJECTILE OWNER IS: %s"), *Spawned->GetOwner()->GetName());
+		// UE_LOG(LogTemp, Warning, TEXT("PROJECTILE OWNER IS: %s"), *Spawned->GetOwner()->GetName());
 		UGameplayStatics::SpawnSoundAtLocation(this,ItemInfo.Weapon.ShootSound,GetActorLocation());
         OnWeaponFire.Broadcast();
 	}		
@@ -89,7 +90,7 @@ void ATDSItemBase::SpawnBullet()
 	}
 }
 
-void ATDSItemBase::StopAttack(){
+void ATDSItemBase::StopSpawnBullet(){
 	if(GetWorld()->GetTimerManager().IsTimerActive(AttackTimer)){
 		GetWorld()->GetTimerManager().ClearTimer(AttackTimer);
 	}

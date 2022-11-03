@@ -151,6 +151,10 @@ struct FWeaponInfo
 	bool bCanFire = false;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="-1", EditCondition="bCanFire == true"))
 	int ProjectileId = -1;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="1", EditCondition="bCanFire == true"))
+	int Magazine;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="1", EditCondition="bCanFire == true"))
+	int MaxMagazine;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EWeaponAttackSpeed AttackSpeed;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -243,8 +247,8 @@ public:
 	UFUNCTION()
 	void SomeClicked(UPrimitiveComponent* pComponent, FKey pKey);
 	
-	void StopAttack();
-	void SpawnBullet();
+	void StopSpawnBullet();
+	void StartSpawnBullet();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "StaticMesh", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* ItemMeshComponent;

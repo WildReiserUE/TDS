@@ -103,6 +103,7 @@ void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent
 	NewInputComponent->BindAction(TEXT("PrevWeapon"),IE_Pressed, this, &ATDSCharacter::PrevWeapon);
 	NewInputComponent->BindAction(TEXT("Fire"),IE_Pressed,this,&ATDSCharacter::FireOn);
 	NewInputComponent->BindAction(TEXT("Fire"),IE_Released,this,&ATDSCharacter::FireOff);
+	NewInputComponent->BindAction(TEXT("ReloadWeapon"),IE_Pressed,this,&ATDSCharacter::ReloadWeapon);
 }
 
 void ATDSCharacter::BeginPlay()
@@ -245,7 +246,7 @@ void ATDSCharacter::PrevWeapon()
 		{
 			if(CurrentWeapon)
 			{
-				CurrentWeapon->StopAttack();
+				CurrentWeapon->StopSpawnBullet();
 				CurrentWeapon->Destroy();
 			}
 			CurrentWeaponIndex --;
@@ -257,7 +258,7 @@ void ATDSCharacter::PrevWeapon()
 			PlayerInventory->OnBulletsEnd.RemoveDynamic(this, &ATDSCharacter::FireOff);
 			CurrentWeapon = SpawnWeapon(CurrentWeaponIndex);
 			PlayerInventory->OnBulletsEnd.AddDynamic(this, &ATDSCharacter::FireOff);
-			OnWeaponSwitch.Broadcast(CurrentWeapon->ItemInfo);
+			OnWeaponSwitch.Broadcast(CurrentWeaponIndex);
 		}
 	}
 }
@@ -271,7 +272,7 @@ void ATDSCharacter::NextWeapon()
 		{
 			if(CurrentWeapon)
 			{
-				CurrentWeapon->StopAttack();
+				CurrentWeapon->StopSpawnBullet();
 				CurrentWeapon->Destroy();
 			}
 			CurrentWeaponIndex ++;
@@ -283,7 +284,7 @@ void ATDSCharacter::NextWeapon()
 			PlayerInventory->OnBulletsEnd.RemoveDynamic(this, &ATDSCharacter::FireOff);
 			CurrentWeapon = SpawnWeapon(CurrentWeaponIndex);
 			PlayerInventory->OnBulletsEnd.AddDynamic(this, &ATDSCharacter::FireOff);
-			OnWeaponSwitch.Broadcast(CurrentWeapon->ItemInfo);
+			OnWeaponSwitch.Broadcast(CurrentWeaponIndex);
 		}
 	}
 }
@@ -300,7 +301,7 @@ void ATDSCharacter::FireOn()
 		const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
 		if(PlayerInventory)
 		{
-			bool BulletsAviable = PlayerInventory->CheckCount(CurrentWeapon->ItemInfo.Weapon.ProjectileId);
+			bool BulletsAviable = CurrentWeapon->ItemInfo.Weapon.Magazine > 0;
 			if(BulletsAviable && CurrentWeapon->ItemInfo.Weapon.bCanFire)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("BULLET FOUND -- Command to Weapon -Fire-"));
@@ -313,7 +314,7 @@ void ATDSCharacter::FireOn()
 			{				
 				UE_LOG(LogTemp, Warning, TEXT("MELLEE ATTACK"));
 				bRotateToAttack = true;
-				CurrentWeapon->SpawnBullet();
+				CurrentWeapon->StartSpawnBullet();
 				if(CharacterInfo.MontageHandleAttack.Num()>0)
 				{
 					int RndMontage = UKismetMathLibrary::RandomIntegerInRange(0,CharacterInfo.MontageHandleAttack.Num()-1);
@@ -330,9 +331,36 @@ void ATDSCharacter::StartFire()
 	if(PlayerInventory)
 	{
 		PlayerInventory->DecreaseCount(CurrentWeapon->ItemInfo.Weapon.ProjectileId);
-		CurrentWeapon->SpawnBullet();
-		PlayAnimMontage(Montage2HAttack);
+		UE_LOG(LogTemp,Log,TEXT("TRY BULLET  = %i"), CurrentWeapon->ItemInfo.Weapon.ProjectileId)
+		int Result = CurrentWeapon->ItemInfo.Weapon.Magazine -= 1;
+		if( Result >=0)
+		{
+			CurrentWeapon->StartSpawnBullet();
+			PlayAnimMontage(Montage2HAttack);
+		}
+		else
+		{
+			if(GetWorld()->GetTimerManager().IsTimerActive(CurrentWeapon->AttackTimer))
+			{
+				GetWorld()->GetTimerManager().ClearTimer(CurrentWeapon->AttackTimer);		
+			}
+			ReloadWeapon();
+		}
 	}
+}
+
+void ATDSCharacter::ReloadWeapon()
+{
+	const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
+ 	if(PlayerInventory)
+ 	{
+ 		if(CurrentWeapon && PlayerInventory->TryReloadWeapon(CurrentWeapon->ItemInfo.Weapon.ProjectileId))
+ 		{
+ 			UE_LOG(LogTemp,Log,TEXT("BULLET IN MAGAZINE = %i"), CurrentWeapon->ItemInfo.Weapon.Magazine)
+ 		}
+ 		else 
+ 			UE_LOG(LogTemp,Log,TEXT("MAGAZINE IS FULL"));
+ 	}
 }
 	
 void ATDSCharacter::FireOff()
@@ -342,6 +370,6 @@ void ATDSCharacter::FireOff()
 		UE_LOG(LogTemp, Warning, TEXT("Command to Weapon - STOP Fire"));
 		GetWorld()->GetTimerManager().ClearTimer(CurrentWeapon->AttackTimer);		
 		bRotateToAttack = false;
-		CurrentWeapon->StopAttack();
+		CurrentWeapon->StopSpawnBullet();
 	}
 }

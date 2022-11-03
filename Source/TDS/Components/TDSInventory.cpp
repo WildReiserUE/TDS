@@ -90,6 +90,23 @@ int UTDSInventory::FindItemById(int aId){
 	return n;
 }
 
+bool UTDSInventory::TryReloadWeapon(int ProjectileId)
+{
+	int i = FindItemById(ProjectileId);
+	if (i == INDEX_NONE) //если элемента нет
+	{
+		UE_LOG(LogTemp,Warning,TEXT("TRY RELOAD BULLET ID: %i ---HET--- COBCEM"), i);
+		OnBulletsEnd.Broadcast();
+		return false;
+	}
+	else
+	{
+		UE_LOG(LogTemp,Warning,TEXT("TRY RELOAD BULLET ID: %i ------ ECTb"), i);
+		return true;
+	}
+		
+}
+
 void UTDSInventory::DecreaseCount(int WeaponBulletId)
 {	
 	int i = FindItemById(WeaponBulletId);
@@ -101,12 +118,13 @@ void UTDSInventory::DecreaseCount(int WeaponBulletId)
 	else
 	{
 		if(Inventory[i].Count >= 1)
-		{
-			UE_LOG(LogTemp,Warning,TEXT("TRY DECREASE BULLET ---OK--- ELAPSED: -- %d  --"), Inventory[i].Count);
+		{			
 			Inventory[i].Count -= 1;
+			UE_LOG(LogTemp,Warning,TEXT("TRY DECREASE BULLET ---OK--- ELAPSED: -- %d  --"), Inventory[i].Count);
 			if(Inventory[i].Count == 0)
 			{
 				Inventory.RemoveAt(i);
+				OnBulletsChanged.Broadcast(0);
 				OnBulletsEnd.Broadcast();
 			}
 			else
@@ -122,8 +140,7 @@ void UTDSInventory::DecreaseCount(int WeaponBulletId)
 
 bool UTDSInventory::CheckCount(int WeaponBulletId)
 {
-	bool BulletAviable;// = false;
-	//int InventoryBulletCount = 0;
+	bool BulletAviable;
 	int i = FindItemById(WeaponBulletId);
 	if (i == INDEX_NONE) //если элемента нет
 	{

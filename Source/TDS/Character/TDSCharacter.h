@@ -9,7 +9,7 @@
 #include "TDSCharacter.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponSwitch,FItemInfo,WeaponInfo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponSwitch,int,WeaponIndex);
 
 UCLASS()
 class ATDSCharacter : public ABaseCharacter
@@ -47,6 +47,7 @@ public:
 	void FireOn();
 	UFUNCTION()
 	void StartFire();
+	void ReloadWeapon();
 	UFUNCTION(BlueprintCallable)
 	void FireOff();
 

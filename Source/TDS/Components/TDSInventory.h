@@ -46,6 +46,7 @@ public:
 	AActor* ComponentOwner();
 	void AddItem(ATDSItemBase* Item);
 	int FindItemById(int aId);
+	bool TryReloadWeapon(int ProjectileId);
 	void DecreaseCount(int WeaponBulletId);
 	bool CheckCount(int WeaponBulletId);
 	bool FoundAround = false;
