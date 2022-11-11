@@ -56,6 +56,10 @@ struct FBaseHumanoidData : public FTableRowBase
 	TArray<UAnimMontage*>MontageHandleAttack;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<UAnimMontage*>MontageDead;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	UAnimMontage* Montage2HReload;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	UAnimMontage* Montage2HAttack;
 };
 
 UCLASS()

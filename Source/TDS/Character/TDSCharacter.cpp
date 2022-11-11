@@ -2,6 +2,7 @@
 
 #include "TDSCharacter.h"
 
+#include "BaseAnimNotify.h"
 #include "TDSInventory.h"
 #include "TDSItemBase.h"
 #include "TDSSkillComponent.h"
@@ -301,7 +302,7 @@ void ATDSCharacter::FireOn()
 		const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
 		if(PlayerInventory)
 		{
-			bool BulletsAviable = CurrentWeapon->ItemInfo.Weapon.Magazine > 0;
+			bool BulletsAviable = CurrentWeapon->ItemInfo.Weapon.CurMagazine > 0;
 			if(BulletsAviable && CurrentWeapon->ItemInfo.Weapon.bCanFire)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("BULLET FOUND -- Command to Weapon -Fire-"));
@@ -321,6 +322,8 @@ void ATDSCharacter::FireOn()
 					PlayAnimMontage(CharacterInfo.MontageHandleAttack[RndMontage]);
 				}					
 			}
+			else if (!BulletsAviable && CurrentWeapon->ItemInfo.Weapon.bCanFire)
+				ReloadWeapon();
 		}
 	}
 }
@@ -332,11 +335,11 @@ void ATDSCharacter::StartFire()
 	{
 		PlayerInventory->DecreaseCount(CurrentWeapon->ItemInfo.Weapon.ProjectileId);
 		UE_LOG(LogTemp,Log,TEXT("TRY BULLET  = %i"), CurrentWeapon->ItemInfo.Weapon.ProjectileId)
-		int Result = CurrentWeapon->ItemInfo.Weapon.Magazine -= 1;
+		int Result = CurrentWeapon->ItemInfo.Weapon.CurMagazine -= 1;
 		if( Result >=0)
 		{
 			CurrentWeapon->StartSpawnBullet();
-			PlayAnimMontage(Montage2HAttack);
+			PlayAnimMontage(CharacterInfo.Montage2HAttack);
 		}
 		else
 		{
@@ -356,13 +359,38 @@ void ATDSCharacter::ReloadWeapon()
  	{
  		if(CurrentWeapon && PlayerInventory->TryReloadWeapon(CurrentWeapon->ItemInfo.Weapon.ProjectileId))
  		{
- 			UE_LOG(LogTemp,Log,TEXT("BULLET IN MAGAZINE = %i"), CurrentWeapon->ItemInfo.Weapon.Magazine)
+ 			UE_LOG(LogTemp,Log,TEXT("BULLET IN MAGAZINE = %i"), CurrentWeapon->ItemInfo.Weapon.CurMagazine);
+ 			if(!GetMesh()->GetAnimInstance()->Montage_IsPlaying(CharacterInfo.Montage2HReload))
+ 			{
+ 				PlayAnimMontage(CharacterInfo.Montage2HReload);
+ 				if(CharacterInfo.Montage2HReload && CharacterInfo.Montage2HReload->IsNotifyAvailable())
+ 				{
+ 					const auto AnimNotifies = CharacterInfo.Montage2HReload->Notifies;
+ 					for (const auto& AnimNotify : AnimNotifies)
+ 					{
+ 						auto BaseAnimNotify = Cast<UBaseAnimNotify>(AnimNotify.Notify);
+ 						if(BaseAnimNotify)
+ 						{
+ 							UE_LOG(LogTemp, Warning, TEXT("EXAMPLE --- NOTIFY AVAIABLE"));// LOG ONLY FOR TEST SOME
+ 							if(!(BaseAnimNotify->OnNotified.IsBoundToObject(this)))
+ 								BaseAnimNotify->OnNotified.AddUFunction(this, FName ("Example"),AnimNotify.NotifyName);
+	                			
+ 						}
+ 					}
+ 				}
+ 			} 				
  		}
  		else 
- 			UE_LOG(LogTemp,Log,TEXT("MAGAZINE IS FULL"));
+ 			UE_LOG(LogTemp,Log,TEXT("MAGAZINE IS FULL OR NO AMMO"));
  	}
 }
-	
+
+FName ATDSCharacter::Example()
+{
+	UE_LOG(LogTemp, Warning, TEXT("EXAMPLE --- NOTIFY FUNCTION TEST"));// LOG ONLY FOR TEST SOME
+	return FName();
+}
+
 void ATDSCharacter::FireOff()
 {
 	if(CurrentWeapon && GetWorld()->GetTimerManager().IsTimerActive(CurrentWeapon->AttackTimer))

@@ -117,7 +117,7 @@ void UTDSInventory::DecreaseCount(int WeaponBulletId)
 	}
 	else
 	{
-		if(Inventory[i].Count >= 1)
+		if(Inventory[i].Count > 0)
 		{			
 			Inventory[i].Count -= 1;
 			UE_LOG(LogTemp,Warning,TEXT("TRY DECREASE BULLET ---OK--- ELAPSED: -- %d  --"), Inventory[i].Count);

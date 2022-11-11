@@ -116,13 +116,13 @@ struct FProjectileInfo
 	UNiagaraSystem* HitNiagara = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	USoundBase* HitSound = nullptr;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, meta = (ClampMin="0"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="0"))
 	float ProjectileSpeed = 0.f;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, meta = (ClampMin="0"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="0"))
 	float ProjectileMaxSpeed = 0.f;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bBounced = false;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, meta = (ClampMin="0"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="0"))
 	float ProjectileBouncines = 0.3f;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	float ProjectileGravity = 0.f;
@@ -151,9 +151,9 @@ struct FWeaponInfo
 	bool bCanFire = false;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="-1", EditCondition="bCanFire == true"))
 	int ProjectileId = -1;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="1", EditCondition="bCanFire == true"))
-	int Magazine;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="1", EditCondition="bCanFire == true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="0", EditCondition="bCanFire == true"))
+	int CurMagazine;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="0", EditCondition="bCanFire == true"))
 	int MaxMagazine;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EWeaponAttackSpeed AttackSpeed;

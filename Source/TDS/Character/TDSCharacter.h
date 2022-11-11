@@ -48,6 +48,8 @@ public:
 	UFUNCTION()
 	void StartFire();
 	void ReloadWeapon();
+	UFUNCTION()
+	FName Example();
 	UFUNCTION(BlueprintCallable)
 	void FireOff();
 
@@ -82,12 +84,6 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	ATDSItemBase* CurrentWeapon = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Player Settings")
-	UAnimMontage* Montage2HAttack = nullptr;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Player Settings")
-	UAnimMontage* Montage2HReload = nullptr;
 	
 	float AxisX = 0.0f;
 	float AxisY = 0.0f;
