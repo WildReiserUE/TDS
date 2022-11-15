@@ -48,6 +48,7 @@ public:
 	int FindItemById(int aId);
 	bool TryReloadWeapon(int ProjectileId);
 	void DecreaseCount(int WeaponBulletId);
-	bool CheckCount(int WeaponBulletId);
+	bool CheckCount(int WeaponMagazineBullet);
+	int FindMagazBullet(int aId);
 	bool FoundAround = false;
 };

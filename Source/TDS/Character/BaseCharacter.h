@@ -42,7 +42,7 @@ struct FBaseHumanoidData : public FTableRowBase
 	float AimMoveSpeed;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	bool bCanUseShield = false;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,meta=(EditCondition="bCanUseShield == true"))
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, meta=(EditCondition="bCanUseShield == true"))
 	float MaxShield;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, meta=(ClampMin="0"))
 	float MaxHealth;

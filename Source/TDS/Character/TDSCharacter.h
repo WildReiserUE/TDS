@@ -41,7 +41,6 @@ public:
 	ATDSItemBase* SpawnWeapon(int WeaponIndex);
 	void PrevWeapon();
 	void NextWeapon();
-	int Some();
 	
 	UFUNCTION(BlueprintCallable)
 	void FireOn();

@@ -112,7 +112,7 @@ void UTDSInventory::DecreaseCount(int WeaponBulletId)
 	int i = FindItemById(WeaponBulletId);
 	if (i == INDEX_NONE) //если элемента нет
 	{
-		UE_LOG(LogTemp,Warning,TEXT("TRY DECREASE BULLET ---HET--- COBCEM"));
+		UE_LOG(LogTemp,Warning,TEXT("TRY DECREASE INVENTORY BULLET ---HET--- COBCEM"));
 		OnBulletsEnd.Broadcast();
 	}
 	else
@@ -138,10 +138,10 @@ void UTDSInventory::DecreaseCount(int WeaponBulletId)
 	}
 }
 
-bool UTDSInventory::CheckCount(int WeaponBulletId)
+bool UTDSInventory::CheckCount(int WeaponMagazibeBullet)
 {
 	bool BulletAviable;
-	int i = FindItemById(WeaponBulletId);
+	int i = FindMagazBullet(WeaponMagazibeBullet);
 	if (i == INDEX_NONE) //если элемента нет
 	{
 		UE_LOG(LogTemp,Warning,TEXT("CHECK BULLET: --- HET COBCEM ---"));
@@ -161,4 +161,18 @@ bool UTDSInventory::CheckCount(int WeaponBulletId)
 		}
 	}
 	return BulletAviable;
+}
+
+
+int UTDSInventory::FindMagazBullet(int aId){
+	int n = INDEX_NONE;
+	int i = 0;
+	for (FItemInfo aItem : Inventory){
+		if (aItem.ItemID == aId){
+			n = i;
+			break;
+		}
+		i++;
+	}
+	return n;
 }

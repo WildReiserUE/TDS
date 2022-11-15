@@ -59,7 +59,7 @@ void ATDSCharacter::Tick(float DeltaSeconds){
 					FRotator CursorR = CursorFV.Rotation();
 					CursorToWorld->SetWorldLocation(TraceHitResult.Location);
 					CursorToWorld->SetWorldRotation(CursorR);
-					auto Target = Cast<ATDSItemBase>(TraceHitResult.Actor);
+					auto Target = Cast<ATDSItemBase>(TraceHitResult.GetActor());
 					if(Target){
 						const auto InventoryComponent = FindComponentByClass<UTDSInventory>();
 						if(InventoryComponent && InventoryComponent->FoundAround){
@@ -289,12 +289,7 @@ void ATDSCharacter::NextWeapon()
 	}
 }
 
-int ATDSCharacter::Some()
-{
-	return 0;
-}
-
-void ATDSCharacter::FireOn()
+void ATDSCharacter::FireOn()  //По нажатию кнопки - стрельба
 {		
 	if(CurrentWeapon)
 	{
@@ -304,7 +299,7 @@ void ATDSCharacter::FireOn()
 			bool BulletsAviable = CurrentWeapon->ItemInfo.Weapon.Magazine > 0;
 			if(BulletsAviable && CurrentWeapon->ItemInfo.Weapon.bCanFire)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("BULLET FOUND -- Command to Weapon -Fire-"));
+				UE_LOG(LogTemp, Warning, TEXT("BULLET ECTb -- Command to Weapon -Fire-"));
 				bRotateToAttack = true;
 				if(!GetWorld()->GetTimerManager().IsTimerActive(CurrentWeapon->AttackTimer)){
 					GetWorld()->GetTimerManager().SetTimer(CurrentWeapon->AttackTimer, this, &ATDSCharacter::StartFire, CurrentWeapon->AttackRate,true,0.f);
@@ -330,9 +325,11 @@ void ATDSCharacter::StartFire()
 	const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
 	if(PlayerInventory)
 	{
-		PlayerInventory->DecreaseCount(CurrentWeapon->ItemInfo.Weapon.ProjectileId);
-		UE_LOG(LogTemp,Log,TEXT("TRY BULLET  = %i"), CurrentWeapon->ItemInfo.Weapon.ProjectileId)
+		//PlayerInventory->DecreaseCount(CurrentWeapon->ItemInfo.Weapon.ProjectileId);
+		//UE_LOG(LogTemp,Log,TEXT("TRY BULLET ID = %i"), CurrentWeapon->ItemInfo.Weapon.ProjectileId)
+		UE_LOG(LogTemp,Log,TEXT("BULLET IN MAGAZINE = %i"), CurrentWeapon->ItemInfo.Weapon.Magazine);
 		int Result = CurrentWeapon->ItemInfo.Weapon.Magazine -= 1;
+		UE_LOG(LogTemp,Log,TEXT("SHOT BULLET IN MAGAZINE = %i"), CurrentWeapon->ItemInfo.Weapon.Magazine);
 		if( Result >=0)
 		{
 			CurrentWeapon->StartSpawnBullet();
@@ -350,16 +347,20 @@ void ATDSCharacter::StartFire()
 }
 
 void ATDSCharacter::ReloadWeapon()
-{
-	const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
- 	if(PlayerInventory)
+{	
+ 	if(CurrentWeapon)
  	{
- 		if(CurrentWeapon && PlayerInventory->TryReloadWeapon(CurrentWeapon->ItemInfo.Weapon.ProjectileId))
+ 		const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
+ 		if(PlayerInventory
+ 			&& PlayerInventory->TryReloadWeapon(CurrentWeapon->ItemInfo.Weapon.ProjectileId)
+ 			&& (CurrentWeapon->ItemInfo.Weapon.Magazine < CurrentWeapon->ItemInfo.Weapon.MaxMagazine))
  		{
- 			UE_LOG(LogTemp,Log,TEXT("BULLET IN MAGAZINE = %i"), CurrentWeapon->ItemInfo.Weapon.Magazine)
+ 			UE_LOG(LogTemp,Log,TEXT("BULLET IN MAGAZINE = %i"), CurrentWeapon->ItemInfo.Weapon.Magazine);
+ 			UE_LOG(LogTemp,Log,TEXT("NEED FIND BULLET ID = %i"), CurrentWeapon->ItemInfo.Weapon.ProjectileId);
+ 			UE_LOG(LogTemp,Log,TEXT("START RELOAD WEAPON"));
  		}
  		else 
- 			UE_LOG(LogTemp,Log,TEXT("MAGAZINE IS FULL"));
+ 			UE_LOG(LogTemp,Log,TEXT("MAGAZINE IS FULL OR NO INVENTORY BULLETS"));
  	}
 }
 	
