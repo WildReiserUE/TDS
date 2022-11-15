@@ -19,6 +19,12 @@ void UTDSHealthComponent::BeginPlay(){
 	InitParams();
 }
 
+void UTDSHealthComponent::InitParams()
+{
+	Health = HealthSettings.Health;
+	Shield = HealthSettings.Shield;
+}
+
 void UTDSHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -31,15 +37,15 @@ void UTDSHealthComponent::HealthChange(float Value)
 		if(Shield + Value >= 0)
 		{
 			Shield+=Value;
-			OnShieldChange.Broadcast(Shield,PlayerHealthSettings.Shield);
+			OnShieldChange.Broadcast(Shield,HealthSettings.Shield);
 			ShieldRecovery();
 		}
 		else if(Shield + Value < 0)
 		{
 			Shield = 0;
 			Health = Health + Shield + Value;
-			OnShieldChange.Broadcast(Shield,PlayerHealthSettings.Shield);
-			OnHealthChange.Broadcast(Health, PlayerHealthSettings.Health);
+			OnShieldChange.Broadcast(Shield,HealthSettings.Shield);
+			OnHealthChange.Broadcast(Health, HealthSettings.Health);
 			if(Health <= 0)
 			{
 				Health = 0;
@@ -61,7 +67,7 @@ void UTDSHealthComponent::HealthChange(float Value)
 
 void UTDSHealthComponent::TakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {	
-	UE_LOG(LogTemp, Log, TEXT("%s --- Recive DAMAGE ---  %f"), *ComponentOwner()->GetName(),Damage);
+	UE_LOG(LogTemp, Log, TEXT("%s Recive %f DAMAGE FROM  %s"), *ComponentOwner()->GetName(), Damage, *DamageCauser->GetName());
 	HealthChange(-Damage);
 }
 
@@ -69,16 +75,16 @@ void UTDSHealthComponent::ShieldRecovery()
 {
 	if(!GetWorld()->GetTimerManager().IsTimerActive(ShieldRecoveryTimer))
 	{
-		GetWorld()->GetTimerManager().SetTimer(ShieldRecoveryTimer, this, &UTDSHealthComponent::ShieldRecoveryStart, PlayerHealthSettings.ShieldRecoveryTick, true,PlayerHealthSettings.ShieldStartDelay);
+		GetWorld()->GetTimerManager().SetTimer(ShieldRecoveryTimer, this, &UTDSHealthComponent::ShieldRecoveryStart, HealthSettings.ShieldRecoveryTick, true,HealthSettings.ShieldStartDelay);
 	}
 }
 
 void UTDSHealthComponent::ShieldRecoveryStart()
 {
-	if(Shield<PlayerHealthSettings.Shield)
+	if(Shield<HealthSettings.Shield)
 	{
-		Shield+=PlayerHealthSettings.ShieldRecoveryValue;
-		OnShieldChange.Broadcast(Shield,PlayerHealthSettings.Shield);
+		Shield+=HealthSettings.ShieldRecoveryValue;
+		OnShieldChange.Broadcast(Shield,HealthSettings.Shield);
 	}
 	else
 	{
@@ -90,10 +96,4 @@ AActor* UTDSHealthComponent::ComponentOwner()
 {
 	auto ComponentOwner = this->GetOwner();
 	return ComponentOwner ? (ComponentOwner) : nullptr;
-}
-
-void UTDSHealthComponent::InitParams()
-{
-	Health = PlayerHealthSettings.Health;
-	Shield = PlayerHealthSettings.Shield;
 }

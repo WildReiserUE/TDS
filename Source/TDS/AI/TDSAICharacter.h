@@ -26,7 +26,4 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UPROPERTY(BlueprintAssignable)
-	FOnComponentsAdded OnComponentsAdded;
 };

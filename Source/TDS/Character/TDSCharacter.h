@@ -22,10 +22,6 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
-
-	FORCEINLINE class UCameraComponent* GetCharacterCameraComponent() const { return CharacterCameraComponent; }
-
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraArm; }
 	
 	UFUNCTION()
 	void InputAxisY(float Value);
@@ -47,6 +43,8 @@ public:
 	UFUNCTION()
 	void StartFire();
 	void ReloadWeapon();
+	UFUNCTION()
+	FName Example();
 	UFUNCTION(BlueprintCallable)
 	void FireOff();
 
@@ -79,15 +77,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player Settings")
 	FVector CursorSize=FVector(10.0f,20.0f,20.0f);
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
-	ATDSItemBase* CurrentWeapon = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Player Settings")
-	UAnimMontage* Montage2HAttack = nullptr;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= "Player Settings")
-	UAnimMontage* Montage2HReload = nullptr;
-	
 	float AxisX = 0.0f;
 	float AxisY = 0.0f;
 	bool bSprintAllow = false;
@@ -95,14 +84,6 @@ public:
 	int CurrentWeaponIndex = -1;
 
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* CharacterCameraComponent;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
-	USpringArmComponent* CameraArm;	
-
-	UPROPERTY(BlueprintAssignable)
-	FOnComponentsAdded ComponentsAdded;
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnWeaponSwitch OnWeaponSwitch;

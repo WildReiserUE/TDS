@@ -2,6 +2,7 @@
 
 #include "TDSInventory.h"
 
+#include "BaseCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
 UTDSInventory::UTDSInventory(){
@@ -20,9 +21,9 @@ void UTDSInventory::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-AActor* UTDSInventory::ComponentOwner()
+ABaseCharacter* UTDSInventory::ComponentOwner()
 {
-	const auto ComponentOwner = this->GetOwner();
+	const auto ComponentOwner = Cast<ABaseCharacter>(this->GetOwner());
 	return ComponentOwner ? (ComponentOwner) : nullptr;
 }
 
@@ -103,13 +104,12 @@ bool UTDSInventory::TryReloadWeapon(int ProjectileId)
 	{
 		UE_LOG(LogTemp,Warning,TEXT("TRY RELOAD BULLET ID: %i ------ ECTb"), i);
 		return true;
-	}
-		
+	}		
 }
 
-void UTDSInventory::DecreaseCount(int WeaponBulletId)
+void UTDSInventory::DecreaseCount(FItemInfo WeaponInfo)
 {	
-	int i = FindItemById(WeaponBulletId);
+	int i = FindItemById(WeaponInfo.Weapon.ProjectileId);
 	if (i == INDEX_NONE) //если элемента нет
 	{
 		UE_LOG(LogTemp,Warning,TEXT("TRY DECREASE INVENTORY BULLET ---HET--- COBCEM"));
@@ -119,18 +119,22 @@ void UTDSInventory::DecreaseCount(int WeaponBulletId)
 	{
 		if(Inventory[i].Count >= 1)
 		{			
-			Inventory[i].Count -= 1;
+			Inventory[i].Count -= (WeaponInfo.Weapon.MaxMagazine - WeaponInfo.Weapon.Magazine);
 			UE_LOG(LogTemp,Warning,TEXT("TRY DECREASE BULLET ---OK--- ELAPSED: -- %d  --"), Inventory[i].Count);
-			if(Inventory[i].Count == 0)
+			if(Inventory[i].Count <= 0)
 			{
-				Inventory.RemoveAt(i);
+				ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine = Inventory[i].Count + ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine; 
+				//Inventory.RemoveAt(i);
 				OnBulletsChanged.Broadcast(0);
 				OnBulletsEnd.Broadcast();
 			}
 			else
+			{
+				ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine = WeaponInfo.Weapon.MaxMagazine;
 				OnBulletsChanged.Broadcast(Inventory[i].Count);
+			}				
 		}
-		else //по логике сюда не зайдем никогда... но мало ли...
+		else //пустой слот патрона
 		{
 			UE_LOG(LogTemp,Warning,TEXT("FIRE BULLET ECTb HO SHOT = 0"));
 			OnBulletsEnd.Broadcast();
@@ -141,7 +145,7 @@ void UTDSInventory::DecreaseCount(int WeaponBulletId)
 bool UTDSInventory::CheckCount(int WeaponMagazibeBullet)
 {
 	bool BulletAviable;
-	int i = FindMagazBullet(WeaponMagazibeBullet);
+	int i = FindItemById(WeaponMagazibeBullet);
 	if (i == INDEX_NONE) //если элемента нет
 	{
 		UE_LOG(LogTemp,Warning,TEXT("CHECK BULLET: --- HET COBCEM ---"));
@@ -161,18 +165,4 @@ bool UTDSInventory::CheckCount(int WeaponMagazibeBullet)
 		}
 	}
 	return BulletAviable;
-}
-
-
-int UTDSInventory::FindMagazBullet(int aId){
-	int n = INDEX_NONE;
-	int i = 0;
-	for (FItemInfo aItem : Inventory){
-		if (aItem.ItemID == aId){
-			n = i;
-			break;
-		}
-		i++;
-	}
-	return n;
 }

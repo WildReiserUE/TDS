@@ -28,7 +28,8 @@ class TDS_API UTDSHealthComponent : public UActorComponent
 
 public:	
 	UTDSHealthComponent();
-
+	void InitParams();
+	
 	UPROPERTY(BlueprintAssignable, Category="Health")
 	FOnHealthChange OnHealthChange;
 	
@@ -39,7 +40,7 @@ public:
 	FOnOwnerDeath OnOwnerDeath;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
-	FHealthSettings PlayerHealthSettings;
+	FHealthSettings HealthSettings;
 
 	FTimerHandle ShieldRecoveryTimer;	
 	
@@ -51,7 +52,7 @@ public:
 	void ShieldRecovery();
 	void ShieldRecoveryStart();
 	AActor* ComponentOwner();
-	void InitParams();
+	
 
 protected:
 	virtual void BeginPlay() override;

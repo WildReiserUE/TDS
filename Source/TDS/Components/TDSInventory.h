@@ -7,6 +7,8 @@
 #include "Components/ActorComponent.h"
 #include "TDSInventory.generated.h"
 
+class ABaseCharacter;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerFindItem,FItemInfo, ItemInfo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBulletsEnd);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBulletsChanged,int,Count);
@@ -43,12 +45,11 @@ public:
 	UFUNCTION()
 	void EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor);
 
-	AActor* ComponentOwner();
+	ABaseCharacter* ComponentOwner();
 	void AddItem(ATDSItemBase* Item);
 	int FindItemById(int aId);
 	bool TryReloadWeapon(int ProjectileId);
-	void DecreaseCount(int WeaponBulletId);
+	void DecreaseCount(FItemInfo WeaponInfo);
 	bool CheckCount(int WeaponMagazineBullet);
-	int FindMagazBullet(int aId);
 	bool FoundAround = false;
 };
