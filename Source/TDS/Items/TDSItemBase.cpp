@@ -1,9 +1,6 @@
 // Created WildReiser ©2022
 
 #include "TDSItemBase.h"
-
-#include <string>
-
 #include "TDSCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -80,10 +77,10 @@ void ATDSItemBase::StartSpawnBullet()
         Spawned->SpawnedName = ItemInfo.Weapon.ProjectileName;
         UGameplayStatics::FinishSpawningActor(Spawned,SpawnPoint);
         Spawned->ChangeSettings();
-		// UE_LOG(LogTemp, Warning, TEXT("PROJECTILE OWNER IS: %s"), *Spawned->GetOwner()->GetName());
 		UGameplayStatics::SpawnSoundAtLocation(this,ItemInfo.Weapon.ShootSound,GetActorLocation());
-		ItemInfo.Weapon.Magazine -= 1;
-        OnWeaponFire.Broadcast();
+		ItemInfo.Weapon.Magazine --;
+		//UE_LOG(LogTemp, Warning, TEXT("WEAPON - ATTACK !!! --- BULLETS: %i "), ItemInfo.Weapon.Magazine);
+        OnWeaponFire.Broadcast(ItemInfo.Weapon.Magazine);
 	}		
 	else if(ItemInfo.Weapon.WeaponClass == EWeaponClass::Handle){
 		UE_LOG(LogTemp, Warning, TEXT("WEAPON - MELEEE ATTACK !!!"));
@@ -112,7 +109,10 @@ void ATDSItemBase::BeginPlay()
 			auto Player = PC->GetPawn(); //player
 			{
 				Direction = Player->GetActorForwardVector();
-				ProjectileMovementComponent->Velocity = FVector((Direction.X*ItemInfo.Projectile.ProjectileSpeed),(Direction.Y*ItemInfo.Projectile.ProjectileSpeed), 0);
+				ProjectileMovementComponent->Velocity = FVector(
+					(Direction.X*ItemInfo.Projectile.ProjectileSpeed),
+					(Direction.Y*ItemInfo.Projectile.ProjectileSpeed),
+					0);
                 //UE_LOG(LogTemp, Warning, TEXT("PROJECTILE VELOCITY = %f"), ProjectileMovementComponent->Velocity.Y);
                 ProjectileMovementComponent->InitialSpeed = ItemInfo.Projectile.ProjectileSpeed;
                 ProjectileMovementComponent->MaxSpeed = ItemInfo.Projectile.ProjectileMaxSpeed;

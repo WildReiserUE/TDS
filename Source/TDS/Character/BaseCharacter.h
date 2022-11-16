@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "KismetAnimationLibrary.h"
 #include "TDSInventory.h"
+#include "TDSSkillComponent.h"
 #include "Engine/DataTable.h"
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
@@ -98,10 +99,13 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraArm;
-
+	
 #if WITH_EDITOR
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;	
 #endif
 
 	void ChangeSettings();
+	virtual void FireOn();
+	UTDSInventory* GetInventory();
+	UTDSSkillComponent* GetSkillComponent();
 };

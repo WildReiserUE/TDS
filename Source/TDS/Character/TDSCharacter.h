@@ -38,14 +38,16 @@ public:
 	void PrevWeapon();
 	void NextWeapon();
 	
-	UFUNCTION(BlueprintCallable)
-	void FireOn();
+	UFUNCTION()
+	virtual void FireOn() override;
 	UFUNCTION()
 	void StartFire();
+	UFUNCTION()
+	void DecreaseBullet(int BulletInMagazine);
 	void ReloadWeapon();
 	UFUNCTION()
-	FName Example();
-	UFUNCTION(BlueprintCallable)
+	FName ReloadEnd();
+	UFUNCTION()
 	void FireOff();
 
 	void CalculateAllowSprint();

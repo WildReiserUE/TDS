@@ -15,7 +15,6 @@ ATDSAICharacter::ATDSAICharacter()
 void ATDSAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	//ChangeSettings();  //apply datatable info
 }
 
 void ATDSAICharacter::Tick(float DeltaTime)

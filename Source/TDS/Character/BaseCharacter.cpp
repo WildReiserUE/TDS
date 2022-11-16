@@ -53,3 +53,19 @@ void ABaseCharacter::ChangeSettings()
 	else
 		GetMesh()->SetAnimInstanceClass(nullptr);
 }
+
+void ABaseCharacter::FireOn()
+{	
+}
+
+UTDSInventory* ABaseCharacter::GetInventory()
+{
+	const auto Inventory = FindComponentByClass<UTDSInventory>();
+	return Inventory ? (Inventory) : nullptr;
+}
+
+UTDSSkillComponent* ABaseCharacter::GetSkillComponent()
+{
+	const auto SkillComponent = FindComponentByClass<UTDSSkillComponent>();
+	return SkillComponent ? (SkillComponent) : nullptr;
+}
