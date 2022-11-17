@@ -11,7 +11,7 @@ class ABaseCharacter;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFindItem, FItemInfo, ItemInfo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCountChange, int, ItemCount);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBulletsChanged, FItemInfo, ItemInfo, int, InventoryBullet);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReloadEnd, int, Magazine, int, InventoryBullet);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TDS_API UTDSInventory : public UActorComponent
@@ -26,23 +26,26 @@ public:
 	
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Inventory")
 	TArray<FItemInfo> Inventory;
-	
+
 	TArray<FItemInfo*> WeaponInventory;
-	
+
 	UPROPERTY(BlueprintAssignable)
-	FOnFindItem OnPlayerFindItem;
+	FOnFindItem OnFindItem;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnCountChange OnCountChange;
 	
 	UPROPERTY(BlueprintAssignable)
-	FOnBulletsChanged OnBulletsChanged;
+	FOnReloadEnd OnReloadEnd;
 
 	UFUNCTION()
 	void OverlapItem(AActor* OverlappedActor, AActor* OtherActor);
 
 	UFUNCTION()
 	void EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor);
+
+	UFUNCTION(BlueprintCallable)
+	int GetWeaponIndex(FItemInfo ItemInfo);
 
 	ABaseCharacter* ComponentOwner();
 	void AddItem(ATDSItemBase* Item);

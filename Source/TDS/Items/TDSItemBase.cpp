@@ -72,24 +72,25 @@ void ATDSItemBase::StartSpawnBullet()
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		FVector SocketLocation = this->ItemMeshComponent->GetSocketLocation(FName("BulletSocket"));
-        FTransform SpawnPoint = FTransform(FRotator(0),SocketLocation,FVector(1));
-        auto Spawned = GetWorld()->SpawnActorDeferred<ATDSItemBase>(ItemInfo.Weapon.WeaponProjectile, SpawnPoint, this,nullptr, SpawnParams.SpawnCollisionHandlingOverride);
-        Spawned->SpawnedName = ItemInfo.Weapon.ProjectileName;
-        UGameplayStatics::FinishSpawningActor(Spawned,SpawnPoint);
-        Spawned->ChangeSettings();
+		FTransform SpawnPoint = FTransform(FRotator(0),SocketLocation,FVector(1));
+		auto Spawned = GetWorld()->SpawnActorDeferred<ATDSItemBase>(ItemInfo.Weapon.WeaponProjectile, SpawnPoint, this,nullptr, SpawnParams.SpawnCollisionHandlingOverride);
+		Spawned->SpawnedName = ItemInfo.Weapon.ProjectileName;
+		UGameplayStatics::FinishSpawningActor(Spawned,SpawnPoint);
+		Spawned->ChangeSettings();
 		UGameplayStatics::SpawnSoundAtLocation(this,ItemInfo.Weapon.ShootSound,GetActorLocation());
 		ItemInfo.Weapon.Magazine --;
-		//UE_LOG(LogTemp, Warning, TEXT("WEAPON - ATTACK !!! --- BULLETS: %i "), ItemInfo.Weapon.Magazine);
-        OnWeaponFire.Broadcast(ItemInfo.Weapon.Magazine);
-	}		
+		OnWeaponFire.Broadcast(ItemInfo.Weapon.Magazine);
+	}
 	else if(ItemInfo.Weapon.WeaponClass == EWeaponClass::Handle){
 		UE_LOG(LogTemp, Warning, TEXT("WEAPON - MELEEE ATTACK !!!"));
 		OnWeaponAttack.Broadcast();
 	}
 }
 
-void ATDSItemBase::StopSpawnBullet(){
-	if(GetWorld()->GetTimerManager().IsTimerActive(AttackTimer)){
+void ATDSItemBase::StopSpawnBullet()
+{
+	if(GetWorld()->GetTimerManager().IsTimerActive(AttackTimer))
+	{
 		GetWorld()->GetTimerManager().ClearTimer(AttackTimer);
 	}
 }
@@ -113,9 +114,9 @@ void ATDSItemBase::BeginPlay()
 					(Direction.X*ItemInfo.Projectile.ProjectileSpeed),
 					(Direction.Y*ItemInfo.Projectile.ProjectileSpeed),
 					0);
-                //UE_LOG(LogTemp, Warning, TEXT("PROJECTILE VELOCITY = %f"), ProjectileMovementComponent->Velocity.Y);
-                ProjectileMovementComponent->InitialSpeed = ItemInfo.Projectile.ProjectileSpeed;
-                ProjectileMovementComponent->MaxSpeed = ItemInfo.Projectile.ProjectileMaxSpeed;
+					//UE_LOG(LogTemp, Warning, TEXT("PROJECTILE VELOCITY = %f"), ProjectileMovementComponent->Velocity.Y);
+					ProjectileMovementComponent->InitialSpeed = ItemInfo.Projectile.ProjectileSpeed;
+					ProjectileMovementComponent->MaxSpeed = ItemInfo.Projectile.ProjectileMaxSpeed;
 			}
 		}
 	}
@@ -130,7 +131,7 @@ void ATDSItemBase::BeginPlay()
 			case  EWeaponAttackSpeed::Normal:
 				AttackRate = 0.5f; break;
 			case EWeaponAttackSpeed::Fast:
-        		AttackRate = 0.25f; break;
+				AttackRate = 0.25f; break;
 			case EWeaponAttackSpeed::VeryFast:
 				AttackRate = 0.125f; break;
 			default:break;
@@ -154,7 +155,7 @@ void ATDSItemBase::ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 			UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = POINT DAMAGE FROM WEAPON %f"), Info->GetItemInfo().Weapon.PhysicalDamage);
 			UGameplayStatics::ApplyDamage(OtherActor,Info->ItemInfo.Weapon.PhysicalDamage,nullptr,this,UDamageType::StaticClass());
 			break;
-			
+
 		case EProjectileTypeDamage::Radial:
 			UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = RADIAL DAMAGE FROM WEAPON %f"), Info->GetItemInfo().Weapon.PhysicalDamage);
 			UGameplayStatics::ApplyRadialDamage(OtherActor,
@@ -165,7 +166,7 @@ void ATDSItemBase::ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 				Info->ItemInfo.Weapon.IgnoredActors,
 				Info);
 			break;
-			
+
 		case EProjectileTypeDamage::Visible:
 			UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = VISIBLE DAMAGE FROM WEAPON %f"), Info->GetItemInfo().Weapon.PhysicalDamage);
 			UGameplayStatics::ApplyRadialDamage(OtherActor,
@@ -179,10 +180,10 @@ void ATDSItemBase::ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 				true,
 				ECollisionChannel::ECC_Visibility);
 			break;
-			
+
 		default:break;
-		}		
+		}
 	}
-	
+
 	Destroy();
 }

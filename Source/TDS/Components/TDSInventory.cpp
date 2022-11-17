@@ -49,17 +49,24 @@ void UTDSInventory::EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor)
 	}
 }
 
+int UTDSInventory::GetWeaponIndex(FItemInfo ItemInfo)
+{
+	return WeaponInventory.Find(&ItemInfo);
+}
+
 void UTDSInventory::AddItem(ATDSItemBase* Item)
 {
 	const int i = FindItemById(Item->ItemInfo.ItemID);
 	if (i == INDEX_NONE)									//если такого предмета нет
-	{								
+	{
 		Inventory.Add(Item->ItemInfo);						//добавляем в общий инвентарь
+		UE_LOG(LogTemp,Log,TEXT("---AAA--- %x"), &Inventory.Last());
 		if(Item->ItemInfo.ItemType == EItemType::Weapon)	//если оружие добавляем в список оружия  TODO:DuplicateWeapon?
     	{
-    		WeaponInventory.Add(&Item->ItemInfo);
+    		WeaponInventory.Add(&Inventory.Last());
+			UE_LOG(LogTemp,Log,TEXT("---BBB--- %x"), WeaponInventory.Last());
     	}
-		OnPlayerFindItem.Broadcast(Item->ItemInfo);
+		OnFindItem.Broadcast(Item->ItemInfo);
 	}
 	else
 	{														//если такой предмет есть
@@ -71,9 +78,9 @@ void UTDSInventory::AddItem(ATDSItemBase* Item)
 		else
 		{
 			Inventory.Add(Item->ItemInfo);					//добавляем в общий инвентарь			 если не пачкуется
-			OnPlayerFindItem.Broadcast(Item->ItemInfo);
+			OnFindItem.Broadcast(Item->ItemInfo);
 		}
-	}	
+	}
 	Item->Destroy();
 }
 
@@ -123,19 +130,19 @@ void UTDSInventory::DecreaseCount(FItemInfo WeaponInfo)
 			{
 				ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine = Inventory[i].Count + ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine;
 				Inventory.RemoveAt(i);
-				OnBulletsChanged.Broadcast(ComponentOwner()->CurrentWeapon->ItemInfo, 0);
+				OnReloadEnd.Broadcast(ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine, 0);
 			}
 			else
 			{
 				Inventory[i].Count = Result;
 				ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine = WeaponInfo.Weapon.MaxMagazine;
-				OnBulletsChanged.Broadcast(ComponentOwner()->CurrentWeapon->ItemInfo, Inventory[i].Count);
+				OnReloadEnd.Broadcast(ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine, Inventory[i].Count);
 			}
 			//ComponentOwner()->FireOn();
 		}
 		else //пустой слот патрона
 		{
 			UE_LOG(LogTemp,Warning,TEXT("FIRE BULLET ECTb HO = 0"));
-		}		
+		}
 	}
 }

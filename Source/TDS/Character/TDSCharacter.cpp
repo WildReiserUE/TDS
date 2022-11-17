@@ -269,7 +269,7 @@ void ATDSCharacter::NextWeapon()
 			{
 				CurrentWeaponIndex = 0;
 			}
-			StopAnimMontage();			
+			StopAnimMontage();
 			CurrentWeapon = SpawnWeapon(CurrentWeaponIndex);
 			CurrentWeapon->OnWeaponFire.AddDynamic(this, &ATDSCharacter::DecreaseBullet);
 			OnWeaponSwitch.Broadcast(CurrentWeaponIndex);
@@ -305,7 +305,7 @@ void ATDSCharacter::FireOn()  //По нажатию кнопки - стрель�
 			{
 				int RndMontage = UKismetMathLibrary::RandomIntegerInRange(0,CharacterInfo.MontageHandleAttack.Num()-1);
 				PlayAnimMontage(CharacterInfo.MontageHandleAttack[RndMontage]);
-			}					
+			}
 		}
 	}
 }
@@ -327,7 +327,7 @@ void ATDSCharacter::StartFire()
 		else
 		{
 			FireOff();
-            ReloadWeapon();
+			ReloadWeapon();
 		}
 	}
 }
@@ -340,7 +340,7 @@ void ATDSCharacter::DecreaseBullet(int BulletInMagazine)
 void ATDSCharacter::ReloadWeapon()
 {	
  	if(CurrentWeapon
- 		&& GetInventory() 		
+ 		&& GetInventory()
  		&& CurrentWeapon->ItemInfo.Weapon.Magazine < CurrentWeapon->ItemInfo.Weapon.MaxMagazine
  		&& GetInventory()->CheckBullets(CurrentWeapon->ItemInfo.Weapon.ProjectileId))
  		{
@@ -363,7 +363,7 @@ void ATDSCharacter::ReloadWeapon()
  						}
  					}
  				}
- 			} 				
+ 			}
  		}
  		else 
  			UE_LOG(LogTemp,Error,TEXT("MAGAZINE IS FULL OR NO INVENTORY BULLETS"));
@@ -383,7 +383,7 @@ void ATDSCharacter::FireOff()
 	if(CurrentWeapon && GetWorld()->GetTimerManager().IsTimerActive(CurrentWeapon->AttackTimer))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Command to Weapon - STOP Fire"));
-		GetWorld()->GetTimerManager().ClearTimer(CurrentWeapon->AttackTimer);		
+		GetWorld()->GetTimerManager().ClearTimer(CurrentWeapon->AttackTimer);
 		bRotateToAttack = false;
 		CurrentWeapon->StopSpawnBullet();
 	}
