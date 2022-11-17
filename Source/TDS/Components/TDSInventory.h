@@ -26,8 +26,7 @@ public:
 	
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Inventory")
 	TArray<FItemInfo> Inventory;
-
-	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Inventory")
+	
 	TArray<FItemInfo*> WeaponInventory;
 	
 	UPROPERTY(BlueprintAssignable)
