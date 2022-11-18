@@ -57,28 +57,45 @@ int UTDSInventory::GetWeaponIndex(FItemInfo ItemInfo)
 void UTDSInventory::AddItem(ATDSItemBase* Item)
 {
 	const int i = FindItemById(Item->ItemInfo.ItemID);
-	if (i == INDEX_NONE)									//если такого предмета нет
+	if (i == INDEX_NONE)										//если такого предмета нет
 	{
-		Inventory.Add(Item->ItemInfo);						//добавляем в общий инвентарь
+		Inventory.Add(Item->ItemInfo);							//добавляем в общий инвентарь
 		UE_LOG(LogTemp,Log,TEXT("---AAA--- %x"), &Inventory.Last());
-		if(Item->ItemInfo.ItemType == EItemType::Weapon)	//если оружие добавляем в список оружия  TODO:DuplicateWeapon?
-    	{
-    		WeaponInventory.Add(&Inventory.Last());
+		
+		if(Item->ItemInfo.ItemType == EItemType::Weapon)		//если оружие добавляем в список оружия если такого оружия нет
+		{
+			WeaponInventory.Add(&Inventory.Last());
 			UE_LOG(LogTemp,Log,TEXT("---BBB--- %x"), WeaponInventory.Last());
-    	}
+		}
 		OnFindItem.Broadcast(Item->ItemInfo);
 	}
 	else
-	{														//если такой предмет есть
+	{															//если такой предмет есть
 		if (Item->ItemInfo.bIsStackable)
 		{
-			Inventory[i].Count += Item->ItemInfo.Count;		//складываем если пачкуется
-			OnCountChange.Broadcast(Inventory[i].Count);	//уведомляем об изменении количества
+			Inventory[i].Count += Item->ItemInfo.Count;			//складываем если пачкуется
+			OnCountChange.Broadcast(Inventory[i].Count);		//уведомляем об изменении количества
 		}
 		else
 		{
-			Inventory.Add(Item->ItemInfo);					//добавляем в общий инвентарь			 если не пачкуется
-			OnFindItem.Broadcast(Item->ItemInfo);
+			switch (Item->ItemInfo.ItemType)
+			{
+			case EItemType::Weapon:
+				{
+					UE_LOG(LogTemp,Log,TEXT("---AGAIN WEAPON--- NEED ---ADD BULLETS--- %i"), Item->ItemInfo.Weapon.MaxMagazine);
+					break;
+				}
+			case EItemType::Armor:
+				{
+					UE_LOG(LogTemp,Log,TEXT("---AGAIN ARMOR--- ---WHAT TO DO ---"));
+					break;
+				}
+			default:
+				{
+					Inventory.Add(Item->ItemInfo);				//добавляем в общий инвентарь любой тип кроме описаных если не пачкуется
+					OnFindItem.Broadcast(Item->ItemInfo);
+				}
+			}
 		}
 	}
 	Item->Destroy();

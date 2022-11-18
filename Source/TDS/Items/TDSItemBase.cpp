@@ -134,7 +134,7 @@ void ATDSItemBase::BeginPlay()
 				AttackRate = 0.25f; break;
 			case EWeaponAttackSpeed::VeryFast:
 				AttackRate = 0.125f; break;
-			default:break;
+			default:;
 		}
 	}
 }
