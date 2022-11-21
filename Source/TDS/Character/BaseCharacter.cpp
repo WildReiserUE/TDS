@@ -58,7 +58,7 @@ void ABaseCharacter::FireOn()
 {	
 }
 
-UTDSInventory* ABaseCharacter::GetInventory()
+UTDSInventory* ABaseCharacter::GetInventoryComp()
 {
 	const auto Inventory = FindComponentByClass<UTDSInventory>();
 	return Inventory ? (Inventory) : nullptr;

@@ -106,6 +106,6 @@ public:
 
 	void ChangeSettings();
 	virtual void FireOn();
-	UTDSInventory* GetInventory();
+	UTDSInventory* GetInventoryComp();
 	UTDSSkillComponent* GetSkillComponent();
 };
