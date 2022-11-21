@@ -27,7 +27,8 @@ public:
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Inventory")
 	TArray<FItemInfo> Inventory;
 
-	TArray<FItemInfo*> WeaponInventory;
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="WeaponInventory")
+	TArray<FItemInfo> WeaponInventory;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnFindItem OnFindItem;
@@ -44,8 +45,8 @@ public:
 	UFUNCTION()
 	void EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor);
 
-	UFUNCTION(BlueprintCallable)
-	int GetWeaponIndex(FItemInfo ItemInfo);
+	// UFUNCTION(BlueprintCallable)
+	// int GetWeaponIndex(FItemInfo ItemInfo);
 
 	ABaseCharacter* ComponentOwner();
 	void AddItem(ATDSItemBase* Item);

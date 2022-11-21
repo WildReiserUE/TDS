@@ -206,12 +206,12 @@ ATDSItemBase* ATDSCharacter::SpawnWeapon(int WeaponIndex)
 			const FVector Loc(0,0,0);
 			FTransform SpawnTransform = FTransform(Loc);
 			ATDSItemBase* MyWeapon = Cast<ATDSItemBase>(GetWorld()->SpawnActorDeferred<ATDSItemBase>(
-				GetInventoryComp()->WeaponInventory[WeaponIndex]->BaseClass,
+				GetInventoryComp()->WeaponInventory[WeaponIndex].BaseClass,
 				SpawnTransform,
 				SpawnParams.Owner,
 				SpawnParams.Instigator,
 				SpawnParams.SpawnCollisionHandlingOverride));
-			MyWeapon->SpawnedName = GetInventoryComp()->WeaponInventory[WeaponIndex]->DTItemName;
+			MyWeapon->SpawnedName = GetInventoryComp()->WeaponInventory[WeaponIndex].DTItemName;
 			MyWeapon->ItemMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			UGameplayStatics::FinishSpawningActor(MyWeapon,SpawnTransform);
 			if (MyWeapon)

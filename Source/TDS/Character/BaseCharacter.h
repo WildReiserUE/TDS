@@ -18,7 +18,7 @@ struct FBaseData
 	GENERATED_BODY()
 	float CameraMaxLenght = 1500.f;
 	float CameraMinLenght = 300.f;
-	float CameraChangeStep = 75.f;	
+	float CameraChangeStep = 75.f;
 };
 
 USTRUCT(BlueprintType)

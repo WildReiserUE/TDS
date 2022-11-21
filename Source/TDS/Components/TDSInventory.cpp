@@ -48,32 +48,32 @@ void UTDSInventory::EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor)
 		}
 	}
 }
-
-int UTDSInventory::GetWeaponIndex(FItemInfo ItemInfo)
-{
-	return WeaponInventory.Find(&ItemInfo);
-}
+//
+// int UTDSInventory::GetWeaponIndex(FItemInfo ItemInfo)
+// {
+// 	return WeaponInventory.Find(ItemInfo);
+// }
 
 void UTDSInventory::AddItem(ATDSItemBase* Item)
 {
 	const int i = FindItemById(Item->ItemInfo.ItemID);
-	if (i == INDEX_NONE)										//если такого предмета нет
+	if (i == INDEX_NONE)																						//если такого предмета нет
 	{
-		switch (Item->ItemInfo.ItemType)		//если оружие добавляем в список оружия если такого оружия нет
+		switch (Item->ItemInfo.ItemType)																		//если оружие добавляем в список оружия если такого оружия нет
 		{
 		case EItemType::Weapon:
 			{
-				Inventory.Add(Item->ItemInfo);																//добавляем в общий инвентарь
-				UE_LOG(LogTemp,Log,TEXT("---ADD NEW--- INVENTORY ITEM--- %x"), &Inventory.Last());
-				WeaponInventory.Add(&Inventory.Last());														//добавляем в инвентарь оружия ссылку
-				UE_LOG(LogTemp,Log,TEXT("---ADD NEW--- WEAPON ITEM--- %x"), WeaponInventory.Last());
+				// Inventory.Add(Item->ItemInfo);																//добавляем в общий инвентарь
+				UE_LOG(LogTemp,Log,TEXT("---ADD NEW--- WEAPON ITEM--- "));
+				WeaponInventory.Add(Item->ItemInfo);															//добавляем в инвентарь оружия
+				//UE_LOG(LogTemp,Log,TEXT("---ADD NEW--- WEAPON ITEM--- %x"), WeaponInventory.Last());
 				OnFindItem.Broadcast(Item->ItemInfo);
 				break;
 			}
 		default:
 			{
-				Inventory.Add(Item->ItemInfo);																//добавляем в общий инвентарь
-				UE_LOG(LogTemp,Log,TEXT("---ADD NEW---2222--- INVENTORY ITEM--- %x"), &Inventory.Last());
+				Inventory.Add(Item->ItemInfo);																	//добавляем в общий инвентарь
+				UE_LOG(LogTemp,Log,TEXT("---ADD NEW--- INVENTORY ITEM---"));
 				OnFindItem.Broadcast(Item->ItemInfo);
 				break;
 			}
