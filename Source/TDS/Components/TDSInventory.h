@@ -45,12 +45,13 @@ public:
 	UFUNCTION()
 	void EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor);
 
-	// UFUNCTION(BlueprintCallable)
-	// int GetWeaponIndex(FItemInfo ItemInfo);
+	UFUNCTION(BlueprintCallable)
+	int GetWeaponIndex(FItemInfo ItemInfo);
 
 	ABaseCharacter* ComponentOwner();
 	void AddItem(ATDSItemBase* Item);
-	int FindItemById(int aId);
+	int FindInventoryItemById(int aId);
+	int FindWeaponItemById(int aId);
 	bool CheckBullets(int ProjectileId);
 	void DecreaseCount(FItemInfo WeaponInfo);
 	bool FoundAround = false;

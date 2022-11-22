@@ -48,25 +48,35 @@ void UTDSInventory::EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor)
 		}
 	}
 }
-//
-// int UTDSInventory::GetWeaponIndex(FItemInfo ItemInfo)
-// {
-// 	return WeaponInventory.Find(ItemInfo);
-// }
+
+int UTDSInventory::GetWeaponIndex(FItemInfo ItemInfo)
+{
+	
+	int n = INDEX_NONE;
+	int i = 0;
+	for (FItemInfo aItem : WeaponInventory)
+	{
+		if (aItem.ItemType == EItemType::Weapon){
+			n = i;
+			break;
+		}
+		i++;
+	}
+	return n;
+}
 
 void UTDSInventory::AddItem(ATDSItemBase* Item)
 {
-	const int i = FindItemById(Item->ItemInfo.ItemID);
-	if (i == INDEX_NONE)																						//если такого предмета нет
+	const int i = FindInventoryItemById(Item->ItemInfo.ItemID);
+	const int y = FindWeaponItemById(Item->ItemInfo.ItemID);
+	if (i == INDEX_NONE && y == INDEX_NONE)																		//если такого предмета нет нигде
 	{
 		switch (Item->ItemInfo.ItemType)																		//если оружие добавляем в список оружия если такого оружия нет
 		{
 		case EItemType::Weapon:
 			{
-				// Inventory.Add(Item->ItemInfo);																//добавляем в общий инвентарь
 				UE_LOG(LogTemp,Log,TEXT("---ADD NEW--- WEAPON ITEM--- "));
 				WeaponInventory.Add(Item->ItemInfo);															//добавляем в инвентарь оружия
-				//UE_LOG(LogTemp,Log,TEXT("---ADD NEW--- WEAPON ITEM--- %x"), WeaponInventory.Last());
 				OnFindItem.Broadcast(Item->ItemInfo);
 				break;
 			}
@@ -80,12 +90,12 @@ void UTDSInventory::AddItem(ATDSItemBase* Item)
 		}
 	}
 	else
-	{															//если такой предмет есть
+	{																											//если такой предмет есть
 		if (Item->ItemInfo.bIsStackable)
 		{
-			Inventory[i].Count += Item->ItemInfo.Count;			//складываем если пачкуется
+			Inventory[i].Count += Item->ItemInfo.Count;															//складываем если пачкуется
 			UE_LOG(LogTemp,Log,TEXT("---ADD %i COUNT TO INVENTORY ITEM---"), Inventory[i].Count);
-			OnCountChange.Broadcast(Inventory[i].Count);		//уведомляем об изменении количества
+			OnCountChange.Broadcast(Inventory[i].Count);														//уведомляем об изменении количества
 		}
 		else
 		{
@@ -103,7 +113,8 @@ void UTDSInventory::AddItem(ATDSItemBase* Item)
 				}
 			default:
 				{
-					Inventory.Add(Item->ItemInfo);				//добавляем в общий инвентарь любой тип кроме описаных если не пачкуется
+					Inventory.Add(Item->ItemInfo);																//добавляем в общий инвентарь любой тип
+																												//кроме описаных правил если не пачкуется
 					OnFindItem.Broadcast(Item->ItemInfo);
 					break;
 				}
@@ -113,7 +124,7 @@ void UTDSInventory::AddItem(ATDSItemBase* Item)
 	Item->Destroy();
 }
 
-int UTDSInventory::FindItemById(int aId){
+int UTDSInventory::FindInventoryItemById(int aId){
 	int n = INDEX_NONE;
 	int i = 0;
 	for (FItemInfo aItem : Inventory){
@@ -126,9 +137,23 @@ int UTDSInventory::FindItemById(int aId){
 	return n;
 }
 
+int UTDSInventory::FindWeaponItemById(int aId)
+{
+	int n = INDEX_NONE;
+	int i = 0;
+	for (FItemInfo aItem : WeaponInventory){
+		if (aItem.ItemID == aId){
+			n = i;
+			break;
+		}
+		i++;
+	}
+	return n;
+}
+
 bool UTDSInventory::CheckBullets(int ProjectileId)
 {
-	int i = FindItemById(ProjectileId);
+	int i = FindInventoryItemById(ProjectileId);
 	if (i == INDEX_NONE) //если элемента нет
 	{
 		UE_LOG(LogTemp,Warning,TEXT("TRY RELOAD BULLET ID: %i ---HET--- COBCEM"), i);
@@ -143,7 +168,7 @@ bool UTDSInventory::CheckBullets(int ProjectileId)
 
 void UTDSInventory::DecreaseCount(FItemInfo WeaponInfo)
 {	
-	int i = FindItemById(WeaponInfo.Weapon.ProjectileId);
+	int i = FindInventoryItemById(WeaponInfo.Weapon.ProjectileId);
 	if (i == INDEX_NONE) //если элемента нет
 	{
 		UE_LOG(LogTemp,Warning,TEXT("TRY DECREASE INVENTORY BULLET ---HET--- COBCEM"));
