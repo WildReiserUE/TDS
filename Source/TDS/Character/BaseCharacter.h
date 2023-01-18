@@ -3,11 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "KismetAnimationLibrary.h"
 #include "TDSInventory.h"
 #include "TDSSkillComponent.h"
 #include "Engine/DataTable.h"
 #include "GameFramework/Character.h"
+#include "KismetAnimationLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "BaseCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComponentsAdded);
@@ -26,43 +28,43 @@ struct FBaseHumanoidData : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FName NPC_Id;
+	FName NPC_Id = FName("NoName");
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FText Humanoid_Name;
+	FText Humanoid_Name = FText();
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	USkeletalMesh* Humanoid_Mesh;
+	USkeletalMesh* Humanoid_Mesh = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TSubclassOf<UAnimInstance> Humanoid_AnimInstance;
+	TSubclassOf<UAnimInstance> Humanoid_AnimInstance = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<TSubclassOf<UActorComponent>> ComponentList;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, meta=(ClampMin="0"))
-	float Mana;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, meta=(ClampMin="0"))
-	float WalkSpeed;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, meta=(ClampMin="0"))
-	float RunSpeed;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, meta=(ClampMin="0"))
-	float AimMoveSpeed;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin="0"))
+	float Mana = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin="0"))
+	float WalkSpeed = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin="0"))
+	float RunSpeed = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin="0"))
+	float AimMoveSpeed = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	bool bCanUseShield = false;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, meta=(EditCondition="bCanUseShield == true"))
-	float MaxShield;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, meta=(ClampMin="0"))
-	float MaxHealth;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
-	float ShieldRecoveryValue;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
-	float SheildRecoveryPeriod;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, meta=(ClampMin="0"))
-	int Experience;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
-	TArray<UAnimMontage*>MontageHandleAttack;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(EditCondition="bCanUseShield == true"))
+	float MaxShield = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin="0"))
+	float MaxHealth = 0.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TArray<UAnimMontage*>MontageDead;
+	float ShieldRecoveryValue = 0.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TMap<EWeaponClass,UAnimMontage*> WeaponMontageShotingMap;
+	float SheildRecoveryPeriod = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin="0"))
+	int Experience = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TMap<EWeaponClass,UAnimMontage*> WeaponMontageReloadMap;
+	TArray<UAnimMontage*> MontageHandleAttack;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TArray<UAnimMontage*> MontageDead;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TMap<EWeaponClass, UAnimMontage*> WeaponMontageShotingMap;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TMap<EWeaponClass, UAnimMontage*> WeaponMontageReloadMap;
 };
 
 UCLASS()
@@ -78,7 +80,7 @@ public:
 	FORCEINLINE class UCameraComponent* GetCharacterCameraComponent() const { return CharacterCameraComponent; }
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraArm; }
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
 	FBaseData BaseInfo;
 
@@ -93,15 +95,15 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnComponentsAdded ComponentsAdded;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* CharacterCameraComponent;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraArm;
-	
+
 #if WITH_EDITOR
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;	
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
 	void ChangeSettings();

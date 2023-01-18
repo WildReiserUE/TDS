@@ -9,10 +9,8 @@ bool UTDSStateEffect::InitObject(APawn* Pawn)
 
 void UTDSStateEffect::ExecuteEffect(float DeltaTime)
 {
-	
 }
 
 void UTDSStateEffect::DestroyObject()
 {
-	
 }

@@ -9,5 +9,4 @@ UCLASS()
 class TDS_API UTDSDamageTypePhysic : public UDamageType
 {
 	GENERATED_BODY()
-	
 };

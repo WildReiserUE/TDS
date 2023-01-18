@@ -7,7 +7,9 @@
 #include "TDSHealthComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChange, float, Health, float, MaxHealth);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnShieldChange, float, Shield, float, MaxShield);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOwnerDeath);
 
 USTRUCT(BlueprintType)
@@ -26,38 +28,39 @@ class TDS_API UTDSHealthComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	UTDSHealthComponent();
 	void InitParams();
-	
+
 	UPROPERTY(BlueprintAssignable, Category="Health")
 	FOnHealthChange OnHealthChange;
-	
+
 	UPROPERTY(BlueprintAssignable, Category="Health")
 	FOnShieldChange OnShieldChange;
-	
+
 	UPROPERTY(BlueprintAssignable, Category="Health")
 	FOnOwnerDeath OnOwnerDeath;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	FHealthSettings HealthSettings;
 
-	FTimerHandle ShieldRecoveryTimer;	
-	
+	FTimerHandle ShieldRecoveryTimer;
+
 	UFUNCTION()
 	void HealthChange(float Value);
-	
+
 	UFUNCTION()
-	void TakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+	void TakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
+	                   class AController* InstigatedBy, AActor* DamageCauser);
 	void ShieldRecovery();
 	void ShieldRecoveryStart();
 	AActor* ComponentOwner();
-	
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
+	                           FActorComponentTickFunction* ThisTickFunction) override;
+
 private:
 	float Health;
 	float Shield;

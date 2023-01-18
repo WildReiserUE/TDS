@@ -17,8 +17,8 @@ public:
 	ATDSAIController();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Sensing")
-	UAIPerceptionComponent* AiPerception;
+	UAIPerceptionComponent* AiPerception = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Sensing")
-	UAISenseConfig_Sight* AiConfigSight;
+	UAISenseConfig_Sight* AiConfigSight = nullptr;
 };

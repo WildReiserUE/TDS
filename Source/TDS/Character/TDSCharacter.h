@@ -5,11 +5,10 @@
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
 #include "TDSItemBase.h"
-#include "GameFramework/Character.h"
 #include "TDSCharacter.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponSwitch,int,WeaponIndex);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponSwitch, int, WeaponIndex);
 
 UCLASS()
 class ATDSCharacter : public ABaseCharacter
@@ -18,11 +17,11 @@ class ATDSCharacter : public ABaseCharacter
 
 public:
 	ATDSCharacter();
-	
+
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
-	
+
 	UFUNCTION()
 	void InputAxisY(float Value);
 	UFUNCTION()
@@ -37,7 +36,7 @@ public:
 	ATDSItemBase* SpawnWeapon(int WeaponIndex);
 	void PrevWeapon();
 	void NextWeapon();
-	
+
 	UFUNCTION()
 	virtual void FireOn() override;
 	UFUNCTION()
@@ -66,19 +65,19 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CharacterDirection")
 	float CurrentCharSpeed = 0.0f;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "CharacterStateParam")
 	bool bSniperMode = false;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player Settings")
-	UDecalComponent* CursorToWorld;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player Settings")
-	UMaterialInterface* CursorMaterial =nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player Settings")
-	FVector CursorSize=FVector(10.0f,20.0f,20.0f);
-	
+	UDecalComponent* CursorToWorld = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player Settings")
+	UMaterialInterface* CursorMaterial = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player Settings")
+	FVector CursorSize = FVector(10.0f, 20.0f, 20.0f);
+
 	float AxisX = 0.0f;
 	float AxisY = 0.0f;
 	bool bSprintAllow = false;
@@ -86,10 +85,9 @@ public:
 	int CurrentWeaponIndex = -1;
 
 private:
-	
 	UPROPERTY(BlueprintAssignable)
 	FOnWeaponSwitch OnWeaponSwitch;
-	
+
 	bool bSprintActivate = false;
 	bool bIsALife = true;
 	FTimerHandle WeaponReloadTimer;

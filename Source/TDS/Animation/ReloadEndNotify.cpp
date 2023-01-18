@@ -5,7 +5,7 @@
 
 
 void UReloadEndNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
-	const FAnimNotifyEventReference& EventReference)
+                              const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 	OnNotified.Broadcast(MeshComp);

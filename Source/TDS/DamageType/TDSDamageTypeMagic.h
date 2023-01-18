@@ -13,8 +13,4 @@ UCLASS()
 class TDS_API UTDSDamageTypeMagic : public UDamageType
 {
 	GENERATED_BODY()
-	
-	
-	
-	
 };
