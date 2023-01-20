@@ -68,7 +68,7 @@ struct FBaseHumanoidData : public FTableRowBase
 };
 
 UCLASS()
-class TDS_API ABaseCharacter : public ACharacter
+class TDS_API ABaseCharacter : public APawn
 {
 	GENERATED_BODY()
 
@@ -80,6 +80,19 @@ public:
 	FORCEINLINE class UCameraComponent* GetCharacterCameraComponent() const { return CharacterCameraComponent; }
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraArm; }
+
+	FORCEINLINE USkeletalMeshComponent* GetMesh() const { return CharacterMesh; }
+
+	FORCEINLINE UCapsuleComponent* GetCapsuleComponent() const { return CapsuleComponent; }
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Humanoid Mesh")
+	USkeletalMeshComponent* CharacterMesh;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Humanoid Mesh")
+	UCapsuleComponent* CapsuleComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Humanoid Mesh")
+	UPawnMovementComponent* MovementComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
 	FBaseData BaseInfo;

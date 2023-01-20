@@ -20,10 +20,10 @@ ATDSCharacter::ATDSCharacter()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-	GetCharacterMovement()->bOrientRotationToMovement = false; // Rotate character to moving direction
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
-	GetCharacterMovement()->bConstrainToPlane = true;
-	GetCharacterMovement()->bSnapToPlaneAtStart = true;
+	// GetMovementComponent()->->bOrientRotationToMovement = false; // Rotate character to moving direction
+	// GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
+	// GetCharacterMovement()->bConstrainToPlane = true;
+	// GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
 	CameraArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraArm"));
 	CameraArm->SetupAttachment(RootComponent);
@@ -150,7 +150,7 @@ void ATDSCharacter::ActivateSprint()
 	{
 		if (GetSkillComponent()->SprintPoint > GetSkillComponent()->SprintSettings.SprintLosePoint)
 		{
-			GetCharacterMovement()->MaxWalkSpeed = CharacterInfo.RunSpeed * GetSkillComponent()->SprintCoef;
+			//GetMovementComponent()->MaxWalkSpeed = CharacterInfo.RunSpeed * GetSkillComponent()->SprintCoef;
 			GetSkillComponent()->StartSprint();
 			bSprintActivate = true;
 		}
@@ -163,7 +163,7 @@ void ATDSCharacter::DeActivateSprint()
 	{
 		GetSkillComponent()->StopSprint();
 		bSprintActivate = false;
-		GetCharacterMovement()->MaxWalkSpeed = CharacterInfo.RunSpeed;
+		//GetMovementComponent()->MaxWalkSpeed = CharacterInfo.RunSpeed;
 	}
 }
 
@@ -184,7 +184,7 @@ void ATDSCharacter::SniperModeOn()
 		if (bSprintActivate)
 			DeActivateSprint();
 		bSniperMode = true;
-		GetCharacterMovement()->MaxWalkSpeed = CharacterInfo.AimMoveSpeed;
+		//GetMovementComponent()->MaxWalkSpeed = CharacterInfo.AimMoveSpeed;
 	}
 }
 
@@ -193,7 +193,7 @@ void ATDSCharacter::SniperModeOff()
 	if (bSniperMode)
 	{
 		bSniperMode = false;
-		GetCharacterMovement()->MaxWalkSpeed = CharacterInfo.RunSpeed;
+		//GetMovementComponent()->MaxWalkSpeed = CharacterInfo.RunSpeed;
 	}
 }
 
@@ -254,7 +254,7 @@ void ATDSCharacter::PrevWeapon()
 			{
 				CurrentWeaponIndex = GetInventoryComp()->WeaponInventory.Num() - 1;
 			}
-			StopAnimMontage();
+			GetMesh()->GetAnimInstance()->StopAllMontages(0.01f);
 			CurrentWeapon = SpawnWeapon(CurrentWeaponIndex);
 			CurrentWeapon->OnWeaponFire.AddDynamic(this, &ATDSCharacter::DecreaseBullet);
 			OnWeaponSwitch.Broadcast(CurrentWeaponIndex);
@@ -280,7 +280,7 @@ void ATDSCharacter::NextWeapon()
 			{
 				CurrentWeaponIndex = 0;
 			}
-			StopAnimMontage();
+			GetMesh()->GetAnimInstance()->StopAllMontages(0.01f);
 			CurrentWeapon = SpawnWeapon(CurrentWeaponIndex);
 			CurrentWeapon->OnWeaponFire.AddDynamic(this, &ATDSCharacter::DecreaseBullet);
 			OnWeaponSwitch.Broadcast(CurrentWeaponIndex);
@@ -316,7 +316,7 @@ void ATDSCharacter::FireOn() //По нажатию кнопки - стрельб
 			{
 				int RndMontage = UKismetMathLibrary::RandomIntegerInRange(
 					0, CharacterInfo.MontageHandleAttack.Num() - 1);
-				PlayAnimMontage(CharacterInfo.MontageHandleAttack[RndMontage]);
+				GetMesh()->GetAnimInstance()->Montage_Play(CharacterInfo.MontageHandleAttack[RndMontage]);
 			}
 		}
 	}
@@ -333,7 +333,7 @@ void ATDSCharacter::StartFire()
 			if (CharacterInfo.WeaponMontageShotingMap.Num() > 0)
 			{
 				auto Montag = CharacterInfo.WeaponMontageShotingMap.FindRef(CurrentWeapon->ItemInfo.Weapon.WeaponClass);
-				PlayAnimMontage(Montag);
+				GetMesh()->GetAnimInstance()->Montage_Play(Montag);
 			}
 		}
 		else
@@ -360,7 +360,7 @@ void ATDSCharacter::ReloadWeapon()
 		auto Montag = CharacterInfo.WeaponMontageReloadMap.FindRef(CurrentWeapon->ItemInfo.Weapon.WeaponClass);
 		if (!GetMesh()->GetAnimInstance()->Montage_IsPlaying(Montag))
 		{
-			PlayAnimMontage(Montag);
+			GetMesh()->GetAnimInstance()->Montage_Play(Montag);
 			if (Montag->IsNotifyAvailable())
 			{
 				const auto AnimNotifies = Montag->Notifies;
