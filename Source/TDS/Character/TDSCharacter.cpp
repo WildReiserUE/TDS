@@ -2,8 +2,7 @@
 
 #include "TDSCharacter.h"
 
-#include "TDSInventory.h"
-#include "TDSItemBase.h"
+#include "ReloadEndNotify.h"
 #include "TDSSkillComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
@@ -59,7 +58,7 @@ void ATDSCharacter::Tick(float DeltaSeconds){
 					FRotator CursorR = CursorFV.Rotation();
 					CursorToWorld->SetWorldLocation(TraceHitResult.Location);
 					CursorToWorld->SetWorldRotation(CursorR);
-					auto Target = Cast<ATDSItemBase>(TraceHitResult.Actor);
+					auto Target = Cast<ATDSItemBase>(TraceHitResult.GetActor());
 					if(Target){
 						const auto InventoryComponent = FindComponentByClass<UTDSInventory>();
 						if(InventoryComponent && InventoryComponent->FoundAround){
@@ -70,7 +69,7 @@ void ATDSCharacter::Tick(float DeltaSeconds){
 			}
 		}
 		CurrentCharSpeed = GetVelocity().Size();
-		MeshDirection = GetMesh()->GetAnimInstance()->CalculateDirection(GetVelocity(),GetActorRotation());
+		MeshDirection = UKismetAnimationLibrary::CalculateDirection(GetVelocity(),GetActorRotation());
 	
 		AddMovementInput(FVector(1.f, -0.1f, 0.0f), AxisX);
 		AddMovementInput(FVector(0.1f, 1.f, 0.0f), AxisY);
@@ -109,65 +108,51 @@ void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent
 void ATDSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	ChangeSettings();  //apply datatable info
 	if (CursorMaterial){
 		CursorToWorld = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CursorMaterial,CursorSize,FVector(0));
 	}
-
-	if (CharacterInfo.ComponentList.Num()>0)
-	{
-		const int Comp = CharacterInfo.ComponentList.Num();
-		for (int i = 0; i < Comp; i++)
-		{
-			this->AddComponentByClass(CharacterInfo.ComponentList[i], false, FTransform(FVector(0)),true);
-			FinishAddComponent(GetComponentByClass(CharacterInfo.ComponentList[i]),false,FTransform(FVector(0)));
-		}
-		UE_LOG(LogTemp,Log,TEXT("ADDED COMPONENTS TO PLAYER --- %i"), CharacterInfo.ComponentList.Num());
-		ComponentsAdded.Broadcast();
-	}
-	else
-	{
-		UE_LOG(LogTemp,Log,TEXT("ADDED COMPONENTS TO PLAYER --- HOJlb"));
-	}	
 }
 
-void ATDSCharacter::InputAxisY(float Value){
+void ATDSCharacter::InputAxisY(float Value)
+{
 	AxisY = Value;
 }
 
-void ATDSCharacter::InputAxisX(float Value){
+void ATDSCharacter::InputAxisX(float Value)
+{
 	AxisX = Value;
 }
 
-void ATDSCharacter::InputCameraIn(){
-	if(CameraArm->TargetArmLength <= BaseInfo.CameraMinLenght){
-	}
-	else
+void ATDSCharacter::InputCameraIn()
+{
+	if(CameraArm->TargetArmLength >= BaseInfo.CameraMinLenght)
 		CameraArm->TargetArmLength -= BaseInfo.CameraChangeStep;
 }
 
-void ATDSCharacter::InputCameraOut(){
-	if(CameraArm->TargetArmLength >= BaseInfo.CameraMaxLenght){
-	}
-	else
+void ATDSCharacter::InputCameraOut()
+{
+	if(CameraArm->TargetArmLength <= BaseInfo.CameraMaxLenght)
 		CameraArm->TargetArmLength += BaseInfo.CameraChangeStep;
 }
 
-void ATDSCharacter::ActivateSprint(){
-	const auto SkillComponent = FindComponentByClass<UTDSSkillComponent>();
-	if (SkillComponent && !bSniperMode){
-		if (SkillComponent->SprintPoint > SkillComponent->SprintSettings.SprintLosePoint){
-			GetCharacterMovement()->MaxWalkSpeed = CharacterInfo.RunSpeed*SkillComponent->SprintCoef;
-			SkillComponent->StartSprint();
+void ATDSCharacter::ActivateSprint()
+{
+	if (GetSkillComponent() && !bSniperMode)
+	{
+		if (GetSkillComponent()->SprintPoint > GetSkillComponent()->SprintSettings.SprintLosePoint)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = CharacterInfo.RunSpeed*GetSkillComponent()->SprintCoef;
+			GetSkillComponent()->StartSprint();
 			bSprintActivate=true;
 		}
 	}
 }
 
-void ATDSCharacter::DeActivateSprint(){
-	const auto SkillComponent = FindComponentByClass<UTDSSkillComponent>();
-	if (SkillComponent && !bSniperMode){
-		SkillComponent->StopSprint();
+void ATDSCharacter::DeActivateSprint()
+{
+	if (GetSkillComponent() && !bSniperMode)
+	{
+		GetSkillComponent()->StopSprint();
 		bSprintActivate=false;
 		GetCharacterMovement()->MaxWalkSpeed = CharacterInfo.RunSpeed;
 	}
@@ -176,14 +161,15 @@ void ATDSCharacter::DeActivateSprint(){
 void ATDSCharacter::CalculateAllowSprint()
 {
 	bSprintAllow = MeshDirection >= -35.0f && MeshDirection <=35.0f;
-	if(!bSprintAllow){
-		const auto SkillComponent = FindComponentByClass<UTDSSkillComponent>();
-		if (SkillComponent)
+	if(!bSprintAllow)
+	{
+		//if (GetSkillComponent())
 			DeActivateSprint();
 	}
 }
 
-void ATDSCharacter::SniperModeOn(){	
+void ATDSCharacter::SniperModeOn()
+{	
 	if(CurrentWeapon)
 	{
 		if(bSprintActivate)
@@ -193,7 +179,8 @@ void ATDSCharacter::SniperModeOn(){
 	}
 }
 
-void ATDSCharacter::SniperModeOff(){
+void ATDSCharacter::SniperModeOff()
+{
 	if(bSniperMode)
 	{
 		bSniperMode = false;
@@ -201,16 +188,16 @@ void ATDSCharacter::SniperModeOff(){
 	}
 }
 
-UDecalComponent* ATDSCharacter::GetCursorToWorld(){
+UDecalComponent* ATDSCharacter::GetCursorToWorld()
+{
 	return CursorToWorld;
 }
 
 ATDSItemBase* ATDSCharacter::SpawnWeapon(int WeaponIndex)
 {
-	const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
-	if(PlayerInventory && bIsALife)
+	if(GetInventoryComp() && bIsALife)
 	{
-		if(PlayerInventory->WeaponInventory.Num() > 0)
+		if(GetInventoryComp()->WeaponInventory.Num() > 0)
 		{
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -218,9 +205,13 @@ ATDSItemBase* ATDSCharacter::SpawnWeapon(int WeaponIndex)
 			SpawnParams.Instigator = GetInstigator();
 			const FVector Loc(0,0,0);
 			FTransform SpawnTransform = FTransform(Loc);
-			ATDSItemBase* MyWeapon = Cast<ATDSItemBase>(GetWorld()->SpawnActorDeferred<ATDSItemBase>(PlayerInventory->WeaponInventory[WeaponIndex].BaseClass,
-				SpawnTransform, SpawnParams.Owner, SpawnParams.Instigator,SpawnParams.SpawnCollisionHandlingOverride));
-			MyWeapon->SpawnedName = PlayerInventory->WeaponInventory[WeaponIndex].DTItemName;
+			ATDSItemBase* MyWeapon = Cast<ATDSItemBase>(GetWorld()->SpawnActorDeferred<ATDSItemBase>(
+				GetInventoryComp()->WeaponInventory[WeaponIndex].BaseClass,
+				SpawnTransform,
+				SpawnParams.Owner,
+				SpawnParams.Instigator,
+				SpawnParams.SpawnCollisionHandlingOverride));
+			MyWeapon->SpawnedName = GetInventoryComp()->WeaponInventory[WeaponIndex].DTItemName;
 			MyWeapon->ItemMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			UGameplayStatics::FinishSpawningActor(MyWeapon,SpawnTransform);
 			if (MyWeapon)
@@ -229,7 +220,6 @@ ATDSItemBase* ATDSCharacter::SpawnWeapon(int WeaponIndex)
 				MyWeapon->AttachToComponent(GetMesh(), Rule, FName("RightHandSocket"));
 				MyWeapon->ChangeSettings();
 			}
-			//UE_LOG(LogTemp, Warning, TEXT("My weapon Name: %s"), *MyWeapon->SpawnedName.ToString());
 			CurrentWeapon = MyWeapon;
 			return CurrentWeapon;
 		}
@@ -239,25 +229,24 @@ ATDSItemBase* ATDSCharacter::SpawnWeapon(int WeaponIndex)
 
 void ATDSCharacter::PrevWeapon()
 {
-	if(bIsALife)
+	if(GetInventoryComp() && bIsALife)
 	{
-		const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
-		if(PlayerInventory->WeaponInventory.Num() > 0 && !GetWorld()->GetTimerManager().IsTimerActive(WeaponReloadTimer))
+		if(GetInventoryComp()->WeaponInventory.Num() > 0 && !GetWorld()->GetTimerManager().IsTimerActive(WeaponReloadTimer))
 		{
 			if(CurrentWeapon)
 			{
+				CurrentWeapon->OnWeaponFire.RemoveDynamic(this, &ATDSCharacter::DecreaseBullet);
 				CurrentWeapon->StopSpawnBullet();
 				CurrentWeapon->Destroy();
 			}
 			CurrentWeaponIndex --;
 			if(CurrentWeaponIndex<0)
 			{
-				CurrentWeaponIndex = PlayerInventory->WeaponInventory.Num()-1;
+				CurrentWeaponIndex = GetInventoryComp()->WeaponInventory.Num()-1;
 			}
 			StopAnimMontage();
-			PlayerInventory->OnBulletsEnd.RemoveDynamic(this, &ATDSCharacter::FireOff);
 			CurrentWeapon = SpawnWeapon(CurrentWeaponIndex);
-			PlayerInventory->OnBulletsEnd.AddDynamic(this, &ATDSCharacter::FireOff);
+			CurrentWeapon->OnWeaponFire.AddDynamic(this, &ATDSCharacter::DecreaseBullet);
 			OnWeaponSwitch.Broadcast(CurrentWeaponIndex);
 		}
 	}
@@ -265,61 +254,57 @@ void ATDSCharacter::PrevWeapon()
 
 void ATDSCharacter::NextWeapon()
 {
-	if(bIsALife)
-	{
-		const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
-		if(PlayerInventory->WeaponInventory.Num()> 0 && !GetWorld()->GetTimerManager().IsTimerActive(WeaponReloadTimer))
+	if(GetInventoryComp() && bIsALife)
+	{		
+		if(GetInventoryComp()->WeaponInventory.Num()> 0 && !GetWorld()->GetTimerManager().IsTimerActive(WeaponReloadTimer))
 		{
 			if(CurrentWeapon)
 			{
+				CurrentWeapon->OnWeaponFire.RemoveDynamic(this, &ATDSCharacter::DecreaseBullet);
 				CurrentWeapon->StopSpawnBullet();
 				CurrentWeapon->Destroy();
 			}
 			CurrentWeaponIndex ++;
-			if(CurrentWeaponIndex>=PlayerInventory->WeaponInventory.Num())
+			if(CurrentWeaponIndex>=GetInventoryComp()->WeaponInventory.Num())
 			{
 				CurrentWeaponIndex = 0;
 			}
 			StopAnimMontage();
-			PlayerInventory->OnBulletsEnd.RemoveDynamic(this, &ATDSCharacter::FireOff);
 			CurrentWeapon = SpawnWeapon(CurrentWeaponIndex);
-			PlayerInventory->OnBulletsEnd.AddDynamic(this, &ATDSCharacter::FireOff);
+			CurrentWeapon->OnWeaponFire.AddDynamic(this, &ATDSCharacter::DecreaseBullet);
 			OnWeaponSwitch.Broadcast(CurrentWeaponIndex);
 		}
 	}
 }
 
-int ATDSCharacter::Some()
-{
-	return 0;
-}
-
-void ATDSCharacter::FireOn()
+void ATDSCharacter::FireOn()  //По нажатию кнопки - стрельба
 {		
-	if(CurrentWeapon)
+	if(CurrentWeapon && GetInventoryComp())
 	{
-		const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
-		if(PlayerInventory)
+		if(CurrentWeapon->ItemInfo.Weapon.bCanFire)
 		{
-			bool BulletsAviable = CurrentWeapon->ItemInfo.Weapon.Magazine > 0;
-			if(BulletsAviable && CurrentWeapon->ItemInfo.Weapon.bCanFire)
+			UE_LOG(LogTemp, Log, TEXT("Command to Weapon ---Fire---"));
+			bRotateToAttack = true;
+			if(!GetWorld()->GetTimerManager().IsTimerActive(CurrentWeapon->AttackTimer))
 			{
-				UE_LOG(LogTemp, Warning, TEXT("BULLET FOUND -- Command to Weapon -Fire-"));
-				bRotateToAttack = true;
-				if(!GetWorld()->GetTimerManager().IsTimerActive(CurrentWeapon->AttackTimer)){
-					GetWorld()->GetTimerManager().SetTimer(CurrentWeapon->AttackTimer, this, &ATDSCharacter::StartFire, CurrentWeapon->AttackRate,true,0.f);
-				}
+				GetWorld()->GetTimerManager().SetTimer(
+					CurrentWeapon->AttackTimer,
+					this,
+					&ATDSCharacter::StartFire,
+					CurrentWeapon->AttackRate,
+					true,
+					0.f);
 			}
-			else if (!CurrentWeapon->ItemInfo.Weapon.bCanFire)
-			{				
-				UE_LOG(LogTemp, Warning, TEXT("MELLEE ATTACK"));
-				bRotateToAttack = true;
-				CurrentWeapon->StartSpawnBullet();
-				if(CharacterInfo.MontageHandleAttack.Num()>0)
-				{
-					int RndMontage = UKismetMathLibrary::RandomIntegerInRange(0,CharacterInfo.MontageHandleAttack.Num()-1);
-					PlayAnimMontage(CharacterInfo.MontageHandleAttack[RndMontage]);
-				}					
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("Command to Weapon ---ATTACK---"));
+			bRotateToAttack = true;
+			CurrentWeapon->StartSpawnBullet();
+			if(CharacterInfo.MontageHandleAttack.Num()>0)
+			{
+				int RndMontage = UKismetMathLibrary::RandomIntegerInRange(0,CharacterInfo.MontageHandleAttack.Num()-1);
+				PlayAnimMontage(CharacterInfo.MontageHandleAttack[RndMontage]);
 			}
 		}
 	}
@@ -327,48 +312,78 @@ void ATDSCharacter::FireOn()
 		
 void ATDSCharacter::StartFire()
 {
-	const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
-	if(PlayerInventory)
+	if(bIsALife && GetInventoryComp())
 	{
-		PlayerInventory->DecreaseCount(CurrentWeapon->ItemInfo.Weapon.ProjectileId);
-		UE_LOG(LogTemp,Log,TEXT("TRY BULLET  = %i"), CurrentWeapon->ItemInfo.Weapon.ProjectileId)
-		int Result = CurrentWeapon->ItemInfo.Weapon.Magazine -= 1;
-		if( Result >=0)
+		UE_LOG(LogTemp, Log, TEXT("BULLET IN MAGAZINE = %i"), CurrentWeapon->ItemInfo.Weapon.Magazine);
+		if(CurrentWeapon->ItemInfo.Weapon.Magazine > 0)
 		{
 			CurrentWeapon->StartSpawnBullet();
-			PlayAnimMontage(Montage2HAttack);
+			if(CharacterInfo.WeaponMontageShotingMap.Num()>0)
+			{
+				auto Montag = CharacterInfo.WeaponMontageShotingMap.FindRef(CurrentWeapon->ItemInfo.Weapon.WeaponClass);
+				PlayAnimMontage(Montag);
+			}
 		}
 		else
 		{
-			if(GetWorld()->GetTimerManager().IsTimerActive(CurrentWeapon->AttackTimer))
-			{
-				GetWorld()->GetTimerManager().ClearTimer(CurrentWeapon->AttackTimer);		
-			}
+			FireOff();
 			ReloadWeapon();
 		}
 	}
 }
 
-void ATDSCharacter::ReloadWeapon()
+void ATDSCharacter::DecreaseBullet(int BulletInMagazine)
 {
-	const auto PlayerInventory = FindComponentByClass<UTDSInventory>();
- 	if(PlayerInventory)
- 	{
- 		if(CurrentWeapon && PlayerInventory->TryReloadWeapon(CurrentWeapon->ItemInfo.Weapon.ProjectileId))
+	UE_LOG(LogTemp,Log,TEXT("WEAPON DELEGATE --- %i"), BulletInMagazine);
+}
+
+void ATDSCharacter::ReloadWeapon()
+{	
+ 	if(CurrentWeapon
+ 		&& GetInventoryComp()
+ 		&& CurrentWeapon->ItemInfo.Weapon.Magazine < CurrentWeapon->ItemInfo.Weapon.MaxMagazine
+ 		&& GetInventoryComp()->CheckBullets(CurrentWeapon->ItemInfo.Weapon.ProjectileId))
  		{
- 			UE_LOG(LogTemp,Log,TEXT("BULLET IN MAGAZINE = %i"), CurrentWeapon->ItemInfo.Weapon.Magazine)
+ 			UE_LOG(LogTemp,Log,TEXT("START RELOAD WEAPON"));
+ 			auto Montag = CharacterInfo.WeaponMontageReloadMap.FindRef(CurrentWeapon->ItemInfo.Weapon.WeaponClass);
+ 			if(!GetMesh()->GetAnimInstance()->Montage_IsPlaying(Montag))
+ 			{
+ 				PlayAnimMontage(Montag);
+ 				if (Montag->IsNotifyAvailable())
+ 				{
+ 					const auto AnimNotifies = Montag->Notifies;
+ 					for (const auto& AnimNotify : AnimNotifies)
+ 					{
+ 						auto ReloadEndNotify = Cast<UReloadEndNotify>(AnimNotify.Notify);
+ 						if (ReloadEndNotify)
+ 						{
+ 							UE_LOG(LogTemp, Warning, TEXT("ReloadEnd --- NOTIFY AVAIABLE"));
+ 							if (!ReloadEndNotify->OnNotified.IsBoundToObject(this))
+ 								ReloadEndNotify->OnNotified.AddUFunction(this, FName("ReloadEnd"), AnimNotify.NotifyName);
+ 						}
+ 					}
+ 				}
+ 			}
  		}
  		else 
- 			UE_LOG(LogTemp,Log,TEXT("MAGAZINE IS FULL"));
- 	}
+ 			UE_LOG(LogTemp,Error,TEXT("MAGAZINE IS FULL OR NO INVENTORY BULLETS"));
 }
-	
+
+FName ATDSCharacter::ReloadEnd()
+{
+	if(GetInventoryComp())
+	{
+		GetInventoryComp()->DecreaseCount(CurrentWeapon->ItemInfo);
+	}
+	return FName();
+}
+
 void ATDSCharacter::FireOff()
 {
 	if(CurrentWeapon && GetWorld()->GetTimerManager().IsTimerActive(CurrentWeapon->AttackTimer))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Command to Weapon - STOP Fire"));
-		GetWorld()->GetTimerManager().ClearTimer(CurrentWeapon->AttackTimer);		
+		GetWorld()->GetTimerManager().ClearTimer(CurrentWeapon->AttackTimer);
 		bRotateToAttack = false;
 		CurrentWeapon->StopSpawnBullet();
 	}

@@ -7,9 +7,11 @@
 #include "Components/ActorComponent.h"
 #include "TDSInventory.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerFindItem,FItemInfo, ItemInfo);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBulletsEnd);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBulletsChanged,int,Count);
+class ABaseCharacter;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFindItem, FItemInfo, ItemInfo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCountChange, int, ItemCount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReloadEnd, int, Magazine, int, InventoryBullet);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TDS_API UTDSInventory : public UActorComponent
@@ -25,17 +27,17 @@ public:
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Inventory")
 	TArray<FItemInfo> Inventory;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Inventory")
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="WeaponInventory")
 	TArray<FItemInfo> WeaponInventory;
-	
-	UPROPERTY(BlueprintAssignable)
-	FOnPlayerFindItem OnPlayerFindItem;
-	
-	UPROPERTY(BlueprintAssignable)
-	FOnBulletsEnd OnBulletsEnd;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnBulletsChanged OnBulletsChanged;
+	FOnFindItem OnFindItem;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnCountChange OnCountChange;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnReloadEnd OnReloadEnd;
 
 	UFUNCTION()
 	void OverlapItem(AActor* OverlappedActor, AActor* OtherActor);
@@ -43,11 +45,14 @@ public:
 	UFUNCTION()
 	void EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor);
 
-	AActor* ComponentOwner();
+	UFUNCTION(BlueprintCallable)
+	int GetWeaponIndex(FItemInfo ItemInfo);
+
+	ABaseCharacter* ComponentOwner();
 	void AddItem(ATDSItemBase* Item);
-	int FindItemById(int aId);
-	bool TryReloadWeapon(int ProjectileId);
-	void DecreaseCount(int WeaponBulletId);
-	bool CheckCount(int WeaponBulletId);
+	int FindInventoryItemById(int aId);
+	int FindWeaponItemById(int aId);
+	bool CheckBullets(int ProjectileId);
+	void DecreaseCount(FItemInfo WeaponInfo);
 	bool FoundAround = false;
 };

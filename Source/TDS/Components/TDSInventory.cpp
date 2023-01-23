@@ -1,7 +1,7 @@
 // Created WildReiser ©2022
 
 #include "TDSInventory.h"
-
+#include "BaseCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
 UTDSInventory::UTDSInventory(){
@@ -20,9 +20,9 @@ void UTDSInventory::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-AActor* UTDSInventory::ComponentOwner()
+ABaseCharacter* UTDSInventory::ComponentOwner()
 {
-	const auto ComponentOwner = this->GetOwner();
+	const auto ComponentOwner = Cast<ABaseCharacter>(this->GetOwner());
 	return ComponentOwner ? (ComponentOwner) : nullptr;
 }
 
@@ -49,35 +49,82 @@ void UTDSInventory::EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor)
 	}
 }
 
+int UTDSInventory::GetWeaponIndex(FItemInfo ItemInfo)
+{
+	
+	int n = INDEX_NONE;
+	int i = 0;
+	for (FItemInfo aItem : WeaponInventory)
+	{
+		if (aItem.ItemType == EItemType::Weapon){
+			n = i;
+			break;
+		}
+		i++;
+	}
+	return n;
+}
+
 void UTDSInventory::AddItem(ATDSItemBase* Item)
 {
-	const int i = FindItemById(Item->ItemInfo.ItemID);
-	if (i == INDEX_NONE)								//если такого предмета нет
-	{								
-		Inventory.Add(Item->ItemInfo);					//добавляем в общий инвентарь
+	const int i = FindInventoryItemById(Item->ItemInfo.ItemID);
+	const int y = FindWeaponItemById(Item->ItemInfo.ItemID);
+	if (i == INDEX_NONE && y == INDEX_NONE)																		//если такого предмета нет нигде
+	{
+		switch (Item->ItemInfo.ItemType)																		//если оружие добавляем в список оружия если такого оружия нет
+		{
+		case EItemType::Weapon:
+			{
+				UE_LOG(LogTemp,Log,TEXT("---ADD NEW--- WEAPON ITEM--- "));
+				WeaponInventory.Add(Item->ItemInfo);															//добавляем в инвентарь оружия
+				OnFindItem.Broadcast(Item->ItemInfo);
+				break;
+			}
+		default:
+			{
+				Inventory.Add(Item->ItemInfo);																	//добавляем в общий инвентарь
+				UE_LOG(LogTemp,Log,TEXT("---ADD NEW--- INVENTORY ITEM---"));
+				OnFindItem.Broadcast(Item->ItemInfo);
+				break;
+			}
+		}
 	}
 	else
-	{													//если такой предмет есть
+	{																											//если такой предмет есть
 		if (Item->ItemInfo.bIsStackable)
 		{
-			Inventory[i].Count += Item->ItemInfo.Count;	//складываем если пачкуется
+			Inventory[i].Count += Item->ItemInfo.Count;															//складываем если пачкуется
+			UE_LOG(LogTemp,Log,TEXT("---ADD %i COUNT TO INVENTORY ITEM---"), Inventory[i].Count);
+			OnCountChange.Broadcast(Inventory[i].Count);														//уведомляем об изменении количества
 		}
 		else
 		{
-			Inventory.Add(Item->ItemInfo);				//добавляем в общий инвентарь			 если не пачкуется			
+			switch (Item->ItemInfo.ItemType)
+			{
+			case EItemType::Weapon:
+				{
+					UE_LOG(LogTemp,Log,TEXT("---AGAIN WEAPON--- NEED ---ADD BULLETS--- %i"), Item->ItemInfo.Weapon.MaxMagazine);
+					break;
+				}
+			case EItemType::Armor:
+				{
+					UE_LOG(LogTemp,Log,TEXT("---AGAIN ARMOR---   --- WHAT TO DO ??? ---"));
+					break;
+				}
+			default:
+				{
+					Inventory.Add(Item->ItemInfo);																//добавляем в общий инвентарь любой тип
+																												//кроме описаных правил если не пачкуется
+					OnFindItem.Broadcast(Item->ItemInfo);
+					break;
+				}
+			}
 		}
 	}
-	if(Item->ItemInfo.ItemType ==  EItemType::Weapon)	//если оружие добавляем в список оружия
-	{
-		FItemInfo NewWeaponItem;
-		NewWeaponItem = Item->ItemInfo;
-		WeaponInventory.Add(NewWeaponItem);
-	}
-	OnPlayerFindItem.Broadcast(Item->ItemInfo);		//сообщаем что нашли новый предмет
 	Item->Destroy();
 }
 
-int UTDSInventory::FindItemById(int aId){
+int UTDSInventory::FindInventoryItemById(int aId){
 	int n = INDEX_NONE;
 	int i = 0;
 	for (FItemInfo aItem : Inventory){
@@ -90,13 +137,26 @@ int UTDSInventory::FindItemById(int aId){
 	return n;
 }
 
-bool UTDSInventory::TryReloadWeapon(int ProjectileId)
+int UTDSInventory::FindWeaponItemById(int aId)
 {
-	int i = FindItemById(ProjectileId);
+	int n = INDEX_NONE;
+	int i = 0;
+	for (FItemInfo aItem : WeaponInventory){
+		if (aItem.ItemID == aId){
+			n = i;
+			break;
+		}
+		i++;
+	}
+	return n;
+}
+
+bool UTDSInventory::CheckBullets(int ProjectileId)
+{
+	int i = FindInventoryItemById(ProjectileId);
 	if (i == INDEX_NONE) //если элемента нет
 	{
 		UE_LOG(LogTemp,Warning,TEXT("TRY RELOAD BULLET ID: %i ---HET--- COBCEM"), i);
-		OnBulletsEnd.Broadcast();
 		return false;
 	}
 	else
@@ -104,61 +164,39 @@ bool UTDSInventory::TryReloadWeapon(int ProjectileId)
 		UE_LOG(LogTemp,Warning,TEXT("TRY RELOAD BULLET ID: %i ------ ECTb"), i);
 		return true;
 	}
-		
 }
 
-void UTDSInventory::DecreaseCount(int WeaponBulletId)
+void UTDSInventory::DecreaseCount(FItemInfo WeaponInfo)
 {	
-	int i = FindItemById(WeaponBulletId);
+	int i = FindInventoryItemById(WeaponInfo.Weapon.ProjectileId);
 	if (i == INDEX_NONE) //если элемента нет
 	{
-		UE_LOG(LogTemp,Warning,TEXT("TRY DECREASE BULLET ---HET--- COBCEM"));
-		OnBulletsEnd.Broadcast();
+		UE_LOG(LogTemp,Warning,TEXT("TRY DECREASE INVENTORY BULLET ---HET--- COBCEM"));
 	}
 	else
 	{
 		if(Inventory[i].Count >= 1)
-		{			
-			Inventory[i].Count -= 1;
-			UE_LOG(LogTemp,Warning,TEXT("TRY DECREASE BULLET ---OK--- ELAPSED: -- %d  --"), Inventory[i].Count);
-			if(Inventory[i].Count == 0)
+		{
+			UE_LOG(LogTemp,Warning,TEXT("DECREASE BULLET FROM INVENTORY ELAPSED: -- %d  --"), Inventory[i].Count);
+			int Result = Inventory[i].Count - (ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.MaxMagazine - ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine);
+			UE_LOG(LogTemp,Warning,TEXT("DECREASE RESULT BULLET: -- %d  --"), Inventory[i].Count);
+			if(Result <= 0)
 			{
+				ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine = Inventory[i].Count + ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine;
 				Inventory.RemoveAt(i);
-				OnBulletsChanged.Broadcast(0);
-				OnBulletsEnd.Broadcast();
+				OnReloadEnd.Broadcast(ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine, 0);
 			}
 			else
-				OnBulletsChanged.Broadcast(Inventory[i].Count);
+			{
+				Inventory[i].Count = Result;
+				ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine = WeaponInfo.Weapon.MaxMagazine;
+				OnReloadEnd.Broadcast(ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine, Inventory[i].Count);
+			}
+			//ComponentOwner()->FireOn(); //TODO resume fire? 
 		}
-		else //по логике сюда не зайдем никогда... но мало ли...
+		else //пустой слот патрона
 		{
-			UE_LOG(LogTemp,Warning,TEXT("FIRE BULLET ECTb HO SHOT = 0"));
-			OnBulletsEnd.Broadcast();
-		}		
-	}
-}
-
-bool UTDSInventory::CheckCount(int WeaponBulletId)
-{
-	bool BulletAviable;
-	int i = FindItemById(WeaponBulletId);
-	if (i == INDEX_NONE) //если элемента нет
-	{
-		UE_LOG(LogTemp,Warning,TEXT("CHECK BULLET: --- HET COBCEM ---"));
-		BulletAviable = false;
-	}
-	else
-	{
-		if(Inventory[i].Count >= 1) // рабочий элемент, нашли
-		{
-			UE_LOG(LogTemp,Warning,TEXT("CHECK BULLET: --- ECTb --- %d --- COUNT "), Inventory[i].Count);
-			BulletAviable =  true;
-		}
-		else // элемент есть но пустой
-		{
-		//UE_LOG(LogTemp,Warning,TEXT("CHECK BULLET --- ECTb HO COUNT = 0"));
-			BulletAviable = false;
+			UE_LOG(LogTemp,Warning,TEXT("FIRE BULLET ECTb HO = 0"));
 		}
 	}
-	return BulletAviable;
 }

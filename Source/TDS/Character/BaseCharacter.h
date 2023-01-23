@@ -3,6 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "KismetAnimationLibrary.h"
+#include "TDSInventory.h"
+#include "TDSSkillComponent.h"
 #include "Engine/DataTable.h"
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
@@ -15,7 +18,7 @@ struct FBaseData
 	GENERATED_BODY()
 	float CameraMaxLenght = 1500.f;
 	float CameraMinLenght = 300.f;
-	float CameraChangeStep = 75.f;	
+	float CameraChangeStep = 75.f;
 };
 
 USTRUCT(BlueprintType)
@@ -42,7 +45,7 @@ struct FBaseHumanoidData : public FTableRowBase
 	float AimMoveSpeed;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	bool bCanUseShield = false;
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,meta=(EditCondition="bCanUseShield == true"))
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, meta=(EditCondition="bCanUseShield == true"))
 	float MaxShield;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite, meta=(ClampMin="0"))
 	float MaxHealth;
@@ -56,6 +59,10 @@ struct FBaseHumanoidData : public FTableRowBase
 	TArray<UAnimMontage*>MontageHandleAttack;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<UAnimMontage*>MontageDead;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TMap<EWeaponClass,UAnimMontage*> WeaponMontageShotingMap;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TMap<EWeaponClass,UAnimMontage*> WeaponMontageReloadMap;
 };
 
 UCLASS()
@@ -65,7 +72,13 @@ class TDS_API ABaseCharacter : public ACharacter
 
 public:
 	ABaseCharacter();
+	virtual void Tick(float DeltaSeconds) override;
+	virtual void BeginPlay() override;
 
+	FORCEINLINE class UCameraComponent* GetCharacterCameraComponent() const { return CharacterCameraComponent; }
+
+	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraArm; }
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
 	FBaseData BaseInfo;
 
@@ -75,9 +88,24 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="SpawnedName", meta=(ExposeOnSpawn))
 	FName SpawnedName;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	ATDSItemBase* CurrentWeapon = nullptr;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnComponentsAdded ComponentsAdded;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* CharacterCameraComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* CameraArm;
+	
 #if WITH_EDITOR
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;	
 #endif
 
 	void ChangeSettings();
+	virtual void FireOn();
+	UTDSInventory* GetInventoryComp();
+	UTDSSkillComponent* GetSkillComponent();
 };

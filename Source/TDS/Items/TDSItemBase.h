@@ -9,7 +9,7 @@
 #include "Engine/DataTable.h"
 #include "TDSItemBase.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponFire);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponFire,int,Count);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponAttack);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnProjectileHit);
 
