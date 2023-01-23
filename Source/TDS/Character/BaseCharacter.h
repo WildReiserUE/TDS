@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "KismetAnimationLibrary.h"
 #include "TDSInventory.h"
 #include "TDSSkillComponent.h"
 #include "Engine/DataTable.h"
@@ -100,9 +99,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraArm;
 	
-#if WITH_EDITOR
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;	
-#endif
+// #if WITH_EDITOR
+// 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;	
+// #endif
 
 	void ChangeSettings();
 	virtual void FireOn();

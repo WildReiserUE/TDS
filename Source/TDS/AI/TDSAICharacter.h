@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
 #include "NavigationInvokerComponent.h"
-#include "GameFramework/Character.h"
 #include "TDSAICharacter.generated.h"
 
 UCLASS()

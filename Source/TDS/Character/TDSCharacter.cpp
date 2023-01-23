@@ -69,7 +69,7 @@ void ATDSCharacter::Tick(float DeltaSeconds){
 			}
 		}
 		CurrentCharSpeed = GetVelocity().Size();
-		MeshDirection = UKismetAnimationLibrary::CalculateDirection(GetVelocity(),GetActorRotation());
+		MeshDirection = GetMesh()->GetAnimInstance()->CalculateDirection(GetVelocity(),GetActorRotation());
 	
 		AddMovementInput(FVector(1.f, -0.1f, 0.0f), AxisX);
 		AddMovementInput(FVector(0.1f, 1.f, 0.0f), AxisY);

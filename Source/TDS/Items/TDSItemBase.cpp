@@ -27,11 +27,11 @@ ATDSItemBase::ATDSItemBase()
 	ProjectileMovementComponent->Bounciness = 0.3f;
 	ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
 }
-
-void ATDSItemBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent){
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-	ChangeSettings();
-}
+//
+// void ATDSItemBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent){
+// 	Super::PostEditChangeProperty(PropertyChangedEvent);
+// 	ChangeSettings();
+// }
 
 void ATDSItemBase::ChangeSettings(){
 	if(ItemInfo.ItemMesh){
@@ -98,6 +98,7 @@ void ATDSItemBase::StopSpawnBullet()
 void ATDSItemBase::BeginPlay()
 {
 	Super::BeginPlay();
+	ChangeSettings();
 	if(ItemInfo.ItemType == EItemType::Projectile)
 	{
 		ItemMeshComponent->OnComponentHit.AddDynamic(this, &ATDSItemBase::ProjectileHit);

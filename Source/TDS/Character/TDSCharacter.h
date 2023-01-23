@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
 #include "TDSItemBase.h"
-#include "GameFramework/Character.h"
 #include "TDSCharacter.generated.h"
 
 

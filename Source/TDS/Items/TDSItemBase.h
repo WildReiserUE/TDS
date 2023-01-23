@@ -228,7 +228,7 @@ class TDS_API ATDSItemBase : public AActor
 	
 public:
 	ATDSItemBase();
-	
+
 	void SpawnParticleFx(UParticleSystem* NewParticle);
 	void SpawnSoundHit(USoundBase* NewSound);
 
@@ -237,16 +237,16 @@ public:
 
 	UFUNCTION()
 	void RenderOff(UPrimitiveComponent* pComponent);
-
-#if WITH_EDITOR
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-#endif
+//
+// #if WITH_EDITOR
+// 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+// #endif
 
 	void ChangeSettings();
-	
+
 	UFUNCTION()
 	void SomeClicked(UPrimitiveComponent* pComponent, FKey pKey);
-	
+
 	void StopSpawnBullet();
 	void StartSpawnBullet();
 
@@ -258,18 +258,18 @@ public:
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly)
 	UProjectileMovementComponent* ProjectileMovementComponent;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")
 	FItemInfo ItemInfo;
 
 	FORCEINLINE FItemInfo GetItemInfo(){return ItemInfo;};
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn))
 	FName SpawnedName;
-	
+
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Delegate")
 	FOnWeaponFire OnWeaponFire;
-	
+
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Delegate")
 	FOnProjectileHit OnProjectileHit;
 

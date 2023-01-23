@@ -35,12 +35,12 @@ void ABaseCharacter::BeginPlay()
 		UE_LOG(LogTemp,Log,TEXT("ADDED COMPONENTS TO OWNER --- HOJlb"));
 	}
 }
-
-void ABaseCharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-	ChangeSettings();
-}
+//
+// void ABaseCharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+// {
+// 	Super::PostEditChangeProperty(PropertyChangedEvent);
+// 	ChangeSettings();
+// }
 
 void ABaseCharacter::ChangeSettings()
 {

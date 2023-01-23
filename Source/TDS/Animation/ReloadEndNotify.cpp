@@ -4,9 +4,8 @@
 #include "ReloadEndNotify.h"
 
 
-void UReloadEndNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation,
-	const FAnimNotifyEventReference& EventReference)
+void UReloadEndNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
-	Super::Notify(MeshComp, Animation, EventReference);
+	Super::Notify(MeshComp, Animation);
 	OnNotified.Broadcast(MeshComp);
 }
