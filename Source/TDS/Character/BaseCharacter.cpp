@@ -3,20 +3,8 @@
 
 #include "BaseCharacter.h"
 
-#include "Components/CapsuleComponent.h"
-#include "GameFramework/PawnMovementComponent.h"
-
 ABaseCharacter::ABaseCharacter()
 {
-	CharacterMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh"));
-	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
-	CapsuleComponent->SetCapsuleHalfHeight(46,true);
-	CharacterMesh->SetRelativeLocation(FVector(0.f,0.f,-45.f));
-	SetRootComponent(CapsuleComponent);
-	CharacterMesh->SetupAttachment(RootComponent);
-	MovementComponent = CreateDefaultSubobject<UPawnMovementComponent>(TEXT("Movement"));
-	MovementComponent->SetUpdatedComponent(CapsuleComponent);
-	//MovementComponent->UpdatedComponent;
 	PrimaryActorTick.bCanEverTick = true;
 	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 }
