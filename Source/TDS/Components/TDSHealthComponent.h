@@ -12,17 +12,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnShieldChange, float, Shield, flo
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOwnerDeath);
 
-USTRUCT(BlueprintType)
-struct FHealthSettings //Структура с настройками нужно перенести куда-нить
-{
-	GENERATED_BODY()
-	float Health = 1000.0f;
-	float Shield = 1000.0f;
-	float ShieldStartDelay = 2.0f;
-	float ShieldRecoveryValue = 1.0f;
-	float ShieldRecoveryTick = 0.1f;
-};
-
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class TDS_API UTDSHealthComponent : public UActorComponent
 {
@@ -30,7 +19,7 @@ class TDS_API UTDSHealthComponent : public UActorComponent
 
 public:
 	UTDSHealthComponent();
-	void InitParams();
+	void InitParams(int32 Health, int32 Shield, float ShieldDelay, float ShieldRecValue, float ShieldRecTick);
 
 	UPROPERTY(BlueprintAssignable, Category="Health")
 	FOnHealthChange OnHealthChange;
@@ -40,9 +29,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="Health")
 	FOnOwnerDeath OnOwnerDeath;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
-	FHealthSettings HealthSettings;
 
 	FTimerHandle ShieldRecoveryTimer;
 
@@ -62,9 +48,16 @@ protected:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-	float Health;
-	float Shield;
-	float ShieldStartDelay;
-	float ShieldRecoveryValue;
-	float ShieldRecoveryTick;
+	float CHealth = 0.f;
+	float MaxCHealth = 0.f;
+
+	float CShield = 0.f;
+	float MaxCShield = 0.f;
+
+	float CShieldStartDelay = 0.f;
+
+	float CShieldRecoveryValue = 0.f;
+
+	float CShieldRecoveryTick = 0.f;
+
 };

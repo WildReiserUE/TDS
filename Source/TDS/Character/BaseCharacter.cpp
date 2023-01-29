@@ -1,7 +1,8 @@
 // Created WildReiser @2022
 
-
 #include "BaseCharacter.h"
+
+#include "Kismet/KismetMathLibrary.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -26,22 +27,30 @@ void ABaseCharacter::BeginPlay()
 			this->AddComponentByClass(CharacterInfo.ComponentList[i], false, FTransform(FVector(0)), true);
 			FinishAddComponent(GetComponentByClass(CharacterInfo.ComponentList[i]), false, FTransform(FVector(0)));
 		}
-		UE_LOG(LogTemp, Log, TEXT("ADDED COMPONENTS TO OWNER --- %i"), CharacterInfo.ComponentList.Num());
 		ComponentsAdded.Broadcast();
+		if(GetHealthComponent())
+		{
+			GetHealthComponent()->InitParams(CharacterInfo.MaxHealth,
+				CharacterInfo.MaxShield,
+				CharacterInfo.ShieldStartDelay,
+				CharacterInfo.ShieldRecoveryValue,
+				CharacterInfo.SheildRecoveryPeriod);
+			GetHealthComponent()->OnOwnerDeath.AddDynamic(this,&ABaseCharacter::DeadEvent);
+		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("ADDED COMPONENTS TO OWNER --- HOJlb"));
+		UE_LOG(LogTemp, Log, TEXT("ADDED COMPONENTS TO OWNER --- NULL"));
 	}
 }
 
-#if WITH_EDITOR
-void ABaseCharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-	ChangeSettings();
-}
-#endif
+// #if WITH_EDITOR
+// void ABaseCharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+// {
+// 	Super::PostEditChangeProperty(PropertyChangedEvent);
+// 	ChangeSettings();
+// }
+// #endif
 
 void ABaseCharacter::ChangeSettings()
 {
@@ -63,11 +72,37 @@ void ABaseCharacter::FireOn()
 UTDSInventory* ABaseCharacter::GetInventoryComp()
 {
 	UTDSInventory* Inventory = FindComponentByClass<UTDSInventory>();
-	return Inventory ? (Inventory) : nullptr;
+	return Inventory ? Inventory : nullptr;
 }
 
 UTDSSkillComponent* ABaseCharacter::GetSkillComponent()
 {
 	UTDSSkillComponent* SkillComponent = FindComponentByClass<UTDSSkillComponent>();
-	return SkillComponent ? (SkillComponent) : nullptr;
+	return SkillComponent ? SkillComponent : nullptr;
+}
+
+UTDSHealthComponent* ABaseCharacter::GetHealthComponent()
+{
+	UTDSHealthComponent* HealthComponent = FindComponentByClass<UTDSHealthComponent>();
+	return HealthComponent ? HealthComponent : nullptr;
+}
+
+void ABaseCharacter::DeadEvent()
+{
+	if(CharacterInfo.MontageDead.Num() > 0)
+	{
+		int32 RND_Montage = UKismetMathLibrary::RandomIntegerInRange(0,CharacterInfo.MontageDead.Num()-1);
+		GetMesh()->GetAnimInstance()->Montage_Play(CharacterInfo.MontageDead[RND_Montage]);
+		float EndPos = CharacterInfo.MontageDead[RND_Montage]->CalculateSequenceLength();
+		DetachFromControllerPendingDestroy();
+		GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+		SetActorEnableCollision(true);
+
+		GetMesh()->SetAllBodiesSimulatePhysics(true);
+		GetMesh()->SetSimulatePhysics(true);
+		GetMesh()->WakeAllRigidBodies();
+		GetMesh()->bBlendPhysics = true;
+
+		SetLifeSpan(EndPos + 3.f);
+	}
 }

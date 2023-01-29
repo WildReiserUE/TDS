@@ -7,9 +7,8 @@
 #include "TDSSkillComponent.h"
 #include "Engine/DataTable.h"
 #include "GameFramework/Character.h"
-#include "KismetAnimationLibrary.h"
+#include "TDSHealthComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "BaseCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComponentsAdded);
@@ -51,6 +50,8 @@ struct FBaseHumanoidData : public FTableRowBase
 	float MaxShield = 0.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin="0"))
 	float MaxHealth = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float ShieldStartDelay = 0.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float ShieldRecoveryValue = 0.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -102,12 +103,16 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraArm;
 
-#if WITH_EDITOR
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-#endif
+// #if WITH_EDITOR
+// 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+// #endif
 
 	void ChangeSettings();
 	virtual void FireOn();
 	UTDSInventory* GetInventoryComp();
 	UTDSSkillComponent* GetSkillComponent();
+	UTDSHealthComponent* GetHealthComponent();
+
+	UFUNCTION()
+	void DeadEvent();
 };

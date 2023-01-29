@@ -28,11 +28,11 @@ ATDSItemBase::ATDSItemBase()
 	ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
 }
 
-void ATDSItemBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-	ChangeSettings();
-}
+// void ATDSItemBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+// {
+// 	Super::PostEditChangeProperty(PropertyChangedEvent);
+// 	ChangeSettings();
+// }
 
 void ATDSItemBase::ChangeSettings()
 {
@@ -109,6 +109,7 @@ void ATDSItemBase::StopSpawnBullet()
 void ATDSItemBase::BeginPlay()
 {
 	Super::BeginPlay();
+	ChangeSettings();
 	if (ItemInfo.ItemType == EItemType::Projectile)
 	{
 		ItemMeshComponent->OnComponentHit.AddDynamic(this, &ATDSItemBase::ProjectileHit);
@@ -165,15 +166,13 @@ void ATDSItemBase::ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		switch (Info->GetItemInfo().Weapon.ProjectileTypeDamage)
 		{
 		case EProjectileTypeDamage::Point:
-			UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = POINT DAMAGE FROM WEAPON %f"),
-			       Info->GetItemInfo().Weapon.PhysicalDamage);
+			//UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = POINT DAMAGE FROM WEAPON %f"), Info->GetItemInfo().Weapon.PhysicalDamage);
 			UGameplayStatics::ApplyDamage(OtherActor, Info->ItemInfo.Weapon.PhysicalDamage, nullptr, this,
 			                              UDamageType::StaticClass());
 			break;
 
 		case EProjectileTypeDamage::Radial:
-			UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = RADIAL DAMAGE FROM WEAPON %f"),
-			       Info->GetItemInfo().Weapon.PhysicalDamage);
+			//UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = RADIAL DAMAGE FROM WEAPON %f"), Info->GetItemInfo().Weapon.PhysicalDamage);
 			UGameplayStatics::ApplyRadialDamage(OtherActor,
 			                                    Info->ItemInfo.Weapon.PhysicalDamage,
 			                                    Hit.Location,
@@ -184,8 +183,7 @@ void ATDSItemBase::ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 			break;
 
 		case EProjectileTypeDamage::Visible:
-			UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = VISIBLE DAMAGE FROM WEAPON %f"),
-			       Info->GetItemInfo().Weapon.PhysicalDamage);
+			//UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = VISIBLE DAMAGE FROM WEAPON %f"), Info->GetItemInfo().Weapon.PhysicalDamage);
 			UGameplayStatics::ApplyRadialDamage(OtherActor,
 			                                    Info->ItemInfo.Weapon.PhysicalDamage,
 			                                    Hit.Location,

@@ -2,6 +2,9 @@
 
 #include "TDSCharacter.h"
 
+
+#include "KismetAnimationLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "ReloadEndNotify.h"
 #include "TDSSkillComponent.h"
 #include "Camera/CameraComponent.h"
@@ -86,7 +89,7 @@ void ATDSCharacter::Tick(float DeltaSeconds)
 			if (AxisX != 0 || AxisY != 0 || (bSniperMode && CurrentWeapon) || bRotateToAttack)
 			{
 				FHitResult ResultHit;
-				myController->GetHitResultUnderCursor(ECC_GameTraceChannel1, false, ResultHit);
+				myController->GetHitResultUnderCursor(ECC_GameTraceChannel2, false, ResultHit);
 				float FindRotaterResultYaw = UKismetMathLibrary::FindLookAtRotation(
 					GetActorLocation(), ResultHit.Location).Yaw;
 				SetActorRotation(FQuat(FRotator(0.0f, FindRotaterResultYaw, 0.0f)));
@@ -116,10 +119,9 @@ void ATDSCharacter::SetupPlayerInputComponent(UInputComponent* NewInputComponent
 void ATDSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	if (CursorMaterial)
-	{
-		CursorToWorld = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CursorMaterial, CursorSize, FVector(0));
-	}
+
+	CursorToWorld = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CursorMaterial, CursorSize, FVector(0));
+
 }
 
 void ATDSCharacter::InputAxisY(float Value)
@@ -294,7 +296,7 @@ void ATDSCharacter::FireOn() //По нажатию кнопки - стрельб
 	{
 		if (CurrentWeapon->ItemInfo.Weapon.bCanFire)
 		{
-			UE_LOG(LogTemp, Log, TEXT("Command to Weapon ---Fire---"));
+			//UE_LOG(LogTemp, Log, TEXT("Command to Weapon ---Fire---"));
 			bRotateToAttack = true;
 			if (!GetWorld()->GetTimerManager().IsTimerActive(CurrentWeapon->AttackTimer))
 			{
@@ -309,7 +311,7 @@ void ATDSCharacter::FireOn() //По нажатию кнопки - стрельб
 		}
 		else
 		{
-			UE_LOG(LogTemp, Log, TEXT("Command to Weapon ---ATTACK---"));
+			//UE_LOG(LogTemp, Log, TEXT("Command to Weapon ---ATTACK---"));
 			bRotateToAttack = true;
 			CurrentWeapon->StartSpawnBullet();
 			if (CharacterInfo.MontageHandleAttack.Num() > 0)
@@ -326,7 +328,7 @@ void ATDSCharacter::StartFire()
 {
 	if (bIsALife && GetInventoryComp())
 	{
-		UE_LOG(LogTemp, Log, TEXT("BULLET IN MAGAZINE = %i"), CurrentWeapon->ItemInfo.Weapon.Magazine);
+		//UE_LOG(LogTemp, Log, TEXT("BULLET IN MAGAZINE = %i"), CurrentWeapon->ItemInfo.Weapon.Magazine);
 		if (CurrentWeapon->ItemInfo.Weapon.Magazine > 0)
 		{
 			CurrentWeapon->StartSpawnBullet();
@@ -356,7 +358,7 @@ void ATDSCharacter::ReloadWeapon()
 		&& CurrentWeapon->ItemInfo.Weapon.Magazine < CurrentWeapon->ItemInfo.Weapon.MaxMagazine
 		&& GetInventoryComp()->CheckBullets(CurrentWeapon->ItemInfo.Weapon.ProjectileId))
 	{
-		UE_LOG(LogTemp, Log, TEXT("START RELOAD WEAPON"));
+		//UE_LOG(LogTemp, Log, TEXT("START RELOAD WEAPON"));
 		auto Montag = CharacterInfo.WeaponMontageReloadMap.FindRef(CurrentWeapon->ItemInfo.Weapon.WeaponClass);
 		if (!GetMesh()->GetAnimInstance()->Montage_IsPlaying(Montag))
 		{
@@ -369,7 +371,7 @@ void ATDSCharacter::ReloadWeapon()
 					auto ReloadEndNotify = Cast<UReloadEndNotify>(AnimNotify.Notify);
 					if (ReloadEndNotify)
 					{
-						UE_LOG(LogTemp, Warning, TEXT("ReloadEnd --- NOTIFY AVAIABLE"));
+						//UE_LOG(LogTemp, Warning, TEXT("ReloadEnd --- NOTIFY AVAIABLE"));
 						if (!ReloadEndNotify->OnNotified.IsBoundToObject(this))
 							ReloadEndNotify->OnNotified.AddUFunction(this, FName("ReloadEnd"), AnimNotify.NotifyName);
 					}
@@ -394,7 +396,7 @@ void ATDSCharacter::FireOff()
 {
 	if (CurrentWeapon && GetWorld()->GetTimerManager().IsTimerActive(CurrentWeapon->AttackTimer))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Command to Weapon - STOP Fire"));
+		//UE_LOG(LogTemp, Warning, TEXT("Command to Weapon - STOP Fire"));
 		GetWorld()->GetTimerManager().ClearTimer(CurrentWeapon->AttackTimer);
 		bRotateToAttack = false;
 		CurrentWeapon->StopSpawnBullet();

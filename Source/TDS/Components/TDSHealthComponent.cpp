@@ -10,6 +10,18 @@ UTDSHealthComponent::UTDSHealthComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
+void UTDSHealthComponent::InitParams(int32 Health, int32 Shield, float ShieldDelay, float ShieldRecValue, float ShieldRecTick)
+{
+	MaxCHealth = CHealth = Health;
+	MaxCShield = CShield = Shield;
+
+	UE_LOG(LogTemp, Log, TEXT("--- COMPONENT HEALTH --- %f"), MaxCHealth);
+	UE_LOG(LogTemp, Log, TEXT("--- COMPONENT SHIELD --- %f"), MaxCShield);
+	CShieldStartDelay = ShieldDelay;
+	CShieldRecoveryValue = ShieldRecValue;
+	CShieldRecoveryTick = ShieldRecTick;
+}
+
 void UTDSHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -17,13 +29,6 @@ void UTDSHealthComponent::BeginPlay()
 	if (!ComponentOwner()) return;
 	UE_LOG(LogTemp, Log, TEXT("HEALTH COMPONENT OWNER --- %s"), *ComponentOwner()->GetName());
 	ComponentOwner()->OnTakeAnyDamage.AddDynamic(this, &UTDSHealthComponent::TakeAnyDamage);
-	InitParams();
-}
-
-void UTDSHealthComponent::InitParams()
-{
-	Health = HealthSettings.Health;
-	Shield = HealthSettings.Shield;
 }
 
 void UTDSHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType,
@@ -36,30 +41,29 @@ void UTDSHealthComponent::HealthChange(float Value)
 {
 	if (Value < 0)
 	{
-		if (Shield + Value >= 0)
+		if (CShield + Value >= 0)
 		{
-			Shield += Value;
-			OnShieldChange.Broadcast(Shield, HealthSettings.Shield);
+			CShield += Value;
+			OnShieldChange.Broadcast(CShield, MaxCShield);
 			ShieldRecovery();
 		}
-		else if (Shield + Value < 0)
+		else if (CShield + Value < 0)
 		{
-			Shield = 0;
-			Health = Health + Shield + Value;
-			OnShieldChange.Broadcast(Shield, HealthSettings.Shield);
-			OnHealthChange.Broadcast(Health, HealthSettings.Health);
-			if (Health <= 0)
+			CShield = 0;
+			CHealth = CHealth + CShield + Value;
+			OnShieldChange.Broadcast(CShield, MaxCShield);
+			OnHealthChange.Broadcast(CHealth, MaxCHealth);
+			if (CHealth <= 0)
 			{
-				Health = 0;
-				UE_LOG(LogViewport, Display, TEXT("Player is Dead"));
+				CHealth = 0;
 				GetOwner()->SetActorEnableCollision(ECollisionResponse::ECR_Ignore);
 				if (GetWorld()->GetTimerManager().IsTimerActive(ShieldRecoveryTimer))
 					GetWorld()->GetTimerManager().ClearTimer(ShieldRecoveryTimer);
 				OnOwnerDeath.Broadcast();
 			}
 		}
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::Printf(TEXT("SHIELD: %f"), Shield));
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("Health: %f"), Health));
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::Printf(TEXT("SHIELD: %f"), CShield));
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, FString::Printf(TEXT("Health: %f"), CHealth));
 	}
 	else
 	{
@@ -80,17 +84,17 @@ void UTDSHealthComponent::ShieldRecovery()
 	if (!GetWorld()->GetTimerManager().IsTimerActive(ShieldRecoveryTimer))
 	{
 		GetWorld()->GetTimerManager().SetTimer(ShieldRecoveryTimer, this, &UTDSHealthComponent::ShieldRecoveryStart,
-		                                       HealthSettings.ShieldRecoveryTick, true,
-		                                       HealthSettings.ShieldStartDelay);
+		                                       CShieldRecoveryTick, true,
+		                                       CShieldStartDelay);
 	}
 }
 
 void UTDSHealthComponent::ShieldRecoveryStart()
 {
-	if (Shield < HealthSettings.Shield)
+	if (CShield < MaxCShield)
 	{
-		Shield += HealthSettings.ShieldRecoveryValue;
-		OnShieldChange.Broadcast(Shield, HealthSettings.Shield);
+		CShield += CShieldRecoveryValue;
+		OnShieldChange.Broadcast(CShield, MaxCShield);
 	}
 	else
 	{

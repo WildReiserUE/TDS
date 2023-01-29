@@ -30,7 +30,8 @@ public class TDS : ModuleRules
 	        "TDS/DamageType",
 	        "TDS/StateEffects",
 	        "TDS/Interface",
-	        "TDS/Game"
+	        "TDS/Game",
+			"TDS/Managers"
         });
 	}
 }
