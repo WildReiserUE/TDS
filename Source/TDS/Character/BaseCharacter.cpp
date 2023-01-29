@@ -2,6 +2,7 @@
 
 #include "BaseCharacter.h"
 
+#include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
 ABaseCharacter::ABaseCharacter()
@@ -96,6 +97,7 @@ void ABaseCharacter::DeadEvent()
 		float EndPos = CharacterInfo.MontageDead[RND_Montage]->CalculateSequenceLength();
 		DetachFromControllerPendingDestroy();
 		GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn,ECR_Ignore);
 		SetActorEnableCollision(true);
 
 		GetMesh()->SetAllBodiesSimulatePhysics(true);
