@@ -10,18 +10,3 @@ ATDSAICharacter::ATDSAICharacter()
 	Navigator->SetGenerationRadii(3000.f, 3100.f);
 	PrimaryActorTick.bCanEverTick = true;
 }
-//
-// void ATDSAICharacter::BeginPlay()
-// {
-// 	Super::BeginPlay();
-// }
-//
-// void ATDSAICharacter::Tick(float DeltaTime)
-// {
-// 	Super::Tick(DeltaTime);
-// }
-//
-// void ATDSAICharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-// {
-// 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-// }

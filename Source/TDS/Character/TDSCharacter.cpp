@@ -212,8 +212,8 @@ ATDSItemBase* ATDSCharacter::SpawnWeapon(int WeaponIndex)
 		{
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			SpawnParams.Owner = GetOwner();
-			SpawnParams.Instigator = GetInstigator();
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = this;
 			const FVector Loc(0, 0, 0);
 			const FTransform SpawnTransform = FTransform(Loc);
 			ATDSItemBase* MyWeapon = Cast<ATDSItemBase>(GetWorld()->SpawnActorDeferred<ATDSItemBase>(

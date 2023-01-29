@@ -3,6 +3,7 @@
 #include "TDSItemBase.h"
 #include "TDSCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "Perception/AISense_Damage.h"
 
 ATDSItemBase::ATDSItemBase()
 {
@@ -173,7 +174,7 @@ void ATDSItemBase::ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 
 		case EProjectileTypeDamage::Radial:
 			//UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = RADIAL DAMAGE FROM WEAPON %f"), Info->GetItemInfo().Weapon.PhysicalDamage);
-			UGameplayStatics::ApplyRadialDamage(OtherActor,
+			UGameplayStatics::ApplyRadialDamage(GetWorld(),
 			                                    Info->ItemInfo.Weapon.PhysicalDamage,
 			                                    Hit.Location,
 			                                    Info->ItemInfo.Weapon.DamageRadius,
@@ -184,7 +185,7 @@ void ATDSItemBase::ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 
 		case EProjectileTypeDamage::Visible:
 			//UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = VISIBLE DAMAGE FROM WEAPON %f"), Info->GetItemInfo().Weapon.PhysicalDamage);
-			UGameplayStatics::ApplyRadialDamage(OtherActor,
+			UGameplayStatics::ApplyRadialDamage(GetWorld(),
 			                                    Info->ItemInfo.Weapon.PhysicalDamage,
 			                                    Hit.Location,
 			                                    Info->ItemInfo.Weapon.DamageRadius,
@@ -199,6 +200,9 @@ void ATDSItemBase::ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		default: break;
 		}
 	}
+
+	UAISense_Damage::ReportDamageEvent(GetWorld(),Hit.GetActor(),GetOwner()->GetOwner(), Info->ItemInfo.Weapon.PhysicalDamage,GetOwner()->GetOwner()->GetActorLocation(),Hit.Location);
+	UE_LOG(LogTemp, Warning, TEXT("INSTIGATOR ACTOR --- %s"), *GetOwner()->GetOwner()->GetClass()->GetName());
 
 	Destroy();
 }

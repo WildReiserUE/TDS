@@ -17,13 +17,7 @@ public:
 	ATDSAICharacter();
 
 protected:
-	//virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere)
 	UNavigationInvokerComponent* Navigator;
-
-public:
-	//virtual void Tick(float DeltaTime) override;
-
-	//virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 };
