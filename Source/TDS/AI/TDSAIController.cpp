@@ -8,7 +8,7 @@ ATDSAIController::ATDSAIController()
 {
 	AiPerception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AiPerception"));
 	AiConfigSight = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("AiConfigSight"));
-	
+
 	if (AiPerception)
 	{
 		// The following corresponds to the setting of sound perception components in the blueprint
@@ -21,6 +21,5 @@ ATDSAIController::ATDSAIController()
 
 		AiPerception->ConfigureSense(*AiConfigSight);
 		AiPerception->SetDominantSense(UAISenseConfig_Sight::StaticClass());
-
 	}
 }

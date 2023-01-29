@@ -20,45 +20,45 @@ struct FSprintSettings //Структура с настройками нужно
 	float SprintTimerTick = 0.2f;
 };
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class TDS_API UTDSSkillComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
 	UTDSSkillComponent();
-	
+
 	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Sprint")
 	FOnSprint OnSprintValueChange;
 
 	FSprintSettings SprintSettings;
-	
+
 	FTimerHandle StaminaRecoveryTimer;
 	FTimerHandle StaminaLoseTimer;
-	
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, BlueprintReadWrite, Category="Sprint")
 	bool bCanSprint = false;
-	
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, BlueprintReadWrite, Category="Sprint")
 	bool bSprintStart = false;
-	
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
+
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
+	                           FActorComponentTickFunction* ThisTickFunction) override;
+
 	AActor* ComponentOwner();
-	void InitSprint();	
-	void StartSprint();	
+	void InitSprint();
+	void StartSprint();
 	void DecreaseStamina();
 	void StopSprint();
 	void IncreaseStamina();
-	
-	float SprintPoint;
-	float SprintLoseValue;
-	float SprintRecoveryValue;
-	float SprintRecoveryTimerStart;
-	float SprintTimerTick;
-	float SprintCoef;
-	
+
+	float SprintPoint = 0.f;
+	float SprintLoseValue = 0.f;
+	float SprintRecoveryValue = 0.f;
+	float SprintRecoveryTimerStart = 0.f;
+	float SprintTimerTick = 0.f;
+	float SprintCoef = 0.f;
+
 protected:
 	virtual void BeginPlay() override;
-
 };

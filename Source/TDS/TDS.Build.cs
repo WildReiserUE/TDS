@@ -13,23 +13,25 @@ public class TDS : ModuleRules
 	        "Core",
 	        "CoreUObject",
 	        "Engine",
-	        "InputCore",
+	        "InputCore", 
 	        "HeadMountedDisplay",
 	        "NavigationSystem",
 	        "AIModule",
 	        "Niagara",
-	        "UMG"
+	        "UMG",
+	        "AnimGraphRuntime"
         });
         PublicIncludePaths.AddRange(new string[]
         {
-	        "TDS/Components",
+	        "TDS/Components", 
+	        "TDS/Animation",
 	        "TDS/Character",
 	        "TDS/Items",
 	        "TDS/DamageType",
 	        "TDS/StateEffects",
 	        "TDS/Interface",
 	        "TDS/Game",
-	        "TDS/Animation"
+			"TDS/Managers"
         });
 	}
 }

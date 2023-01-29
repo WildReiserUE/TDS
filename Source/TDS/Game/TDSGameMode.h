@@ -14,6 +14,3 @@ class ATDSGameMode : public AGameMode
 public:
 	ATDSGameMode();
 };
-
-
-

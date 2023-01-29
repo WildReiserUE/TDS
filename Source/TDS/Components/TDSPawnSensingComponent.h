@@ -13,8 +13,4 @@ UCLASS()
 class TDS_API UTDSPawnSensingComponent : public UPawnSensingComponent
 {
 	GENERATED_BODY()
-	
-	
-	
-	
 };

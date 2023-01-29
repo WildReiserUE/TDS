@@ -2,5 +2,3 @@
 
 
 #include "TDSDamageTypeMagic.h"
-
-

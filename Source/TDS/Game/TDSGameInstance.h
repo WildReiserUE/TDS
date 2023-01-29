@@ -13,8 +13,4 @@ UCLASS()
 class TDS_API UTDSGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
-	
-	
-	
-	
 };

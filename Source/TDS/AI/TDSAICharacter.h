@@ -17,16 +17,13 @@ public:
 	ATDSAICharacter();
 
 protected:
-	virtual void BeginPlay() override;
+	//virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere)
 	UNavigationInvokerComponent* Navigator;
-	
-public:	
-	virtual void Tick(float DeltaTime) override;
 
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+public:
+	//virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(BlueprintAssignable)
-	FOnComponentsAdded OnComponentsAdded;
+	//virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 };

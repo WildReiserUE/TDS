@@ -11,8 +11,10 @@ ATDSGameMode::ATDSGameMode()
 	PlayerControllerClass = ATDSPlayerController::StaticClass();
 
 	// set default pawn class to our Blueprinted character
-	 static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("DefaultPawn'/Game/TDS/Blueprints/Character/BP_TDSCharacter'"));
-	 if (PlayerPawnBPClass.Class != nullptr){
-	 	DefaultPawnClass = PlayerPawnBPClass.Class;
-	 }
+	// static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(
+	// 	TEXT("DefaultPawn'/Game/TDS/Blueprints/Character/BP_TDSCharacter'"));
+	// if (PlayerPawnBPClass.Class != nullptr)
+	// {
+	// 	DefaultPawnClass = PlayerPawnBPClass.Class;
+	// }
 }
