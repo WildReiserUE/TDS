@@ -359,17 +359,16 @@ void ATDSCharacter::ReloadWeapon()
 		&& GetInventoryComp()->CheckBullets(CurrentWeapon->ItemInfo.Weapon.ProjectileId))
 	{
 		//UE_LOG(LogTemp, Log, TEXT("START RELOAD WEAPON"));
-		auto Montag = CharacterInfo.WeaponMontageReloadMap.FindRef(CurrentWeapon->ItemInfo.Weapon.WeaponClass);
-		if (!GetMesh()->GetAnimInstance()->Montage_IsPlaying(Montag))
+		UAnimMontage* ReloadMontage = CharacterInfo.WeaponMontageReloadMap.FindRef(CurrentWeapon->ItemInfo.Weapon.WeaponClass);
+		if (!GetMesh()->GetAnimInstance()->Montage_IsPlaying(ReloadMontage) && ReloadMontage)
 		{
-			PlayAnimMontage(Montag);
-			if (Montag->IsNotifyAvailable())
+			PlayAnimMontage(ReloadMontage);
+			if (ReloadMontage->IsNotifyAvailable())
 			{
-				const auto AnimNotifies = Montag->Notifies;
-				for (const auto& AnimNotify : AnimNotifies)
+				const TArray<FAnimNotifyEvent> AnimNotifies = ReloadMontage->Notifies;
+				for (const FAnimNotifyEvent AnimNotify : AnimNotifies)
 				{
-					auto ReloadEndNotify = Cast<UReloadEndNotify>(AnimNotify.Notify);
-					if (ReloadEndNotify)
+					if (UReloadEndNotify* ReloadEndNotify = Cast<UReloadEndNotify>(AnimNotify.Notify))
 					{
 						//UE_LOG(LogTemp, Warning, TEXT("ReloadEnd --- NOTIFY AVAIABLE"));
 						if (!ReloadEndNotify->OnNotified.IsBoundToObject(this))
