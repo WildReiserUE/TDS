@@ -90,6 +90,7 @@ UTDSHealthComponent* ABaseCharacter::GetHealthComponent()
 
 void ABaseCharacter::DeadEvent()
 {
+	bIsALife = false;
 	if(CharacterInfo.MontageDead.Num() > 0)
 	{
 		int32 RND_Montage = UKismetMathLibrary::RandomIntegerInRange(0,CharacterInfo.MontageDead.Num()-1);
@@ -105,6 +106,7 @@ void ABaseCharacter::DeadEvent()
 		GetMesh()->WakeAllRigidBodies();
 		GetMesh()->bBlendPhysics = true;
 
+		GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 		SetLifeSpan(EndPos + 3.f);
 	}
 }

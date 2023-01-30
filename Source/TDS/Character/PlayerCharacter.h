@@ -5,18 +5,18 @@
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
 #include "TDSItemBase.h"
-#include "TDSCharacter.generated.h"
+#include "PlayerCharacter.generated.h"
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponSwitch, int, WeaponIndex);
 
 UCLASS()
-class ATDSCharacter : public ABaseCharacter
+class APlayerCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
 public:
-	ATDSCharacter();
+	APlayerCharacter();
 
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
@@ -88,7 +88,8 @@ private:
 	UPROPERTY(BlueprintAssignable)
 	FOnWeaponSwitch OnWeaponSwitch;
 
+	bool bFireAllow = false;
+	FTimerHandle FireTimer;
 	bool bSprintActivate = false;
-	bool bIsALife = true;
 	FTimerHandle WeaponReloadTimer;
 };

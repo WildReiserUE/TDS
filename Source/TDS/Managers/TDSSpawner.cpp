@@ -1,6 +1,6 @@
 #include "TDSSpawner.h"
 
-#include "TDSCharacter.h"
+#include "PlayerCharacter.h"
 #include "Kismet/KismetArrayLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -55,7 +55,7 @@ void ATDSSpawner::SpawnMobs(FSpawnerInfo Info)
 
 void ATDSSpawner::PlayerOver(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
-	if(GetWorld() && !GetWorld()->GetTimerManager().IsTimerActive(SpawnTimer) && (OtherActor->IsA(ATDSCharacter::StaticClass())))
+	if(GetWorld() && !GetWorld()->GetTimerManager().IsTimerActive(SpawnTimer) && (OtherActor->IsA(APlayerCharacter::StaticClass())))
 	{
 		UE_LOG(LogTemp, Warning,TEXT("OVER SPAWNER"));
 		GetWorld()->GetTimerManager().SetTimer(

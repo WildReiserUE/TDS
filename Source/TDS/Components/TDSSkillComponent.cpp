@@ -2,7 +2,7 @@
 
 #include "TDSSkillComponent.h"
 
-#include "TDSCharacter.h"
+#include "PlayerCharacter.h"
 
 UTDSSkillComponent::UTDSSkillComponent()
 {
@@ -47,7 +47,7 @@ void UTDSSkillComponent::StartSprint()
 			GetWorld()->GetTimerManager().ClearTimer(StaminaRecoveryTimer);
 		GetWorld()->GetTimerManager().SetTimer(StaminaLoseTimer, this, &UTDSSkillComponent::DecreaseStamina,
 		                                       SprintTimerTick, true, 0.0f);
-		if (ComponentOwner()->IsA(ATDSCharacter::StaticClass()))
+		if (ComponentOwner()->IsA(APlayerCharacter::StaticClass()))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("SprintActivated"));
 		}
@@ -60,7 +60,7 @@ void UTDSSkillComponent::StopSprint()
 		GetWorld()->GetTimerManager().ClearTimer(StaminaLoseTimer);
 	GetWorld()->GetTimerManager().SetTimer(StaminaRecoveryTimer, this, &UTDSSkillComponent::IncreaseStamina,
 	                                       SprintTimerTick, true, SprintSettings.SprintRecoveryTimerStart);
-	if (ComponentOwner()->IsA(ATDSCharacter::StaticClass()))
+	if (ComponentOwner()->IsA(APlayerCharacter::StaticClass()))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("SprintDEActivated"));
 	}

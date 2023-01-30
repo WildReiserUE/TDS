@@ -2,7 +2,7 @@
 
 #include "TDSHealthComponent.h"
 
-#include "TDSCharacter.h"
+#include "PlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
 UTDSHealthComponent::UTDSHealthComponent()

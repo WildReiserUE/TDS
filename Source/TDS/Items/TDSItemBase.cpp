@@ -1,7 +1,7 @@
 // Created WildReiser ©2022
 
 #include "TDSItemBase.h"
-#include "TDSCharacter.h"
+#include "PlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Perception/AISense_Damage.h"
 
@@ -160,7 +160,7 @@ void ATDSItemBase::ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 	UGameplayStatics::SpawnEmitterAtLocation(this, ItemInfo.Projectile.HitParticle, Hit.Location);
 	UGameplayStatics::SpawnSoundAtLocation(this, ItemInfo.Projectile.HitSound, Hit.Location);
 
-	ATDSCharacter* Player = Cast<ATDSCharacter>(OtherActor);
+	APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor);
 	ATDSItemBase* Info = Cast<ATDSItemBase>(this->GetOwner());
 	if ((!Player || Info) && Hit.bBlockingHit) //Hit not owner item or item owner
 	{

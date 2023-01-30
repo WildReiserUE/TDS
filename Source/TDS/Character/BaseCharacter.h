@@ -115,4 +115,5 @@ public:
 
 	UFUNCTION()
 	void DeadEvent();
+	bool bIsALife = true;
 };
