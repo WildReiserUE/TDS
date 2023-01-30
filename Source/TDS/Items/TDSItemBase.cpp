@@ -162,47 +162,46 @@ void ATDSItemBase::ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 
 	ATDSCharacter* Player = Cast<ATDSCharacter>(OtherActor);
 	ATDSItemBase* Info = Cast<ATDSItemBase>(this->GetOwner());
-	if (!Player || Info) //Hit not owner item or item owner
+	if ((!Player || Info) && Hit.bBlockingHit) //Hit not owner item or item owner
 	{
 		switch (Info->GetItemInfo().Weapon.ProjectileTypeDamage)
 		{
 		case EProjectileTypeDamage::Point:
 			//UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = POINT DAMAGE FROM WEAPON %f"), Info->GetItemInfo().Weapon.PhysicalDamage);
 			UGameplayStatics::ApplyDamage(OtherActor, Info->ItemInfo.Weapon.PhysicalDamage, nullptr, this,
-			                              UDamageType::StaticClass());
+										  UDamageType::StaticClass());
 			break;
 
 		case EProjectileTypeDamage::Radial:
 			//UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = RADIAL DAMAGE FROM WEAPON %f"), Info->GetItemInfo().Weapon.PhysicalDamage);
 			UGameplayStatics::ApplyRadialDamage(GetWorld(),
-			                                    Info->ItemInfo.Weapon.PhysicalDamage,
-			                                    Hit.Location,
-			                                    Info->ItemInfo.Weapon.DamageRadius,
-			                                    UDamageType::StaticClass(),
-			                                    Info->ItemInfo.Weapon.IgnoredActors,
-			                                    Info);
+												Info->ItemInfo.Weapon.PhysicalDamage,
+												Hit.Location,
+												Info->ItemInfo.Weapon.DamageRadius,
+												UDamageType::StaticClass(),
+												Info->ItemInfo.Weapon.IgnoredActors,
+												Info);
 			break;
 
 		case EProjectileTypeDamage::Visible:
 			//UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = VISIBLE DAMAGE FROM WEAPON %f"), Info->GetItemInfo().Weapon.PhysicalDamage);
 			UGameplayStatics::ApplyRadialDamage(GetWorld(),
-			                                    Info->ItemInfo.Weapon.PhysicalDamage,
-			                                    Hit.Location,
-			                                    Info->ItemInfo.Weapon.DamageRadius,
-			                                    UDamageType::StaticClass(),
-			                                    Info->ItemInfo.Weapon.IgnoredActors,
-			                                    this,
-			                                    nullptr,
-			                                    true,
-			                                    ECollisionChannel::ECC_Visibility);
+												Info->ItemInfo.Weapon.PhysicalDamage,
+												Hit.Location,
+												Info->ItemInfo.Weapon.DamageRadius,
+												UDamageType::StaticClass(),
+												Info->ItemInfo.Weapon.IgnoredActors,
+												this,
+												nullptr,
+												true,
+												ECollisionChannel::ECC_Visibility);
 			break;
 
 		default: break;
 		}
+		UAISense_Damage::ReportDamageEvent(GetWorld(),Hit.GetActor(),GetOwner()->GetOwner(), Info->ItemInfo.Weapon.PhysicalDamage,GetOwner()->GetOwner()->GetActorLocation(),Hit.Location);
+		UE_LOG(LogTemp, Warning, TEXT("INSTIGATOR ACTOR --- %s"), *GetOwner()->GetOwner()->GetClass()->GetName());
 	}
-
-	UAISense_Damage::ReportDamageEvent(GetWorld(),Hit.GetActor(),GetOwner()->GetOwner(), Info->ItemInfo.Weapon.PhysicalDamage,GetOwner()->GetOwner()->GetActorLocation(),Hit.Location);
-	UE_LOG(LogTemp, Warning, TEXT("INSTIGATOR ACTOR --- %s"), *GetOwner()->GetOwner()->GetClass()->GetName());
 
 	Destroy();
 }

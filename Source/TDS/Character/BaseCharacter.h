@@ -109,7 +109,7 @@ public:
 
 	void ChangeSettings();
 	virtual void FireOn();
-	UTDSInventory* GetInventoryComp();
+	UTDSInventory* GetInventoryComponent();
 	UTDSSkillComponent* GetSkillComponent();
 	UTDSHealthComponent* GetHealthComponent();
 

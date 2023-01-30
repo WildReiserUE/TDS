@@ -70,7 +70,7 @@ void ABaseCharacter::FireOn()
 {
 }
 
-UTDSInventory* ABaseCharacter::GetInventoryComp()
+UTDSInventory* ABaseCharacter::GetInventoryComponent()
 {
 	UTDSInventory* Inventory = FindComponentByClass<UTDSInventory>();
 	return Inventory ? Inventory : nullptr;

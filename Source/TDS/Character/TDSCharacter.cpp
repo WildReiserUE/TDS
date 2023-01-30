@@ -206,9 +206,9 @@ UDecalComponent* ATDSCharacter::GetCursorToWorld()
 
 ATDSItemBase* ATDSCharacter::SpawnWeapon(int WeaponIndex)
 {
-	if (GetInventoryComp() && bIsALife)
+	if (GetInventoryComponent() && bIsALife)
 	{
-		if (GetInventoryComp()->WeaponInventory.Num() > 0)
+		if (GetInventoryComponent()->WeaponInventory.Num() > 0)
 		{
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -217,12 +217,12 @@ ATDSItemBase* ATDSCharacter::SpawnWeapon(int WeaponIndex)
 			const FVector Loc(0, 0, 0);
 			const FTransform SpawnTransform = FTransform(Loc);
 			ATDSItemBase* MyWeapon = Cast<ATDSItemBase>(GetWorld()->SpawnActorDeferred<ATDSItemBase>(
-				GetInventoryComp()->WeaponInventory[WeaponIndex].BaseClass,
+				GetInventoryComponent()->WeaponInventory[WeaponIndex].BaseClass,
 				SpawnTransform,
 				SpawnParams.Owner,
 				SpawnParams.Instigator,
 				SpawnParams.SpawnCollisionHandlingOverride));
-			MyWeapon->SpawnedName = GetInventoryComp()->WeaponInventory[WeaponIndex].DTItemName;
+			MyWeapon->SpawnedName = GetInventoryComponent()->WeaponInventory[WeaponIndex].DTItemName;
 			MyWeapon->ItemMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			UGameplayStatics::FinishSpawningActor(MyWeapon, SpawnTransform);
 			if (MyWeapon)
@@ -240,9 +240,9 @@ ATDSItemBase* ATDSCharacter::SpawnWeapon(int WeaponIndex)
 
 void ATDSCharacter::PrevWeapon()
 {
-	if (GetInventoryComp() && bIsALife)
+	if (GetInventoryComponent() && bIsALife)
 	{
-		if (GetInventoryComp()->WeaponInventory.Num() > 0 && !GetWorld()->GetTimerManager().IsTimerActive(
+		if (GetInventoryComponent()->WeaponInventory.Num() > 0 && !GetWorld()->GetTimerManager().IsTimerActive(
 			WeaponReloadTimer))
 		{
 			if (CurrentWeapon)
@@ -254,7 +254,7 @@ void ATDSCharacter::PrevWeapon()
 			CurrentWeaponIndex --;
 			if (CurrentWeaponIndex < 0)
 			{
-				CurrentWeaponIndex = GetInventoryComp()->WeaponInventory.Num() - 1;
+				CurrentWeaponIndex = GetInventoryComponent()->WeaponInventory.Num() - 1;
 			}
 			StopAnimMontage();
 			CurrentWeapon = SpawnWeapon(CurrentWeaponIndex);
@@ -266,9 +266,9 @@ void ATDSCharacter::PrevWeapon()
 
 void ATDSCharacter::NextWeapon()
 {
-	if (GetInventoryComp() && bIsALife)
+	if (GetInventoryComponent() && bIsALife)
 	{
-		if (GetInventoryComp()->WeaponInventory.Num() > 0 && !GetWorld()->GetTimerManager().IsTimerActive(
+		if (GetInventoryComponent()->WeaponInventory.Num() > 0 && !GetWorld()->GetTimerManager().IsTimerActive(
 			WeaponReloadTimer))
 		{
 			if (CurrentWeapon)
@@ -278,7 +278,7 @@ void ATDSCharacter::NextWeapon()
 				CurrentWeapon->Destroy();
 			}
 			CurrentWeaponIndex ++;
-			if (CurrentWeaponIndex >= GetInventoryComp()->WeaponInventory.Num())
+			if (CurrentWeaponIndex >= GetInventoryComponent()->WeaponInventory.Num())
 			{
 				CurrentWeaponIndex = 0;
 			}
@@ -292,7 +292,7 @@ void ATDSCharacter::NextWeapon()
 
 void ATDSCharacter::FireOn() //По нажатию кнопки - стрельба
 {
-	if (CurrentWeapon && GetInventoryComp())
+	if (CurrentWeapon && GetInventoryComponent())
 	{
 		if (CurrentWeapon->ItemInfo.Weapon.bCanFire)
 		{
@@ -326,7 +326,7 @@ void ATDSCharacter::FireOn() //По нажатию кнопки - стрельб
 
 void ATDSCharacter::StartFire()
 {
-	if (bIsALife && GetInventoryComp())
+	if (bIsALife && GetInventoryComponent())
 	{
 		//UE_LOG(LogTemp, Log, TEXT("BULLET IN MAGAZINE = %i"), CurrentWeapon->ItemInfo.Weapon.Magazine);
 		if (CurrentWeapon->ItemInfo.Weapon.Magazine > 0)
@@ -354,9 +354,9 @@ void ATDSCharacter::DecreaseBullet(int BulletInMagazine)
 void ATDSCharacter::ReloadWeapon()
 {
 	if (CurrentWeapon
-		&& GetInventoryComp()
+		&& GetInventoryComponent()
 		&& CurrentWeapon->ItemInfo.Weapon.Magazine < CurrentWeapon->ItemInfo.Weapon.MaxMagazine
-		&& GetInventoryComp()->CheckBullets(CurrentWeapon->ItemInfo.Weapon.ProjectileId))
+		&& GetInventoryComponent()->CheckBullets(CurrentWeapon->ItemInfo.Weapon.ProjectileId))
 	{
 		//UE_LOG(LogTemp, Log, TEXT("START RELOAD WEAPON"));
 		UAnimMontage* ReloadMontage = CharacterInfo.WeaponMontageReloadMap.FindRef(CurrentWeapon->ItemInfo.Weapon.WeaponClass);
@@ -384,9 +384,9 @@ void ATDSCharacter::ReloadWeapon()
 
 FName ATDSCharacter::ReloadEnd()
 {
-	if (GetInventoryComp())
+	if (GetInventoryComponent())
 	{
-		GetInventoryComp()->DecreaseCount(CurrentWeapon->ItemInfo);
+		GetInventoryComponent()->DecreaseCount(CurrentWeapon->ItemInfo);
 	}
 	return FName();
 }
