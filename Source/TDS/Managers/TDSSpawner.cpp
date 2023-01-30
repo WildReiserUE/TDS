@@ -63,7 +63,7 @@ void ATDSSpawner::PlayerOver(UPrimitiveComponent* OverlappedComponent, AActor* O
 			[&]() { this->SpawnMobs(SpawnerInfo); },
 			SpawnerInfo.SpawnDelay,
 			true,
-			0.5f);
+			SpawnerInfo.FirstSpawnDelay);
 	}
 }
 

@@ -26,6 +26,8 @@ struct FSpawnerInfo
 	float SpawnDelay = 0.f;
 	UPROPERTY(EditDefaultsOnly)
 	int SpawnCount = 0;
+	UPROPERTY(EditDefaultsOnly)
+	float FirstSpawnDelay = 0.f;
 
 };
 

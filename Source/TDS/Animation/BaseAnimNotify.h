@@ -15,7 +15,7 @@ class TDS_API UBaseAnimNotify : public UAnimNotify
 	GENERATED_BODY()
 
 public:
-	
+
 	void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference);
 
 	FOnNotifiedSignature OnNotified;
