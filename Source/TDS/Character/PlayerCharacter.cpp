@@ -111,8 +111,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* NewInputCompon
 	NewInputComponent->BindAction(TEXT("SniperMode"), IE_Released, this, &APlayerCharacter::SniperModeOff);
 	NewInputComponent->BindAction(TEXT("NextWeapon"), IE_Pressed, this, &APlayerCharacter::NextWeapon);
 	NewInputComponent->BindAction(TEXT("PrevWeapon"), IE_Pressed, this, &APlayerCharacter::PrevWeapon);
-	NewInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &APlayerCharacter::FireOn);
-	NewInputComponent->BindAction(TEXT("Fire"), IE_Released, this, &APlayerCharacter::FireOff);
+	NewInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &APlayerCharacter::AttackOn);
+	NewInputComponent->BindAction(TEXT("Fire"), IE_Released, this, &APlayerCharacter::AttackOff);
 	NewInputComponent->BindAction(TEXT("ReloadWeapon"), IE_Pressed, this, &APlayerCharacter::ReloadWeapon);
 }
 
@@ -232,9 +232,9 @@ ATDSItemBase* APlayerCharacter::SpawnWeapon(int WeaponIndex)
 				FAttachmentTransformRules Rule(EAttachmentRule::SnapToTarget, false);
 				MyWeapon->AttachToComponent(GetMesh(), Rule, FName("RightHandSocket"));
 				MyWeapon->ChangeSettings();
+				CurrentWeapon = MyWeapon;
+				bFireAllow = true;
 			}
-			CurrentWeapon = MyWeapon;
-			bFireAllow = true;
 			return CurrentWeapon;
 		}
 	}
@@ -251,7 +251,7 @@ void APlayerCharacter::PrevWeapon()
 			if (CurrentWeapon)
 			{
 				CurrentWeapon->OnWeaponFire.RemoveDynamic(this, &APlayerCharacter::DecreaseBullet);
-				CurrentWeapon->StopSpawnBullet();
+				GetWorld()->GetTimerManager().ClearTimer(CurrentWeapon->AttackTimer);
 				CurrentWeapon->Destroy();
 			}
 			CurrentWeaponIndex --;
@@ -277,7 +277,7 @@ void APlayerCharacter::NextWeapon()
 			if (CurrentWeapon)
 			{
 				CurrentWeapon->OnWeaponFire.RemoveDynamic(this, &APlayerCharacter::DecreaseBullet);
-				CurrentWeapon->StopSpawnBullet();
+				GetWorld()->GetTimerManager().ClearTimer(CurrentWeapon->AttackTimer);
 				CurrentWeapon->Destroy();
 			}
 			CurrentWeaponIndex ++;
@@ -293,31 +293,18 @@ void APlayerCharacter::NextWeapon()
 	}
 }
 
-void APlayerCharacter::FireOn() //По нажатию кнопки - стрельба
+void APlayerCharacter::AttackOn() //По нажатию кнопки - стрельба
 {
 	if (CurrentWeapon && bFireAllow)
 	{
+		bRotateToAttack = true;
 		if (CurrentWeapon->ItemInfo.Weapon.bCanFire && GetInventoryComponent())
 		{
-			//UE_LOG(LogTemp, Log, TEXT("Command to Weapon ---Fire---"));
 			bFireAllow = false;
-			bRotateToAttack = true;
-			if (!GetWorld()->GetTimerManager().IsTimerActive(CurrentWeapon->AttackTimer) && !bFireAllow)
-			{
-				GetWorld()->GetTimerManager().SetTimer(
-											CurrentWeapon->AttackTimer,
-											this,
-											&APlayerCharacter::StartFire,
-											CurrentWeapon->AttackRate,
-											true,
-											0.f);
-			}
+			LaunchTimer(CurrentWeapon->AttackTimer);
 		}
 		else
 		{
-			//UE_LOG(LogTemp, Log, TEXT("Command to Weapon ---ATTACK---"));
-			bRotateToAttack = true;
-			CurrentWeapon->StartSpawnBullet();
 			if (CharacterInfo.MontageHandleAttack.Num() > 0)
 			{
 				int RndMontage = UKismetMathLibrary::RandomIntegerInRange(0, CharacterInfo.MontageHandleAttack.Num() - 1);
@@ -327,9 +314,35 @@ void APlayerCharacter::FireOn() //По нажатию кнопки - стрел�
 	}
 }
 
+void APlayerCharacter::AttackOff()
+{
+	if (!bFireAllow)
+	{
+		bFireAllow = true;
+		bRotateToAttack = false;
+	}
+	else if (!bIsALife)
+	{
+		bRotateToAttack = false;
+	}
+}
+
+void APlayerCharacter::LaunchTimer(FTimerHandle &Timer)
+{
+	if (!GetWorld()->GetTimerManager().IsTimerActive(Timer))
+	{
+		bFireAllow = false;
+	    GetWorld()->GetTimerManager().SetTimer(Timer,this, &APlayerCharacter::StartFire, CurrentWeapon->AttackRate,true,0.f);
+	}
+	else
+	{
+		bFireAllow = true;
+	}
+}
+
 void APlayerCharacter::StartFire()
 {
-	if (bIsALife)
+	if (bIsALife && !bFireAllow)
 	{
 		if (CurrentWeapon->ItemInfo.Weapon.Magazine > 0 && GetInventoryComponent())
 		{
@@ -337,13 +350,18 @@ void APlayerCharacter::StartFire()
 			if (CharacterInfo.WeaponMontageShotingMap.Num() > 0)
 			{
 				PlayAnimMontage(CharacterInfo.WeaponMontageShotingMap.FindRef(CurrentWeapon->ItemInfo.Weapon.WeaponClass));
+				//bFireAllow = true;
 			}
 		}
 		else
 		{
-			FireOff();
+			
 			ReloadWeapon();
 		}
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().ClearTimer(CurrentWeapon->AttackTimer);
 	}
 }
 
@@ -390,20 +408,4 @@ FName APlayerCharacter::ReloadEnd()
 		GetInventoryComponent()->DecreaseCount(CurrentWeapon->ItemInfo);
 	}
 	return FName();
-}
-
-void APlayerCharacter::FireOff()
-{
-	if (CurrentWeapon && GetWorld()->GetTimerManager().IsTimerActive(CurrentWeapon->AttackTimer) && !bFireAllow)
-	{
-		CurrentWeapon->StopSpawnBullet();
-		
-		bFireAllow = true;
-		bRotateToAttack = false;
-	}
-	else if (!bIsALife)
-	{
-		GetWorld()->GetTimerManager().ClearTimer(CurrentWeapon->AttackTimer);
-		bRotateToAttack = false;
-	}
 }

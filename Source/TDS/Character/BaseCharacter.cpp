@@ -66,7 +66,15 @@ void ABaseCharacter::ChangeSettings()
 		GetMesh()->SetAnimInstanceClass(nullptr);
 }
 
-void ABaseCharacter::FireOn()
+void ABaseCharacter::AttackOn()
+{
+}
+
+void ABaseCharacter::AttackOff()
+{
+}
+
+void ABaseCharacter::LaunchTimer(FTimerHandle &Timer)
 {
 }
 

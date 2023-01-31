@@ -108,7 +108,10 @@ public:
 // #endif
 
 	void ChangeSettings();
-	virtual void FireOn();
+	virtual void AttackOn();
+	virtual void AttackOff();
+	virtual void LaunchTimer(FTimerHandle &Timer);
+
 	UTDSInventory* GetInventoryComponent();
 	UTDSSkillComponent* GetSkillComponent();
 	UTDSHealthComponent* GetHealthComponent();

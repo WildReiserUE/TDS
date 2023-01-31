@@ -99,6 +99,7 @@ void ATDSItemBase::StartSpawnBullet()
 	}
 }
 
+//If object shoting without Player
 void ATDSItemBase::StopSpawnBullet()
 {
 	if (GetWorld()->GetTimerManager().IsTimerActive(AttackTimer))
@@ -200,7 +201,7 @@ void ATDSItemBase::ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		default: break;
 		}
 		UAISense_Damage::ReportDamageEvent(GetWorld(),Hit.GetActor(),GetOwner()->GetOwner(), Info->ItemInfo.Weapon.PhysicalDamage,GetOwner()->GetOwner()->GetActorLocation(),Hit.Location);
-		UE_LOG(LogTemp, Warning, TEXT("INSTIGATOR ACTOR --- %s"), *GetOwner()->GetOwner()->GetClass()->GetName());
+		//UE_LOG(LogTemp, Warning, TEXT("INSTIGATOR ACTOR --- %s"), *GetOwner()->GetOwner()->GetClass()->GetName());
 	}
 
 	Destroy();

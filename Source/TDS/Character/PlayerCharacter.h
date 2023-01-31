@@ -38,7 +38,13 @@ public:
 	void NextWeapon();
 
 	UFUNCTION()
-	virtual void FireOn() override;
+	virtual void AttackOn() override;
+	UFUNCTION()
+	virtual void AttackOff() override;
+
+	UFUNCTION()
+	virtual void LaunchTimer(FTimerHandle &Timer) override;
+
 	UFUNCTION()
 	void StartFire();
 	UFUNCTION()
@@ -46,8 +52,6 @@ public:
 	void ReloadWeapon();
 	UFUNCTION()
 	FName ReloadEnd();
-	UFUNCTION()
-	void FireOff();
 
 	void CalculateAllowSprint();
 
