@@ -67,7 +67,7 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 					auto Target = Cast<ATDSItemBase>(TraceHitResult.GetActor());
 					if (Target)
 					{
-						const auto InventoryComponent = FindComponentByClass<UTDSInventory>();
+						const auto InventoryComponent = FindComponentByClass<UTDSInventoryComponent>();
 						if (InventoryComponent && InventoryComponent->FoundAround)
 						{
 							NotifyActorOnClicked(EKeys::LeftMouseButton);

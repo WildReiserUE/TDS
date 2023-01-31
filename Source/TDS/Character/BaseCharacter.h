@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TDSInventory.h"
+#include "TDSInventoryComponent.h"
 #include "TDSSkillComponent.h"
 #include "Engine/DataTable.h"
 #include "GameFramework/Character.h"
@@ -112,7 +112,7 @@ public:
 	virtual void AttackOff();
 	virtual void LaunchTimer(FTimerHandle &Timer);
 
-	UTDSInventory* GetInventoryComponent();
+	UTDSInventoryComponent* GetInventoryComponent();
 	UTDSSkillComponent* GetSkillComponent();
 	UTDSHealthComponent* GetHealthComponent();
 

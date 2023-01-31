@@ -78,9 +78,9 @@ void ABaseCharacter::LaunchTimer(FTimerHandle &Timer)
 {
 }
 
-UTDSInventory* ABaseCharacter::GetInventoryComponent()
+UTDSInventoryComponent* ABaseCharacter::GetInventoryComponent()
 {
-	UTDSInventory* Inventory = FindComponentByClass<UTDSInventory>();
+	UTDSInventoryComponent* Inventory = FindComponentByClass<UTDSInventoryComponent>();
 	return Inventory ? Inventory : nullptr;
 }
 

@@ -1,34 +1,34 @@
 // Created WildReiser ©2022
 
-#include "TDSInventory.h"
+#include "TDSInventoryComponent.h"
 #include "BaseCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
-UTDSInventory::UTDSInventory()
+UTDSInventoryComponent::UTDSInventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-void UTDSInventory::BeginPlay()
+void UTDSInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	if (!ComponentOwner()) return;
-	ComponentOwner()->OnActorBeginOverlap.AddDynamic(this, &UTDSInventory::OverlapItem);
-	ComponentOwner()->OnActorEndOverlap.AddDynamic(this, &UTDSInventory::EndOverlapItem);
+	ComponentOwner()->OnActorBeginOverlap.AddDynamic(this, &UTDSInventoryComponent::OverlapItem);
+	ComponentOwner()->OnActorEndOverlap.AddDynamic(this, &UTDSInventoryComponent::EndOverlapItem);
 }
 
-void UTDSInventory::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UTDSInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-ABaseCharacter* UTDSInventory::ComponentOwner()
+ABaseCharacter* UTDSInventoryComponent::ComponentOwner()
 {
 	const auto ComponentOwner = Cast<ABaseCharacter>(this->GetOwner());
 	return ComponentOwner ? ComponentOwner : nullptr;
 }
 
-void UTDSInventory::OverlapItem(AActor* OverlappedActor, AActor* OtherActor)
+void UTDSInventoryComponent::OverlapItem(AActor* OverlappedActor, AActor* OtherActor)
 {
 	if (OverlappedActor)
 	{
@@ -41,7 +41,7 @@ void UTDSInventory::OverlapItem(AActor* OverlappedActor, AActor* OtherActor)
 	}
 }
 
-void UTDSInventory::EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor)
+void UTDSInventoryComponent::EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor)
 {
 	if (OverlappedActor)
 	{
@@ -52,30 +52,30 @@ void UTDSInventory::EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor)
 		}
 	}
 }
+//
+// int UTDSInventoryComponent::GetWeaponIndex(FItemInfo ItemInfo)
+// {
+// 	int n = INDEX_NONE;
+// 	int i = 0;
+// 	for (FItemInfo aItem : WeaponInventory)
+// 	{
+// 		if (aItem.ItemType == EItemType::Weapon)
+// 		{
+// 			n = i;
+// 			break;
+// 		}
+// 		i++;
+// 	}
+// 	return n;
+// }
 
-int UTDSInventory::GetWeaponIndex(FItemInfo ItemInfo)
-{
-	int n = INDEX_NONE;
-	int i = 0;
-	for (FItemInfo aItem : WeaponInventory)
-	{
-		if (aItem.ItemType == EItemType::Weapon)
-		{
-			n = i;
-			break;
-		}
-		i++;
-	}
-	return n;
-}
-
-void UTDSInventory::AddItem(ATDSItemBase* Item)
+void UTDSInventoryComponent::AddItem(ATDSItemBase* Item)
 {
 	const int i = FindInventoryItemById(Item->ItemInfo.ItemID);
 	const int w = FindWeaponItemById(Item->ItemInfo.ItemID);
 	if (i == INDEX_NONE && w == INDEX_NONE) //если такого предмета нет нигде
 	{
-		switch (Item->ItemInfo.ItemType) //если оружие добавляем в список оружия если такого оружия нет
+		switch (Item->ItemInfo.ItemType) //если оружие добавляем в список оружия
 		{
 		case EItemType::Weapon:
 			{
@@ -112,17 +112,16 @@ void UTDSInventory::AddItem(ATDSItemBase* Item)
 	{
 		UE_LOG(LogTemp, Log, TEXT("---AGAIN WEAPON--- NEED ---ADD BULLETS--- "));
 		const int a = FindInventoryItemById(Item->ItemInfo.Weapon.ProjectileId);
-		if(a == INDEX_NONE)
+		if(a == INDEX_NONE) //не нашли к чему добавить количество
 		{
 			UE_LOG(LogTemp, Log, TEXT("---INDEX BULLETS NONE--- "));
-			FItemInfo NewInfo;
-			
-			Inventory.Add(Item->ItemInfo);
-			OnFindItem.Broadcast(Item->ItemInfo); //уведомляем о добавлении
+			//TODO создать структуру патронаосновываясь на его имени из оружия
+			//Inventory.Add(Item->ItemInfo);
+			//OnFindItem.Broadcast(Item->ItemInfo); //уведомляем о добавлении
 		}
 		else
 		{
-			UE_LOG(LogTemp, Log, TEXT("---INDEX XXXX NONE--- "));
+			UE_LOG(LogTemp, Log, TEXT("---INDEX XXXX ADD COUNT--- "));
 			Inventory[a].Count += Item->ItemInfo.Weapon.MaxMagazine;
 			OnCountChange.Broadcast(Inventory[i].Count); //уведомляем об изменении количества
 		}
@@ -130,7 +129,7 @@ void UTDSInventory::AddItem(ATDSItemBase* Item)
 	Item->Destroy();
 }
 
-int UTDSInventory::FindInventoryItemById(int aId)
+int UTDSInventoryComponent::FindInventoryItemById(int aId)
 {
 	int n = INDEX_NONE;
 	int i = 0;
@@ -146,7 +145,7 @@ int UTDSInventory::FindInventoryItemById(int aId)
 	return n;
 }
 
-int UTDSInventory::FindWeaponItemById(int aId)
+int UTDSInventoryComponent::FindWeaponItemById(int aId)
 {
 	int n = INDEX_NONE;
 	int i = 0;
@@ -162,7 +161,7 @@ int UTDSInventory::FindWeaponItemById(int aId)
 	return n;
 }
 
-bool UTDSInventory::CheckBullets(int ProjectileId)
+bool UTDSInventoryComponent::CheckBullets(int ProjectileId)
 {
 	int i = FindInventoryItemById(ProjectileId);
 	if (i == INDEX_NONE) //если элемента нет
@@ -184,7 +183,7 @@ bool UTDSInventory::CheckBullets(int ProjectileId)
 	}
 }
 
-void UTDSInventory::DecreaseInventoryCount(FItemInfo WeaponInfo)
+void UTDSInventoryComponent::DecreaseInventoryCount(FItemInfo WeaponInfo)
 {
 	int i = FindInventoryItemById(WeaponInfo.Weapon.ProjectileId);
 	if (i == INDEX_NONE) //если элемента нет

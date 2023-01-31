@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "TDSItemBase.h"
 #include "Components/ActorComponent.h"
-#include "TDSInventory.generated.h"
+#include "TDSInventoryComponent.generated.h"
 
 class ABaseCharacter;
 
@@ -16,12 +16,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCountChange, int, ItemCount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnReloadEnd, int, Magazine, int, InventoryBullet);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class TDS_API UTDSInventory : public UActorComponent
+class TDS_API UTDSInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	UTDSInventory();
+	UTDSInventoryComponent();
 
 	virtual void BeginPlay() override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
@@ -47,9 +47,9 @@ public:
 
 	UFUNCTION()
 	void EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor);
-
-	UFUNCTION(BlueprintCallable)
-	int GetWeaponIndex(FItemInfo ItemInfo);
+	//
+	// UFUNCTION(BlueprintCallable)
+	// int GetWeaponIndex(FItemInfo ItemInfo);
 
 	ABaseCharacter* ComponentOwner();
 	void AddItem(ATDSItemBase* Item);
