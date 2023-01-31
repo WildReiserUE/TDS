@@ -224,8 +224,9 @@ ATDSItemBase* APlayerCharacter::SpawnWeapon(int WeaponIndex)
 				SpawnParams.Owner,
 				SpawnParams.Instigator,
 				SpawnParams.SpawnCollisionHandlingOverride));
-			MyWeapon->SpawnedName = GetInventoryComponent()->WeaponInventory[WeaponIndex].DTItemName;
+			//MyWeapon->SpawnedName = GetInventoryComponent()->WeaponInventory[WeaponIndex].DTItemName;
 			MyWeapon->ItemMeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			MyWeapon->ItemInfo = GetInventoryComponent()->WeaponInventory[WeaponIndex];
 			UGameplayStatics::FinishSpawningActor(MyWeapon, SpawnTransform);
 			if (MyWeapon)
 			{
@@ -252,6 +253,8 @@ void APlayerCharacter::PrevWeapon()
 			{
 				CurrentWeapon->OnWeaponFire.RemoveDynamic(this, &APlayerCharacter::DecreaseBullet);
 				GetWorld()->GetTimerManager().ClearTimer(CurrentWeapon->AttackTimer);
+				//GetInventoryComponent()->WeaponInventory[CurrentWeaponIndex] = CurrentWeapon->ItemInfo;
+				//TODO: STORE CURRENT INFO IN INVENTORY
 				CurrentWeapon->Destroy();
 			}
 			CurrentWeaponIndex --;
@@ -278,6 +281,7 @@ void APlayerCharacter::NextWeapon()
 			{
 				CurrentWeapon->OnWeaponFire.RemoveDynamic(this, &APlayerCharacter::DecreaseBullet);
 				GetWorld()->GetTimerManager().ClearTimer(CurrentWeapon->AttackTimer);
+				//TODO: STORE CURRENT INFO IN INVENTORY
 				CurrentWeapon->Destroy();
 			}
 			CurrentWeaponIndex ++;
@@ -350,12 +354,10 @@ void APlayerCharacter::StartFire()
 			if (CharacterInfo.WeaponMontageShotingMap.Num() > 0)
 			{
 				PlayAnimMontage(CharacterInfo.WeaponMontageShotingMap.FindRef(CurrentWeapon->ItemInfo.Weapon.WeaponClass));
-				//bFireAllow = true;
 			}
 		}
 		else
 		{
-			
 			ReloadWeapon();
 		}
 	}
@@ -365,9 +367,10 @@ void APlayerCharacter::StartFire()
 	}
 }
 
-void APlayerCharacter::DecreaseBullet(int BulletInMagazine)
+void APlayerCharacter::DecreaseBullet(FItemInfo Info)
 {
-	UE_LOG(LogTemp, Log, TEXT("WEAPON DELEGATE --- %i"), BulletInMagazine);
+	GetInventoryComponent()->WeaponInventory[CurrentWeaponIndex] = Info;
+	UE_LOG(LogTemp, Log, TEXT("WEAPON DELEGATE --- SAVE ITEM %i"), GetInventoryComponent()->WeaponInventory[CurrentWeaponIndex].Weapon.Magazine);
 }
 
 void APlayerCharacter::ReloadWeapon()
@@ -405,7 +408,7 @@ FName APlayerCharacter::ReloadEnd()
 {
 	if (GetInventoryComponent())
 	{
-		GetInventoryComponent()->DecreaseCount(CurrentWeapon->ItemInfo);
+		GetInventoryComponent()->DecreaseInventoryCount(CurrentWeapon->ItemInfo);
 	}
 	return FName();
 }

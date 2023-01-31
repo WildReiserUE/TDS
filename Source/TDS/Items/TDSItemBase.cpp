@@ -90,7 +90,7 @@ void ATDSItemBase::StartSpawnBullet()
 		Spawned->ChangeSettings();
 		UGameplayStatics::SpawnSoundAtLocation(this, ItemInfo.Weapon.ShootSound, GetActorLocation());
 		ItemInfo.Weapon.Magazine --;
-		OnWeaponFire.Broadcast(ItemInfo.Weapon.Magazine);
+		OnWeaponFire.Broadcast(ItemInfo);
 	}
 	else if (ItemInfo.Weapon.WeaponClass == EWeaponClass::Handle)
 	{
@@ -200,8 +200,11 @@ void ATDSItemBase::ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 
 		default: break;
 		}
-		UAISense_Damage::ReportDamageEvent(GetWorld(),Hit.GetActor(),GetOwner()->GetOwner(), Info->ItemInfo.Weapon.PhysicalDamage,GetOwner()->GetOwner()->GetActorLocation(),Hit.Location);
-		//UE_LOG(LogTemp, Warning, TEXT("INSTIGATOR ACTOR --- %s"), *GetOwner()->GetOwner()->GetClass()->GetName());
+		//TODO DamageSensor
+		if(Hit.GetActor())
+		{
+			UAISense_Damage::ReportDamageEvent(GetWorld(),Hit.GetActor(),GetOwner()->GetOwner(), Info->ItemInfo.Weapon.PhysicalDamage,GetOwner()->GetOwner()->GetActorLocation(),Hit.Location);
+		}
 	}
 
 	Destroy();

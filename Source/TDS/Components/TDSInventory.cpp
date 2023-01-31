@@ -177,7 +177,7 @@ bool UTDSInventory::CheckBullets(int ProjectileId)
 	}
 }
 
-void UTDSInventory::DecreaseCount(FItemInfo WeaponInfo)
+void UTDSInventory::DecreaseInventoryCount(FItemInfo WeaponInfo)
 {
 	int i = FindInventoryItemById(WeaponInfo.Weapon.ProjectileId);
 	if (i == INDEX_NONE) //если элемента нет
@@ -189,13 +189,14 @@ void UTDSInventory::DecreaseCount(FItemInfo WeaponInfo)
 		if (Inventory[i].Count >= 1)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("DECREASE BULLET FROM INVENTORY ELAPSED: -- %d  --"), Inventory[i].Count);
-			int Result = Inventory[i].Count - (ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.MaxMagazine -
-				ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine);
-			UE_LOG(LogTemp, Warning, TEXT("DECREASE BULLET FROM ITEM: -- %d  --"), Inventory[i].Count);
+			int Result = Inventory[i].Count -
+				(ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.MaxMagazine -
+					ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine);
+			UE_LOG(LogTemp, Warning, TEXT("DECREASE BULLET FROM INVENTORY: -- %d  --"), Inventory[i].Count);
 			if (Result <= 0)
 			{
-				ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine = Inventory[i].Count + ComponentOwner()->
-					CurrentWeapon->ItemInfo.Weapon.Magazine;
+				ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine =
+					Inventory[i].Count + ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine;
 				Inventory.RemoveAt(i);
 				OnReloadEnd.Broadcast(ComponentOwner()->CurrentWeapon->ItemInfo.Weapon.Magazine, 0);
 			}

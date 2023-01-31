@@ -41,20 +41,20 @@ public:
 	virtual void AttackOn() override;
 	UFUNCTION()
 	virtual void AttackOff() override;
-
 	UFUNCTION()
 	virtual void LaunchTimer(FTimerHandle &Timer) override;
-
 	UFUNCTION()
 	void StartFire();
+
 	UFUNCTION()
-	void DecreaseBullet(int BulletInMagazine);
+	void DecreaseBullet(FItemInfo Info);
+
 	void ReloadWeapon();
+
 	UFUNCTION()
 	FName ReloadEnd();
 
 	void CalculateAllowSprint();
-
 	UFUNCTION()
 	void ActivateSprint();
 	UFUNCTION()

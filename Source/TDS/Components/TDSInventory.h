@@ -56,6 +56,6 @@ public:
 	int FindInventoryItemById(int aId);
 	int FindWeaponItemById(int aId);
 	bool CheckBullets(int ProjectileId);
-	void DecreaseCount(FItemInfo WeaponInfo);
+	void DecreaseInventoryCount(FItemInfo WeaponInfo);
 	bool FoundAround = false;
 };
