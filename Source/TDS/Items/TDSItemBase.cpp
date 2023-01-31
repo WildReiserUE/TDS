@@ -82,13 +82,15 @@ void ATDSItemBase::StartSpawnBullet()
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		FVector SocketLocation = this->ItemMeshComponent->GetSocketLocation(FName("BulletSocket"));
 		FTransform SpawnPoint = FTransform(FRotator(0), SocketLocation, FVector(1));
-		auto Spawned = GetWorld()->SpawnActorDeferred<ATDSItemBase>(ItemInfo.Weapon.WeaponProjectile, SpawnPoint, this,
-		                                                            nullptr,
-		                                                            SpawnParams.SpawnCollisionHandlingOverride);
+		auto Spawned = GetWorld()->SpawnActorDeferred<ATDSItemBase>(ItemInfo.Weapon.WeaponProjectile,
+																				SpawnPoint,
+																				this,
+																				nullptr,
+																				SpawnParams.SpawnCollisionHandlingOverride);
 		Spawned->SpawnedName = ItemInfo.Weapon.ProjectileName;
 		UGameplayStatics::FinishSpawningActor(Spawned, SpawnPoint);
 		Spawned->ChangeSettings();
-		UGameplayStatics::SpawnSoundAtLocation(this, ItemInfo.Weapon.ShootSound, GetActorLocation());
+		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), ItemInfo.Weapon.ShootSound, GetActorLocation());
 		ItemInfo.Weapon.Magazine --;
 		OnWeaponFire.Broadcast(ItemInfo);
 	}
@@ -158,9 +160,6 @@ void ATDSItemBase::BeginPlay()
 void ATDSItemBase::ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                                  FVector NormalImpulse, const FHitResult& Hit)
 {
-	UGameplayStatics::SpawnEmitterAtLocation(this, ItemInfo.Projectile.HitParticle, Hit.Location);
-	UGameplayStatics::SpawnSoundAtLocation(this, ItemInfo.Projectile.HitSound, Hit.Location);
-
 	APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor);
 	ATDSItemBase* Info = Cast<ATDSItemBase>(this->GetOwner());
 	if ((!Player || Info) && Hit.bBlockingHit) //Hit not owner item or item owner
@@ -168,13 +167,14 @@ void ATDSItemBase::ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		switch (Info->GetItemInfo().Weapon.ProjectileTypeDamage)
 		{
 		case EProjectileTypeDamage::Point:
-			//UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = POINT DAMAGE FROM WEAPON %f"), Info->GetItemInfo().Weapon.PhysicalDamage);
-			UGameplayStatics::ApplyDamage(OtherActor, Info->ItemInfo.Weapon.PhysicalDamage, nullptr, this,
-										  UDamageType::StaticClass());
+			UGameplayStatics::ApplyDamage(OtherActor,
+												Info->ItemInfo.Weapon.PhysicalDamage,
+												nullptr,
+												this,
+												UDamageType::StaticClass());
 			break;
 
 		case EProjectileTypeDamage::Radial:
-			//UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = RADIAL DAMAGE FROM WEAPON %f"), Info->GetItemInfo().Weapon.PhysicalDamage);
 			UGameplayStatics::ApplyRadialDamage(GetWorld(),
 												Info->ItemInfo.Weapon.PhysicalDamage,
 												Hit.Location,
@@ -185,7 +185,6 @@ void ATDSItemBase::ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 			break;
 
 		case EProjectileTypeDamage::Visible:
-			//UE_LOG(LogTemp, Warning, TEXT("PROJECTILE INFO = VISIBLE DAMAGE FROM WEAPON %f"), Info->GetItemInfo().Weapon.PhysicalDamage);
 			UGameplayStatics::ApplyRadialDamage(GetWorld(),
 												Info->ItemInfo.Weapon.PhysicalDamage,
 												Hit.Location,
@@ -203,9 +202,16 @@ void ATDSItemBase::ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActo
 		//TODO DamageSensor
 		if(Hit.GetActor())
 		{
-			UAISense_Damage::ReportDamageEvent(GetWorld(),Hit.GetActor(),GetOwner()->GetOwner(), Info->ItemInfo.Weapon.PhysicalDamage,GetOwner()->GetOwner()->GetActorLocation(),Hit.Location);
+			UAISense_Damage::ReportDamageEvent(GetWorld(),
+				Hit.GetActor(),
+				GetOwner()->GetOwner(),
+				Info->ItemInfo.Weapon.PhysicalDamage,
+				GetOwner()->GetOwner()->GetActorLocation(),
+				Hit.Location);
 		}
 	}
 
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ItemInfo.Projectile.HitParticle, Hit.Location);
+	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), ItemInfo.Projectile.HitSound, Hit.Location);
 	Destroy();
 }
