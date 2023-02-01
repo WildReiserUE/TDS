@@ -115,7 +115,7 @@ void UTDSInventoryComponent::AddItem(ATDSItemBase* Item)
 		if(a == INDEX_NONE) //не нашли к чему добавить количество
 		{
 			UE_LOG(LogTemp, Log, TEXT("---INDEX BULLETS NONE--- "));
-			//TODO создать структуру патронаосновываясь на его имени из оружия
+			//TODO создать-получить структуру патрона основываясь на его имени из информации оружия и добавить в инвентарь
 			//Inventory.Add(Item->ItemInfo);
 			//OnFindItem.Broadcast(Item->ItemInfo); //уведомляем о добавлении
 		}

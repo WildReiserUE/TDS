@@ -13,6 +13,18 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComponentsAdded);
 
+UENUM (BlueprintType)
+enum class EChatacterState: uint8
+{
+	Default,
+	Idle,
+	Walk,
+	Run,
+	Swimm,
+	DistanceAttack,
+	MeleeAttack
+};
+
 USTRUCT(BlueprintType)
 struct FBaseData
 {

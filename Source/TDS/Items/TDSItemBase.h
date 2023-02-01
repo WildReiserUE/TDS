@@ -172,14 +172,14 @@ struct FWeaponInfo
 	EWeaponAttackSpeed AttackSpeed = EWeaponAttackSpeed::None;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float PhysicalDamage = 0.f;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly,
-		meta = (EditCondition="ProjectileTypeDamage != EProjectileTypeDamage::Point"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ProjectileTypeDamage != EProjectileTypeDamage::Point"))
 	float DamageRadius = 0.f;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly,
-		meta = (EditCondition="ProjectileTypeDamage != EProjectileTypeDamage::Point"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ProjectileTypeDamage != EProjectileTypeDamage::Point"))
 	TArray<AActor*> IgnoredActors;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float MagicalDamage = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting", ClampMax="650.0")) //выстрелов в минуту
+	float AttackRate = 0.f;
 };
 
 USTRUCT(BlueprintType, meta = (ExposeOnSpawn))
@@ -229,8 +229,7 @@ struct FItemInfo : public FTableRowBase
 	UParticleSystem* PickupFX = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UParticleSystem* DropFX = nullptr;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly,
-		meta = (EditCondition="ItemType == EItemType::Item", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="ItemType == EItemType::Item", EditConditionHides))
 	bool bIsStackable = false;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="1", EditCondition="bIsStackable == true"))
 	int Count = 1;
@@ -299,11 +298,12 @@ public:
 
 	bool bIsClicked = false;
 	FTimerHandle AttackTimer;
-	float AttackRate = 0.f;
+	float CAttackRate = 0.f;
 
 private:
 	virtual void BeginPlay() override;
 
+	FVector Direction = FVector(0);
 	UFUNCTION()
 	void ProjectileHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	                   FVector NormalImpulse, const FHitResult& Hit);

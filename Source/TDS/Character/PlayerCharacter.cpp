@@ -336,7 +336,7 @@ void APlayerCharacter::LaunchTimer(FTimerHandle &Timer)
 	if (!GetWorld()->GetTimerManager().IsTimerActive(Timer))
 	{
 		bFireAllow = false;
-	    GetWorld()->GetTimerManager().SetTimer(Timer,this, &APlayerCharacter::StartFire, CurrentWeapon->AttackRate,true,0.f);
+	    GetWorld()->GetTimerManager().SetTimer(Timer,this, &APlayerCharacter::StartFire, CurrentWeapon->CAttackRate,true,0.f);
 	}
 	else
 	{

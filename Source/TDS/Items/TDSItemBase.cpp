@@ -3,6 +3,7 @@
 #include "TDSItemBase.h"
 #include "PlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Perception/AISense_Damage.h"
 
 ATDSItemBase::ATDSItemBase()
@@ -43,6 +44,13 @@ void ATDSItemBase::ChangeSettings()
 	}
 	else
 		ItemMeshComponent->SetStaticMesh(nullptr);
+	
+	if(ItemInfo.ItemType == EItemType::Weapon)
+	{
+		CAttackRate = 60.f / ItemInfo.Weapon.AttackRate; 
+		ItemInfo.Weapon.AttackRate = CAttackRate;
+		UE_LOG(LogTemp, Log, TEXT("---WEAPON RATE---   %f"), CAttackRate);
+	}
 }
 
 void ATDSItemBase::SpawnParticleFx(UParticleSystem* NewParticle)
@@ -119,7 +127,7 @@ void ATDSItemBase::BeginPlay()
 		ItemMeshComponent->OnComponentHit.AddDynamic(this, &ATDSItemBase::ProjectileHit);
 		ProjectileMovementComponent->ProjectileGravityScale = ItemInfo.Projectile.ProjectileGravity;
 		ProjectileMovementComponent->bRotationFollowsVelocity = true;
-		FVector Direction = FVector(0);
+
 		const APlayerController* PC = GetWorld()->GetFirstPlayerController();
 		const APawn* Player = PC->GetPawn(); //player
 		if (PC && Player)
@@ -131,28 +139,6 @@ void ATDSItemBase::BeginPlay()
 				0);
 			ProjectileMovementComponent->InitialSpeed = ItemInfo.Projectile.ProjectileSpeed;
 			ProjectileMovementComponent->MaxSpeed = ItemInfo.Projectile.ProjectileMaxSpeed;
-		}
-	}
-	if (ItemInfo.ItemType == EItemType::Weapon)
-	{
-		switch (ItemInfo.Weapon.AttackSpeed)
-		{
-		case EWeaponAttackSpeed::VerySlow:
-			AttackRate = 1.5f;
-			break;
-		case EWeaponAttackSpeed::Slow:
-			AttackRate = 0.75f;
-			break;
-		case EWeaponAttackSpeed::Normal:
-			AttackRate = 0.5f;
-			break;
-		case EWeaponAttackSpeed::Fast:
-			AttackRate = 0.25f;
-			break;
-		case EWeaponAttackSpeed::VeryFast:
-			AttackRate = 0.125f;
-			break;
-		default: ;
 		}
 	}
 }
