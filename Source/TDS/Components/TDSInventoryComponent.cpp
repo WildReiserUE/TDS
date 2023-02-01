@@ -52,22 +52,6 @@ void UTDSInventoryComponent::EndOverlapItem(AActor* OverlappedActor, AActor* Oth
 		}
 	}
 }
-//
-// int UTDSInventoryComponent::GetWeaponIndex(FItemInfo ItemInfo)
-// {
-// 	int n = INDEX_NONE;
-// 	int i = 0;
-// 	for (FItemInfo aItem : WeaponInventory)
-// 	{
-// 		if (aItem.ItemType == EItemType::Weapon)
-// 		{
-// 			n = i;
-// 			break;
-// 		}
-// 		i++;
-// 	}
-// 	return n;
-// }
 
 void UTDSInventoryComponent::AddItem(ATDSItemBase* Item)
 {

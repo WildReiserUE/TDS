@@ -47,9 +47,6 @@ public:
 
 	UFUNCTION()
 	void EndOverlapItem(AActor* OverlappedActor, AActor* OtherActor);
-	//
-	// UFUNCTION(BlueprintCallable)
-	// int GetWeaponIndex(FItemInfo ItemInfo);
 
 	ABaseCharacter* ComponentOwner();
 	void AddItem(ATDSItemBase* Item);
