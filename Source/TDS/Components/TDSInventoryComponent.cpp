@@ -123,7 +123,7 @@ void UTDSInventoryComponent::AddItem(ATDSItemBase* Item)
 		{
 			UE_LOG(LogTemp, Log, TEXT("---INDEX XXXX ADD COUNT--- "));
 			Inventory[a].Count += Item->ItemInfo.Weapon.MaxMagazine;
-			OnCountChange.Broadcast(Inventory[i].Count); //уведомляем об изменении количества
+			OnCountChange.Broadcast(Inventory[a].Count); //уведомляем об изменении количества
 		}
 	}
 	Item->Destroy();
