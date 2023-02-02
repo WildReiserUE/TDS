@@ -2,7 +2,7 @@
 
 #include "TDSHealthComponent.h"
 
-#include "PlayerCharacter.h"
+#include "BaseCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
 UTDSHealthComponent::UTDSHealthComponent()
@@ -10,13 +10,13 @@ UTDSHealthComponent::UTDSHealthComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-void UTDSHealthComponent::InitParams(int32 Health, int32 Shield, float ShieldDelay, float ShieldRecValue, float ShieldRecTick) //TODO: Maybe STRUCT ?
+void UTDSHealthComponent::InitParams(FHealthParams HealthParams) //TODO: Maybe STRUCT ?
 {
-	MaxCHealth = CHealth = Health;
-	MaxCShield = CShield = Shield;
-	CShieldStartDelay = ShieldDelay;
-	CShieldRecoveryValue = ShieldRecValue;
-	CShieldRecoveryTick = ShieldRecTick;
+	MaxCHealth = CHealth = HealthParams.Health;
+	MaxCShield = CShield = HealthParams.Shield;
+	CShieldStartDelay = HealthParams.ShieldDelay;
+	CShieldRecoveryValue = HealthParams.ShieldRecoveryValue;
+	CShieldRecoveryTick = HealthParams.ShieldRecoveryTick;
 
 	UE_LOG(LogTemp, Log, TEXT("--- OWNER COMPONENT HEALTH --- %f"), MaxCHealth);
 	UE_LOG(LogTemp, Log, TEXT("--- OWNER COMPONENT SHIELD --- %f"), MaxCShield);
@@ -104,6 +104,6 @@ void UTDSHealthComponent::ShieldRecoveryStart()
 
 AActor* UTDSHealthComponent::ComponentOwner()
 {
-	auto ComponentOwner = this->GetOwner();
+	AActor* ComponentOwner = this->GetOwner();
 	return ComponentOwner ? ComponentOwner : nullptr;
 }

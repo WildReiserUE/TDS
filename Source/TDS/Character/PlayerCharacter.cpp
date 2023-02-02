@@ -119,10 +119,11 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* NewInputCompon
 
 void APlayerCharacter::BeginPlay()
 {
+	
 	Super::BeginPlay();
-
 	CursorToWorld = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CursorMaterial, CursorSize, FVector(0));
 	bIsALife = true;
+	
 
 }
 

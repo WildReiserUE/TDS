@@ -12,7 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "BaseCharacter.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComponentAdded);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComponentAddComplete);
 
 UENUM (BlueprintType)
 enum class EChatacterState: uint8
@@ -27,7 +27,7 @@ enum class EChatacterState: uint8
 };
 
 USTRUCT(BlueprintType)
-struct FBaseData
+struct FBaseData : public FTableRowBase
 {
 	GENERATED_BODY()
 	float CameraMaxLenght = 1500.f;
@@ -36,7 +36,7 @@ struct FBaseData
 };
 
 USTRUCT(BlueprintType)
-struct FBaseHumanoidData : public FTableRowBase
+struct FBaseHumanoidData : public FBaseData//, public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -58,17 +58,7 @@ struct FBaseHumanoidData : public FTableRowBase
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin="0"))
 	float AimMoveSpeed = 0.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	bool bCanUseShield = false;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(EditCondition="bCanUseShield == true"))
-	float MaxShield = 0.f;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin="0"))
-	float MaxHealth = 0.f;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float ShieldStartDelay = 0.f;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float ShieldRecoveryValue = 0.f;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float SheildRecoveryPeriod = 0.f;
+	FHealthParams HealthParams;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin="0"))
 	int Experience = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -108,7 +98,7 @@ public:
 	ATDSItemBase* CurrentWeapon = nullptr;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnComponentAdded ComponentsAdded;
+	FOnComponentAddComplete CompleteAddComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* CharacterCameraComponent;

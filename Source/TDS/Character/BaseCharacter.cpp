@@ -59,13 +59,19 @@ void ABaseCharacter::ChangeSettings()
 
 	if(CharacterInfo.ComponentList.Num() > 0)
 	{
-		for(int comp = 0 ; comp <= CharacterInfo.ComponentList.Num() - 1 ; comp++) 
+		for(int comp = 0 ; comp < CharacterInfo.ComponentList.Num() ; comp++) 
 		{
 			FTransform ComponentTransform = FTransform(FRotator(0),FVector(0),FVector(1));
-			GetOwner()->AddComponentByClass(CharacterInfo.ComponentList[comp],false, ComponentTransform,true);
+			AddComponentByClass(CharacterInfo.ComponentList[comp],false, ComponentTransform,true);
+			UE_LOG(LogTemp, Log, TEXT("CHAR LOOP --- ADD COMPONENT = %s"), *GetName());
+			//FinishAndRegisterComponent(GetHealthComponent());
 		}
+		//RegisterAllComponents();
 		//TODO: INITIALIZE COMPONENTS PARAMS
-		ComponentsAdded.Broadcast();
+		if(GetHealthComponent())
+			GetHealthComponent()->InitParams(CharacterInfo.HealthParams);
+
+		CompleteAddComponent.Broadcast();
 		UE_LOG(LogTemp, Log, TEXT("BASE CHAR DELEGATE --- TOTAL ADDED COMPONENTS = %i"), CharacterInfo.ComponentList.Num());
 	}
 }

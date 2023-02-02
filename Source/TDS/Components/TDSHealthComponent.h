@@ -6,6 +6,28 @@
 #include "Components/ActorComponent.h"
 #include "TDSHealthComponent.generated.h"
 
+USTRUCT(BlueprintType)
+struct FHealthParams
+{
+	GENERATED_USTRUCT_BODY()
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float Health = 0.f;	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	bool bCanUseShield = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(EditCondition="bCanUseShield == true"))
+	float Shield = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(EditCondition="bCanUseShield == true"))
+	float ShieldDelay = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(EditCondition="bCanUseShield == true"))
+	float ShieldRecoveryValue = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(EditCondition="bCanUseShield == true"))
+	float MaxShield = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(EditCondition="bCanUseShield == true"))
+	float ShieldStartDelay = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(EditCondition="bCanUseShield == true"))
+	float ShieldRecoveryTick = 0.f;
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChange, float, Health, float, MaxHealth);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnShieldChange, float, Shield, float, MaxShield);
@@ -19,7 +41,7 @@ class TDS_API UTDSHealthComponent : public UActorComponent
 
 public:
 	UTDSHealthComponent();
-	void InitParams(int32 Health, int32 Shield, float ShieldDelay, float ShieldRecValue, float ShieldRecTick);
+	void InitParams(FHealthParams HealthParams);
 
 	UPROPERTY(BlueprintAssignable, Category="Health")
 	FOnHealthChange OnHealthChange;
