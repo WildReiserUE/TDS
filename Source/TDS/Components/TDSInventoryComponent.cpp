@@ -30,7 +30,7 @@ ABaseCharacter* UTDSInventoryComponent::ComponentOwner()
 
 void UTDSInventoryComponent::OverlapItem(AActor* OverlappedActor, AActor* OtherActor)
 {
-	if (OverlappedActor)
+	if (OtherActor)
 	{
 		ATDSItemBase* BaseItem = Cast<ATDSItemBase>(OtherActor);
 		if (BaseItem && BaseItem->ItemInfo.ItemType != EItemType::Projectile)

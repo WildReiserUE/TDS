@@ -2,6 +2,7 @@
 
 #include "TDSItemBase.h"
 #include "PlayerCharacter.h"
+#include "TDSGameInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Perception/AISense_Damage.h"

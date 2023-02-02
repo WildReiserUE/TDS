@@ -178,7 +178,7 @@ struct FWeaponInfo
 	TArray<AActor*> IgnoredActors;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float MagicalDamage = 0.f;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition="WeaponClass == EWeaponClass::H1Shoting || WeaponClass == EWeaponClass::H2Shoting", ClampMax="650.0")) //выстрелов в минуту
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMax="650.0")) //активаций в минуту
 	float AttackRate = 0.f;
 };
 

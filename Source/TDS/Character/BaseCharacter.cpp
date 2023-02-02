@@ -19,29 +19,21 @@ void ABaseCharacter::Tick(float DeltaSeconds)
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	ChangeSettings();
-	if (CharacterInfo.ComponentList.Num() > 0)
+
+	if(GetTDSGameInstance())
 	{
-		const int Comp = CharacterInfo.ComponentList.Num();
-		for (int i = 0; i < Comp; i++)
+		FBaseHumanoidData* PlayerPresetRow = GetTDSGameInstance()->BasePlayerPresetTable->FindRow<FBaseHumanoidData>(SpawnedName, "", true);
+		FBaseHumanoidData* AIPresetRow = GetTDSGameInstance()->AIPresetTable->FindRow<FBaseHumanoidData>(SpawnedName, "", true);
+		if (PlayerPresetRow)
 		{
-			this->AddComponentByClass(CharacterInfo.ComponentList[i], false, FTransform(FVector(0)), true);
-			FinishAddComponent(GetComponentByClass(CharacterInfo.ComponentList[i]), false, FTransform(FVector(0)));
+			CharacterInfo = *PlayerPresetRow;
+			ChangeSettings();
 		}
-		ComponentsAdded.Broadcast();
-		if(GetHealthComponent())
+		else if(AIPresetRow)
 		{
-			GetHealthComponent()->InitParams(CharacterInfo.MaxHealth,
-				CharacterInfo.MaxShield,
-				CharacterInfo.ShieldStartDelay,
-				CharacterInfo.ShieldRecoveryValue,
-				CharacterInfo.SheildRecoveryPeriod);
-			GetHealthComponent()->OnOwnerDeath.AddDynamic(this,&ABaseCharacter::DeadEvent);
+			CharacterInfo = *AIPresetRow;
+			ChangeSettings();
 		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("ADDED COMPONENTS TO OWNER --- NULL"));
 	}
 }
 
@@ -64,6 +56,18 @@ void ABaseCharacter::ChangeSettings()
 		GetMesh()->SetAnimInstanceClass(CharacterInfo.Humanoid_AnimInstance);
 	else
 		GetMesh()->SetAnimInstanceClass(nullptr);
+
+	if(CharacterInfo.ComponentList.Num() > 0)
+	{
+		for(int comp = 0 ; comp <= CharacterInfo.ComponentList.Num() - 1 ; comp++) 
+		{
+			FTransform ComponentTransform = FTransform(FRotator(0),FVector(0),FVector(1));
+			GetOwner()->AddComponentByClass(CharacterInfo.ComponentList[comp],false, ComponentTransform,true);
+		}
+		//TODO: INITIALIZE COMPONENTS PARAMS
+		ComponentsAdded.Broadcast();
+		UE_LOG(LogTemp, Log, TEXT("BASE CHAR DELEGATE --- TOTAL ADDED COMPONENTS = %i"), CharacterInfo.ComponentList.Num());
+	}
 }
 
 void ABaseCharacter::AttackOn()
@@ -94,6 +98,12 @@ UTDSHealthComponent* ABaseCharacter::GetHealthComponent()
 {
 	UTDSHealthComponent* HealthComponent = FindComponentByClass<UTDSHealthComponent>();
 	return HealthComponent ? HealthComponent : nullptr;
+}
+
+UTDSGameInstance* ABaseCharacter::GetTDSGameInstance()
+{
+	UTDSGameInstance* Instance = GetGameInstance<UTDSGameInstance>();
+	return Instance ? Instance : nullptr;
 }
 
 void ABaseCharacter::DeadEvent()

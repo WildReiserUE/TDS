@@ -10,16 +10,16 @@ UTDSHealthComponent::UTDSHealthComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-void UTDSHealthComponent::InitParams(int32 Health, int32 Shield, float ShieldDelay, float ShieldRecValue, float ShieldRecTick)
+void UTDSHealthComponent::InitParams(int32 Health, int32 Shield, float ShieldDelay, float ShieldRecValue, float ShieldRecTick) //TODO: Maybe STRUCT ?
 {
 	MaxCHealth = CHealth = Health;
 	MaxCShield = CShield = Shield;
-
-	UE_LOG(LogTemp, Log, TEXT("--- COMPONENT HEALTH --- %f"), MaxCHealth);
-	UE_LOG(LogTemp, Log, TEXT("--- COMPONENT SHIELD --- %f"), MaxCShield);
 	CShieldStartDelay = ShieldDelay;
 	CShieldRecoveryValue = ShieldRecValue;
 	CShieldRecoveryTick = ShieldRecTick;
+
+	UE_LOG(LogTemp, Log, TEXT("--- OWNER COMPONENT HEALTH --- %f"), MaxCHealth);
+	UE_LOG(LogTemp, Log, TEXT("--- OWNER COMPONENT SHIELD --- %f"), MaxCShield);
 }
 
 void UTDSHealthComponent::BeginPlay()

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TDSGameInstance.h"
 #include "TDSInventoryComponent.h"
 #include "TDSSkillComponent.h"
 #include "Engine/DataTable.h"
@@ -11,7 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "BaseCharacter.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComponentsAdded);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComponentAdded);
 
 UENUM (BlueprintType)
 enum class EChatacterState: uint8
@@ -107,7 +108,7 @@ public:
 	ATDSItemBase* CurrentWeapon = nullptr;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnComponentsAdded ComponentsAdded;
+	FOnComponentAdded ComponentsAdded;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* CharacterCameraComponent;
@@ -127,6 +128,7 @@ public:
 	UTDSInventoryComponent* GetInventoryComponent();
 	UTDSSkillComponent* GetSkillComponent();
 	UTDSHealthComponent* GetHealthComponent();
+	UTDSGameInstance* GetTDSGameInstance();
 
 	UFUNCTION()
 	void DeadEvent();

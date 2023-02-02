@@ -3,6 +3,7 @@
 #include "PlayerCharacter.h"
 
 
+#include "K2Node_GetDataTableRow.h"
 #include "KismetAnimationLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "ReloadEndNotify.h"
