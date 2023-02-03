@@ -9,15 +9,21 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSprint, float, CurrentSprintValue, float, MaxSprintValue);
 
 USTRUCT(BlueprintType)
-struct FSprintSettings //Структура с настройками нужно перенести куда-нить
+struct FSkillParams //Структура с настройками нужно перенести куда-нить
 {
-	GENERATED_BODY()
-	float SprintPoint = 100.0f;
-	float SprintCoef = 1.5f;
-	float SprintLosePoint = 3.0f;
-	float SprintRecoveryValue = 5.0f;
-	float SprintRecoveryTimerStart = 2.0f;
-	float SprintTimerTick = 0.2f;
+	GENERATED_USTRUCT_BODY()
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float SprintPoint = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float SprintCoef = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float SprintLosePoint = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float SprintRecoveryValue = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float SprintRecoveryTimerStart = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float SprintTimerTick = 0.f;
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -28,10 +34,8 @@ class TDS_API UTDSSkillComponent : public UActorComponent
 public:
 	UTDSSkillComponent();
 
-	UPROPERTY(BlueprintAssignable, EditAnywhere, BlueprintReadWrite, Category="Sprint")
+	UPROPERTY(BlueprintAssignable, Category="Sprint")
 	FOnSprint OnSprintValueChange;
-
-	FSprintSettings SprintSettings;
 
 	FTimerHandle StaminaRecoveryTimer;
 	FTimerHandle StaminaLoseTimer;
@@ -46,19 +50,26 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 	AActor* ComponentOwner();
-	void InitSprint();
+	void InitSprint(FSkillParams SkillParams);
 	void StartSprint();
 	void DecreaseStamina();
 	void StopSprint();
 	void IncreaseStamina();
 
 	float SprintPoint = 0.f;
+	float CMaxSprintPoint = 0.f;
 	float SprintLoseValue = 0.f;
 	float SprintRecoveryValue = 0.f;
 	float SprintRecoveryTimerStart = 0.f;
 	float SprintTimerTick = 0.f;
 	float SprintCoef = 0.f;
+	bool CanSprint();
+
+private:
+
+
 
 protected:
 	virtual void BeginPlay() override;
+
 };

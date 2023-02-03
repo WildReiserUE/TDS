@@ -21,8 +21,6 @@ struct FHealthParams
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(EditCondition="bCanUseShield == true"))
 	float ShieldRecoveryValue = 0.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(EditCondition="bCanUseShield == true"))
-	float MaxShield = 0.f;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(EditCondition="bCanUseShield == true"))
 	float ShieldStartDelay = 0.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(EditCondition="bCanUseShield == true"))
 	float ShieldRecoveryTick = 0.f;

@@ -24,17 +24,17 @@ APlayerCharacter::APlayerCharacter()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-	GetCharacterMovement()->bOrientRotationToMovement = false; // Rotate character to moving direction
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
 	CameraArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraArm"));
 	CameraArm->SetupAttachment(RootComponent);
-	CameraArm->bUsePawnControlRotation = false; // Don't want arm to rotate when character does
+	CameraArm->bUsePawnControlRotation = false;
 	CameraArm->TargetArmLength = 1000.f;
 	CameraArm->SetRelativeRotation(FRotator(-65.0f, -10.0f, 0.0f));
-	CameraArm->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
+	CameraArm->bDoCollisionTest = false;
 	CameraArm->bInheritPitch = false;
 	CameraArm->bInheritYaw = false;
 	CameraArm->bInheritRoll = false;
@@ -68,8 +68,7 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 					auto Target = Cast<ATDSItemBase>(TraceHitResult.GetActor());
 					if (Target)
 					{
-						const auto InventoryComponent = FindComponentByClass<UTDSInventoryComponent>();
-						if (InventoryComponent && InventoryComponent->FoundAround)
+						if (GetInventoryComponent() && GetInventoryComponent()->FoundAround)
 						{
 							NotifyActorOnClicked(EKeys::LeftMouseButton);
 						}
@@ -139,21 +138,21 @@ void APlayerCharacter::InputAxisX(float Value)
 
 void APlayerCharacter::InputCameraIn()
 {
-	if (CameraArm->TargetArmLength >= BaseInfo.CameraMinLenght)
-		CameraArm->TargetArmLength -= BaseInfo.CameraChangeStep;
+	if (CameraArm->TargetArmLength >= PlayerSettings.CameraMinLenght)
+		CameraArm->TargetArmLength -= PlayerSettings.CameraChangeStep;
 }
 
 void APlayerCharacter::InputCameraOut()
 {
-	if (CameraArm->TargetArmLength <= BaseInfo.CameraMaxLenght)
-		CameraArm->TargetArmLength += BaseInfo.CameraChangeStep;
+	if (CameraArm->TargetArmLength <= PlayerSettings.CameraMaxLenght)
+		CameraArm->TargetArmLength += PlayerSettings.CameraChangeStep;
 }
 
 void APlayerCharacter::ActivateSprint()
 {
-	if (GetSkillComponent() && !bSniperMode)
+	if (GetSkillComponent() && !bSniperMode && (AxisX != 0 || AxisY != 0))
 	{
-		if (GetSkillComponent()->SprintPoint > GetSkillComponent()->SprintSettings.SprintLosePoint)
+		if (GetSkillComponent()->CanSprint())
 		{
 			GetCharacterMovement()->MaxWalkSpeed = CharacterInfo.RunSpeed * GetSkillComponent()->SprintCoef;
 			GetSkillComponent()->StartSprint();

@@ -21,7 +21,9 @@ enum class EChatacterState: uint8
 	Idle,
 	Walk,
 	Run,
-	Swimm,
+	Swimming,
+	CombatPose,
+	BuffPose,
 	DistanceAttack,
 	MeleeAttack
 };
@@ -30,13 +32,28 @@ USTRUCT(BlueprintType)
 struct FBaseData : public FTableRowBase
 {
 	GENERATED_BODY()
-	float CameraMaxLenght = 1500.f;
-	float CameraMinLenght = 300.f;
-	float CameraChangeStep = 75.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	int32 CharacterID = INDEX_NONE;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	bool bIsPlayer = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FString PlayerMail = FString("example@example.ru");
 };
 
 USTRUCT(BlueprintType)
-struct FBaseHumanoidData : public FBaseData//, public FTableRowBase
+struct FPlayerSettings : public FBaseData
+{
+	GENERATED_USTRUCT_BODY()
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(EditCondition = "bIsPlayer == true", EditConditionHides))
+	float CameraChangeStep = 75.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(EditCondition = "bIsPlayer == true", EditConditionHides))
+	float CameraMinLenght = 300.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(EditCondition = "bIsPlayer == true", EditConditionHides))
+	float CameraMaxLenght = 1800.f;
+};
+
+USTRUCT(BlueprintType)
+struct FBaseHumanoidData : public FPlayerSettings//, public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -59,6 +76,8 @@ struct FBaseHumanoidData : public FBaseData//, public FTableRowBase
 	float AimMoveSpeed = 0.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FHealthParams HealthParams;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FSkillParams SkillParams;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin="0"))
 	int Experience = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -85,8 +104,8 @@ public:
 
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraArm; }
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Settings")
 	FBaseData BaseInfo;
+	FPlayerSettings PlayerSettings;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Humanoid Settings")
 	FBaseHumanoidData CharacterInfo;
@@ -122,5 +141,8 @@ public:
 
 	UFUNCTION()
 	void DeadEvent();
+	UFUNCTION()
+	void StartRagdoll();
+	FTimerHandle DeadTimer;
 	bool bIsALife = true;
 };

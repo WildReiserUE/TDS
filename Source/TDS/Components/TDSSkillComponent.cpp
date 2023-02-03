@@ -13,11 +13,24 @@ void UTDSSkillComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	if (!ComponentOwner()) return;
-	InitSprint();
+	UE_LOG(LogTemp, Log, TEXT("SKILL COMPONENT OWNER --- %s"), *ComponentOwner()->GetName());
 }
 
-void UTDSSkillComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                       FActorComponentTickFunction* ThisTickFunction)
+bool UTDSSkillComponent::CanSprint()
+{
+	if (ComponentOwner() && ComponentOwner()->IsA(ABaseCharacter::StaticClass()) && SprintPoint >= SprintLoseValue)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Sprint AVAIBLE"));
+        return true;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Sprint UN---AVAIBLE"));
+		return false;
+	}
+}
+
+void UTDSSkillComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
@@ -28,21 +41,21 @@ AActor* UTDSSkillComponent::ComponentOwner()
 	return ComponentOwner ? ComponentOwner : nullptr;
 }
 
-void UTDSSkillComponent::InitSprint()
+void UTDSSkillComponent::InitSprint(FSkillParams SkillParams)
 {
-	SprintPoint = SprintSettings.SprintPoint;
-	SprintLoseValue = SprintSettings.SprintLosePoint;
-	SprintRecoveryValue = SprintSettings.SprintRecoveryValue;
-	SprintRecoveryTimerStart = SprintSettings.SprintRecoveryTimerStart;
-	SprintTimerTick = SprintSettings.SprintTimerTick;
-	SprintCoef = SprintSettings.SprintCoef;
+	SprintPoint = CMaxSprintPoint = SkillParams.SprintPoint; //init point as max point
+	SprintLoseValue = SkillParams.SprintLosePoint;
+	SprintRecoveryValue = SkillParams.SprintRecoveryValue;
+	SprintRecoveryTimerStart = SkillParams.SprintRecoveryTimerStart;
+	SprintTimerTick = SkillParams.SprintTimerTick;
+	SprintCoef = SkillParams.SprintCoef;
 }
 
 void UTDSSkillComponent::StartSprint()
 {
-	if (ComponentOwner())
+	if (CanSprint())
 	{
-		OnSprintValueChange.Broadcast(SprintPoint, SprintSettings.SprintPoint);
+		OnSprintValueChange.Broadcast(SprintPoint, CMaxSprintPoint);
 		if (GetWorld()->GetTimerManager().IsTimerActive(StaminaRecoveryTimer))
 			GetWorld()->GetTimerManager().ClearTimer(StaminaRecoveryTimer);
 		GetWorld()->GetTimerManager().SetTimer(StaminaLoseTimer, this, &UTDSSkillComponent::DecreaseStamina,
@@ -59,7 +72,7 @@ void UTDSSkillComponent::StopSprint()
 	if (GetWorld()->GetTimerManager().IsTimerActive(StaminaLoseTimer))
 		GetWorld()->GetTimerManager().ClearTimer(StaminaLoseTimer);
 	GetWorld()->GetTimerManager().SetTimer(StaminaRecoveryTimer, this, &UTDSSkillComponent::IncreaseStamina,
-	                                       SprintTimerTick, true, SprintSettings.SprintRecoveryTimerStart);
+	                                       SprintTimerTick, true, SprintRecoveryTimerStart);
 	if (ComponentOwner()->IsA(APlayerCharacter::StaticClass()))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("SprintDEActivated"));
@@ -68,30 +81,30 @@ void UTDSSkillComponent::StopSprint()
 
 void UTDSSkillComponent::DecreaseStamina()
 {
-	if (SprintPoint >= SprintSettings.SprintLosePoint)
+	if (SprintPoint >= SprintLoseValue)
 	{
 		SprintPoint -= SprintLoseValue;
-		if (SprintPoint >= SprintSettings.SprintPoint)
+		if (SprintPoint <= 0.f)
 		{
 			GetWorld()->GetTimerManager().ClearTimer(StaminaLoseTimer);
-			SprintPoint = SprintSettings.SprintPoint;
+			SprintPoint = 0.f;
 		}
-		OnSprintValueChange.Broadcast(SprintPoint, SprintSettings.SprintPoint);
+		OnSprintValueChange.Broadcast(SprintPoint, CMaxSprintPoint);
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Orange, FString::Printf(TEXT("STAMINA: %f"), SprintPoint));
 	}
 }
 
 void UTDSSkillComponent::IncreaseStamina()
 {
-	if (SprintPoint < SprintSettings.SprintPoint)
+	if (SprintPoint < CMaxSprintPoint)
 	{
 		SprintPoint += SprintRecoveryValue;
-		if (SprintPoint >= SprintSettings.SprintPoint)
+		if (SprintPoint >= CMaxSprintPoint)
 		{
 			GetWorld()->GetTimerManager().ClearTimer(StaminaRecoveryTimer);
-			SprintPoint = SprintSettings.SprintPoint;
+			SprintPoint = CMaxSprintPoint;
 		}
-		OnSprintValueChange.Broadcast(SprintPoint, SprintSettings.SprintPoint);
+		OnSprintValueChange.Broadcast(SprintPoint, CMaxSprintPoint);
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Orange, FString::Printf(TEXT("STAMINA: %f"), SprintPoint));
 	}
 }

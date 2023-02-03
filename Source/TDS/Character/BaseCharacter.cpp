@@ -63,16 +63,22 @@ void ABaseCharacter::ChangeSettings()
 		{
 			FTransform ComponentTransform = FTransform(FRotator(0),FVector(0),FVector(1));
 			AddComponentByClass(CharacterInfo.ComponentList[comp],false, ComponentTransform,true);
-			UE_LOG(LogTemp, Log, TEXT("CHAR LOOP --- ADD COMPONENT = %s"), *GetName());
-			//FinishAndRegisterComponent(GetHealthComponent());
+			UE_LOG(LogTemp, Log, TEXT("BASE CHAR LOOP --- ADD COMPONENT --- %s"), *GetName());
 		}
-		//RegisterAllComponents();
-		//TODO: INITIALIZE COMPONENTS PARAMS
+		RegisterAllComponents();
+		//INITIALIZE COMPONENTS PARAMS
 		if(GetHealthComponent())
+		{
 			GetHealthComponent()->InitParams(CharacterInfo.HealthParams);
+			GetHealthComponent()->OnOwnerDeath.AddDynamic(this,&ABaseCharacter::DeadEvent);
+		}
+		if(GetSkillComponent())
+		{
+			GetSkillComponent()->InitSprint(CharacterInfo.SkillParams);
+		}
 
 		CompleteAddComponent.Broadcast();
-		UE_LOG(LogTemp, Log, TEXT("BASE CHAR DELEGATE --- TOTAL ADDED COMPONENTS = %i"), CharacterInfo.ComponentList.Num());
+		UE_LOG(LogTemp, Log, TEXT("BASE CHAR LOG --- TOTAL ADDED COMPONENTS = %i"), CharacterInfo.ComponentList.Num());
 	}
 }
 
@@ -114,15 +120,16 @@ UTDSGameInstance* ABaseCharacter::GetTDSGameInstance()
 
 void ABaseCharacter::DeadEvent()
 {
+	UE_LOG(LogTemp, Log, TEXT("DEAD EVENT CPP --- --- "));
 	bIsALife = false;
 	if(CharacterInfo.MontageDead.Num() > 0)
 	{
 		int32 RND_Montage = UKismetMathLibrary::RandomIntegerInRange(0,CharacterInfo.MontageDead.Num()-1);
 		GetMesh()->GetAnimInstance()->Montage_Play(CharacterInfo.MontageDead[RND_Montage]);
 		float EndPos = CharacterInfo.MontageDead[RND_Montage]->CalculateSequenceLength();
-		DetachFromControllerPendingDestroy();
-		GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn,ECR_Ignore);
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic,ECR_Ignore);
 		SetActorEnableCollision(true);
 
 		GetMesh()->SetAllBodiesSimulatePhysics(true);
@@ -131,6 +138,17 @@ void ABaseCharacter::DeadEvent()
 		GetMesh()->bBlendPhysics = true;
 
 		GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
-		SetLifeSpan(EndPos + 3.f);
+		GetWorld()->GetTimerManager().SetTimer(DeadTimer,this,&ABaseCharacter::StartRagdoll, 1.f,false, EndPos + 1.f);
+		
 	}
+}
+
+void ABaseCharacter::StartRagdoll()
+{
+	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+
+	//TODO Need move to...
+	//DetachFromControllerPendingDestroy();
+	//GetController()->UnPossess();
+	//SetLifeSpan(EndPos + 3.f);
 }

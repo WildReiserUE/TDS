@@ -74,8 +74,7 @@ void UTDSHealthComponent::HealthChange(float Value)
 void UTDSHealthComponent::TakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
                                         AController* InstigatedBy, AActor* DamageCauser)
 {
-	UE_LOG(LogTemp, Log, TEXT("%s Recive %f DAMAGE FROM  %s"), *ComponentOwner()->GetName(), Damage,
-	       *DamageCauser->GetName());
+	UE_LOG(LogTemp, Log, TEXT("%s Recive %f DAMAGE FROM  %s"), *ComponentOwner()->GetName(), Damage, *DamageCauser->GetName());
 	HealthChange(-Damage);
 }
 
