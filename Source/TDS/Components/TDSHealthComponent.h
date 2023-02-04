@@ -30,7 +30,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChange, float, Health, flo
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnShieldChange, float, Shield, float, MaxShield);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnOwnerDeath);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnOwnerDeath, AActor*, Damaged);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class TDS_API UTDSHealthComponent : public UActorComponent
@@ -53,7 +53,7 @@ public:
 	FTimerHandle ShieldRecoveryTimer;
 
 	UFUNCTION()
-	void HealthChange(float Value);
+	void HealthChange(AActor* DamageOwner, float Value);
 
 	UFUNCTION()
 	void TakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,

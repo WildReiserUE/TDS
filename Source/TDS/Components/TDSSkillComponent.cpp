@@ -43,7 +43,7 @@ AActor* UTDSSkillComponent::ComponentOwner()
 
 void UTDSSkillComponent::InitSprint(FSkillParams SkillParams)
 {
-	SprintPoint = CMaxSprintPoint = SkillParams.SprintPoint; //init point as max point
+	SprintPoint = CMaxSprintPoint = SkillParams.EnergyPoint; //init point as max point
 	SprintLoseValue = SkillParams.SprintLosePoint;
 	SprintRecoveryValue = SkillParams.SprintRecoveryValue;
 	SprintRecoveryTimerStart = SkillParams.SprintRecoveryTimerStart;

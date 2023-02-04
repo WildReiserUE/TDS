@@ -9,11 +9,11 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSprint, float, CurrentSprintValue, float, MaxSprintValue);
 
 USTRUCT(BlueprintType)
-struct FSkillParams //Структура с настройками нужно перенести куда-нить
+struct FSkillParams
 {
 	GENERATED_USTRUCT_BODY()
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float SprintPoint = 0.f;
+	float EnergyPoint = 0.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float SprintCoef = 0.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)

@@ -14,20 +14,6 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComponentAddComplete);
 
-UENUM (BlueprintType)
-enum class EChatacterState: uint8
-{
-	Default,
-	Idle,
-	Walk,
-	Run,
-	Swimming,
-	CombatPose,
-	BuffPose,
-	DistanceAttack,
-	MeleeAttack
-};
-
 USTRUCT(BlueprintType)
 struct FBaseData : public FTableRowBase
 {
@@ -61,13 +47,13 @@ struct FBaseHumanoidData : public FPlayerSettings//, public FTableRowBase
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FText Humanoid_Name = FText();
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TMap<ECharacterSex,ECharacterRace> Properties;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	USkeletalMesh* Humanoid_Mesh = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<UAnimInstance> Humanoid_AnimInstance = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<TSubclassOf<UActorComponent>> ComponentList;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin="0"))
-	float Mana = 0.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin="0"))
 	float WalkSpeed = 0.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin="0"))
@@ -79,7 +65,9 @@ struct FBaseHumanoidData : public FPlayerSettings//, public FTableRowBase
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FSkillParams SkillParams;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin="0"))
-	int Experience = 0;
+	int CurrentLevel = 1;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(ClampMin="0"))
+	int CurrentExperience = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<UAnimMontage*> MontageHandleAttack;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -140,7 +128,7 @@ public:
 	UTDSGameInstance* GetTDSGameInstance();
 
 	UFUNCTION()
-	void DeadEvent();
+	void DeadEvent(AActor* Killer);
 	UFUNCTION()
 	void StartRagdoll();
 	FTimerHandle DeadTimer;

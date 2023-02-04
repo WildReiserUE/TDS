@@ -2,6 +2,7 @@
 
 #include "BaseCharacter.h"
 
+#include "PlayerCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -118,15 +119,24 @@ UTDSGameInstance* ABaseCharacter::GetTDSGameInstance()
 	return Instance ? Instance : nullptr;
 }
 
-void ABaseCharacter::DeadEvent()
+void ABaseCharacter::DeadEvent(AActor* Killer)
 {
-	UE_LOG(LogTemp, Log, TEXT("DEAD EVENT CPP --- --- "));
+	UE_LOG(LogTemp, Log, TEXT("DEAD EVENT CPP"));
 	bIsALife = false;
+
+	if(!BaseInfo.bIsPlayer && Killer)
+	{
+		if(Killer->GetOwner()->IsA<APlayerCharacter>())
+			UE_LOG(LogTemp, Log, TEXT("DEAD EVENT CPP --- EXPIRIENCE = %i --- NEED ADD TO --- %s"), CharacterInfo.CurrentExperience, *Killer->GetOwner()->GetName());
+		if(Killer->GetOwner()->GetOwner()->IsA<APlayerCharacter>())
+			UE_LOG(LogTemp, Log, TEXT("DEAD EVENT CPP --- EXPIRIENCE = %i --- NEED ADD TO --- %s"), CharacterInfo.CurrentExperience, *Killer->GetOwner()->GetOwner()->GetName());
+	}
+
 	if(CharacterInfo.MontageDead.Num() > 0)
 	{
 		int32 RND_Montage = UKismetMathLibrary::RandomIntegerInRange(0,CharacterInfo.MontageDead.Num()-1);
 		GetMesh()->GetAnimInstance()->Montage_Play(CharacterInfo.MontageDead[RND_Montage]);
-		float EndPos = CharacterInfo.MontageDead[RND_Montage]->CalculateSequenceLength();
+		float EndPosition = CharacterInfo.MontageDead[RND_Montage]->CalculateSequenceLength();
 
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn,ECR_Ignore);
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic,ECR_Ignore);
@@ -138,7 +148,7 @@ void ABaseCharacter::DeadEvent()
 		GetMesh()->bBlendPhysics = true;
 
 		GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
-		GetWorld()->GetTimerManager().SetTimer(DeadTimer,this,&ABaseCharacter::StartRagdoll, 1.f,false, EndPos + 1.f);
+		GetWorld()->GetTimerManager().SetTimer(DeadTimer,this,&ABaseCharacter::StartRagdoll, 1.f,false, EndPosition + 1.f);
 		
 	}
 }

@@ -37,7 +37,7 @@ void UTDSHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UTDSHealthComponent::HealthChange(float Value)
+void UTDSHealthComponent::HealthChange(AActor* DamageCauser,float Value)
 {
 	if (Value < 0)
 	{
@@ -59,7 +59,7 @@ void UTDSHealthComponent::HealthChange(float Value)
 				GetOwner()->SetActorEnableCollision(ECollisionResponse::ECR_Ignore);
 				if (GetWorld()->GetTimerManager().IsTimerActive(ShieldRecoveryTimer))
 					GetWorld()->GetTimerManager().ClearTimer(ShieldRecoveryTimer);
-				OnOwnerDeath.Broadcast();
+				OnOwnerDeath.Broadcast(DamageCauser);
 			}
 		}
 		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::Printf(TEXT("SHIELD: %f"), CShield));
@@ -75,7 +75,7 @@ void UTDSHealthComponent::TakeAnyDamage(AActor* DamagedActor, float Damage, cons
                                         AController* InstigatedBy, AActor* DamageCauser)
 {
 	UE_LOG(LogTemp, Log, TEXT("%s Recive %f DAMAGE FROM  %s"), *ComponentOwner()->GetName(), Damage, *DamageCauser->GetName());
-	HealthChange(-Damage);
+	HealthChange(DamageCauser, -Damage);
 }
 
 void UTDSHealthComponent::ShieldRecovery()
