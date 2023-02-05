@@ -47,7 +47,11 @@ struct FBaseHumanoidData : public FPlayerSettings//, public FTableRowBase
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FText Humanoid_Name = FText();
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TMap<ECharacterSex,ECharacterRace> Properties;
+	ECharacterSex CharacterSex;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	ECharacterRace CharacterRace;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	ECharacterProfession CharacterProfession;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	USkeletalMesh* Humanoid_Mesh = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
