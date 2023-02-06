@@ -30,17 +30,6 @@ enum class ECharacterProfession: uint8
 };
 
 UENUM (BlueprintType)
-enum class ECharacterRace: uint8
-{
-	Default,
-	Human,
-	DarkElf,
-	Elf,
-	Gnome,
-	Orc
-};
-
-UENUM (BlueprintType)
 enum class ECharacterSex: uint8
 {
 	Default,

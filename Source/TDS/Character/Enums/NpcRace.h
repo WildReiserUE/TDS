@@ -1,0 +1,29 @@
+#pragma once
+
+UENUM(BlueprintType)
+enum class ENpcRace : uint8
+{
+	HUMAN,
+	ELF,
+	DARK_ELF,
+	ORC,
+	DWARF,
+	ANIMAL,
+	BEAST,
+	BUG,
+	CASTLE_GUARD,
+	CONSTRUCT,
+	DEMONIC,
+	DIVINE,
+	DRAGON,
+	ELEMENTAL,
+	ETC,
+	FAIRY,
+	GIANT,
+	HUMANOID,
+	MERCENARY,
+	NONE,
+	PLANT,
+	SIEGE_WEAPON,
+	UNDEAD
+};

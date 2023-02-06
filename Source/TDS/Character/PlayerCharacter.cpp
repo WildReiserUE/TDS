@@ -122,7 +122,14 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 	CursorToWorld = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CursorMaterial, CursorSize, FVector(0));
 	bIsALife = true;
-	
+	if(GetTDSGameInstance())
+	{
+		if (FBaseHumanoidData* PlayerPresetRow = GetTDSGameInstance()->BasePlayerPresetTable->FindRow<FBaseHumanoidData>(SpawnedName, "", true))
+		{
+			CharacterInfo = *PlayerPresetRow;
+			ChangeSettings();
+		}
+	}
 
 }
 

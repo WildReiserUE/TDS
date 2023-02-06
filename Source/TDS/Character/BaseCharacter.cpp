@@ -21,21 +21,7 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(GetTDSGameInstance())
-	{
-		FBaseHumanoidData* PlayerPresetRow = GetTDSGameInstance()->BasePlayerPresetTable->FindRow<FBaseHumanoidData>(SpawnedName, "", true);
-		FBaseHumanoidData* AIPresetRow = GetTDSGameInstance()->AIPresetTable->FindRow<FBaseHumanoidData>(SpawnedName, "", true);
-		if (PlayerPresetRow)
-		{
-			CharacterInfo = *PlayerPresetRow;
-			ChangeSettings();
-		}
-		else if(AIPresetRow)
-		{
-			CharacterInfo = *AIPresetRow;
-			ChangeSettings();
-		}
-	}
+
 }
 
 // #if WITH_EDITOR

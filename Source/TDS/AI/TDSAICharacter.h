@@ -15,6 +15,7 @@ class TDS_API ATDSAICharacter : public ABaseCharacter
 
 public:
 	ATDSAICharacter();
+	virtual void BeginPlay() override;
 
 protected:
 

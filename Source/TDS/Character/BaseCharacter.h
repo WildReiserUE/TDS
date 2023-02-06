@@ -9,6 +9,7 @@
 #include "Engine/DataTable.h"
 #include "GameFramework/Character.h"
 #include "TDSHealthComponent.h"
+#include "Enums/Race.h"
 #include "Kismet/GameplayStatics.h"
 #include "BaseCharacter.generated.h"
 
@@ -49,7 +50,7 @@ struct FBaseHumanoidData : public FPlayerSettings//, public FTableRowBase
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	ECharacterSex CharacterSex;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	ECharacterRace CharacterRace;
+	ERace CharacterRace;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	ECharacterProfession CharacterProfession;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -92,10 +93,6 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
 
-	FORCEINLINE class UCameraComponent* GetCharacterCameraComponent() const { return CharacterCameraComponent; }
-
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraArm; }
-
 	FBaseData BaseInfo;
 	FPlayerSettings PlayerSettings;
 
@@ -110,12 +107,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnComponentAddComplete CompleteAddComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* CharacterCameraComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
-	USpringArmComponent* CameraArm;
 
 // #if WITH_EDITOR
 // 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;

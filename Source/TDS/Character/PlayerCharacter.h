@@ -22,6 +22,15 @@ public:
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
+	class UCameraComponent* CharacterCameraComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
+	class USpringArmComponent* CameraArm;
+
+	UCameraComponent* GetCharacterCameraComponent() { return CharacterCameraComponent; }
+	USpringArmComponent* GetCameraBoom() { return CameraArm; }
+
 	UFUNCTION()
 	void InputAxisY(float Value);
 	UFUNCTION()
