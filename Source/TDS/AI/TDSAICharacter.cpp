@@ -16,7 +16,7 @@ void ATDSAICharacter::BeginPlay()
 	Super::BeginPlay();
 	if(GetTDSGameInstance())
 	{
-		if(FBaseHumanoidData* AIPresetRow = GetTDSGameInstance()->AIPresetTable->FindRow<FBaseHumanoidData>(SpawnedName, "", true))
+		if(FBasePlayerData* AIPresetRow = GetTDSGameInstance()->AIPresetTable->FindRow<FBasePlayerData>(SpawnedName, "", true))
 		{
 			CharacterInfo = *AIPresetRow;
 			ChangeSettings();

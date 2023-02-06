@@ -7,7 +7,6 @@
 #include "TDSItemBase.h"
 #include "PlayerCharacter.generated.h"
 
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponSwitch, int, WeaponIndex);
 
 UCLASS()

@@ -9,8 +9,9 @@
 #include "Engine/DataTable.h"
 #include "GameFramework/Character.h"
 #include "TDSHealthComponent.h"
-#include "Enums/Race.h"
 #include "Kismet/GameplayStatics.h"
+#include "TDS/Enums/Race.h"
+#include "TDS/Enums/Sex.h"
 #include "BaseCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComponentAddComplete);
@@ -40,7 +41,7 @@ struct FPlayerSettings : public FBaseData
 };
 
 USTRUCT(BlueprintType)
-struct FBaseHumanoidData : public FPlayerSettings//, public FTableRowBase
+struct FBasePlayerData : public FPlayerSettings//, public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -48,11 +49,11 @@ struct FBaseHumanoidData : public FPlayerSettings//, public FTableRowBase
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FText Humanoid_Name = FText();
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	ECharacterSex CharacterSex = ECharacterSex::Default;
+	ECharacterSex CharacterSex = ECharacterSex::DEFAULT;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	ERace CharacterRace = ERace::DEFAULT;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	ECharacterProfession CharacterProfession;
+	EPlayerProfession CharacterProfession;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	USkeletalMesh* Humanoid_Mesh = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -97,7 +98,7 @@ public:
 	FPlayerSettings PlayerSettings;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Humanoid Settings")
-	FBaseHumanoidData CharacterInfo;
+	FBasePlayerData CharacterInfo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="SpawnedName", meta=(ExposeOnSpawn))
 	FName SpawnedName;

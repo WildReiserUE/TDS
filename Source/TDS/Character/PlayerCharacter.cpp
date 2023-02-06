@@ -90,9 +90,9 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 			{
 				FHitResult ResultHit;
 				myController->GetHitResultUnderCursor(ECC_GameTraceChannel2, false, ResultHit);
-				float FindRotaterResultYaw = UKismetMathLibrary::FindLookAtRotation(
+				float FindRotationResultYaw = UKismetMathLibrary::FindLookAtRotation(
 					GetActorLocation(), ResultHit.Location).Yaw;
-				SetActorRotation(FQuat(FRotator(0.0f, FindRotaterResultYaw, 0.0f)));
+				SetActorRotation(FQuat(FRotator(0.0f, FindRotationResultYaw, 0.0f)));
 			}
 		}
 	}
@@ -124,13 +124,12 @@ void APlayerCharacter::BeginPlay()
 	bIsALife = true;
 	if(GetTDSGameInstance())
 	{
-		if (FBaseHumanoidData* PlayerPresetRow = GetTDSGameInstance()->BasePlayerPresetTable->FindRow<FBaseHumanoidData>(SpawnedName, "", true))
+		if(FBasePlayerData* PlayerPresetRow = GetTDSGameInstance()->BasePlayerPresetTable->FindRow<FBasePlayerData>(SpawnedName, "", true))
 		{
 			CharacterInfo = *PlayerPresetRow;
 			ChangeSettings();
 		}
 	}
-
 }
 
 void APlayerCharacter::InputAxisY(float Value)
