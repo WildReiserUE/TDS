@@ -28,8 +28,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera", meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraArm;
 
-	UCameraComponent* GetCharacterCameraComponent() { return CharacterCameraComponent; }
-	USpringArmComponent* GetCameraBoom() { return CameraArm; }
+	UCameraComponent* GetCharacterCameraComponent() const { return CharacterCameraComponent; }
+	USpringArmComponent* GetCameraBoom() const { return CameraArm; }
 
 	UFUNCTION()
 	void InputAxisY(float Value);

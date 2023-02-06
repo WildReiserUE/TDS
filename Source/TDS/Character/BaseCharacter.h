@@ -48,9 +48,9 @@ struct FBaseHumanoidData : public FPlayerSettings//, public FTableRowBase
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FText Humanoid_Name = FText();
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	ECharacterSex CharacterSex;
+	ECharacterSex CharacterSex = ECharacterSex::Default;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	ERace CharacterRace;
+	ERace CharacterRace = ERace::DEFAULT;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	ECharacterProfession CharacterProfession;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
