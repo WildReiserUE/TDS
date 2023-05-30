@@ -3,6 +3,9 @@
 
 #include "TDSAIController.h"
 
+#include "BaseCharacter.h"
+#include "BehaviorTree/BlackboardComponent.h"
+
 
 ATDSAIController::ATDSAIController()
 {
@@ -21,5 +24,20 @@ ATDSAIController::ATDSAIController()
 
 		AiPerception->ConfigureSense(*AiConfigSight);
 		AiPerception->SetDominantSense(UAISenseConfig_Sight::StaticClass());
+	}
+}
+
+void ATDSAIController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+	if(InPawn->IsA<ABaseCharacter>())
+	{
+		ControlledPawn = InPawn;
+		UE_LOG(LogTemp,Log,TEXT("POSSES IN PAWN"));
+		if(BehaviorTree)
+		{
+			RunBehaviorTree(BehaviorTree);
+			GetBlackboardComponent()->SetValueAsVector(FName("HomeLocation"),ControlledPawn->GetActorLocation());
+		}
 	}
 }

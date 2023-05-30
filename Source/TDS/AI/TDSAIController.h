@@ -17,8 +17,16 @@ public:
 	ATDSAIController();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Sensing")
-	UAIPerceptionComponent* AiPerception = nullptr;
+	UAIPerceptionComponent* AiPerception;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Sensing")
-	UAISenseConfig_Sight* AiConfigSight = nullptr;
+	UAISenseConfig_Sight* AiConfigSight;
+
+	UPROPERTY()
+	APawn* ControlledPawn = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Behavior")
+	UBehaviorTree* BehaviorTree = nullptr;
+
+	virtual void OnPossess(APawn* InPawn) override;
 };

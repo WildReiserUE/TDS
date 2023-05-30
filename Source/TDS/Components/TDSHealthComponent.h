@@ -56,8 +56,8 @@ public:
 	void HealthChange(AActor* DamageOwner, float Value);
 
 	UFUNCTION()
-	void TakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
-	                   class AController* InstigatedBy, AActor* DamageCauser);
+	void TakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
+	                   AController* InstigatedBy, AActor* DamageCauser);
 	void ShieldRecovery();
 	void ShieldRecoveryStart();
 	AActor* ComponentOwner();

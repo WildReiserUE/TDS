@@ -15,6 +15,7 @@
 #include "BaseCharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnComponentAddComplete);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FIsDead);
 
 USTRUCT(BlueprintType)
 struct FBaseData : public FTableRowBase
@@ -114,6 +115,7 @@ public:
 // #endif
 
 	void ChangeSettings();
+	AController* GetCurrentController();
 	virtual void AttackOn();
 	virtual void AttackOff();
 	virtual void LaunchTimer(FTimerHandle &Timer);

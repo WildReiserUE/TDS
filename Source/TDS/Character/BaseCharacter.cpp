@@ -69,6 +69,12 @@ void ABaseCharacter::ChangeSettings()
 	}
 }
 
+AController* ABaseCharacter::GetCurrentController()
+{
+	AController* CurrentContoller = GetController();
+	return CurrentContoller ? CurrentContoller : nullptr;
+}
+
 void ABaseCharacter::AttackOn()
 {
 }
@@ -122,20 +128,20 @@ void ABaseCharacter::DeadEvent(AActor* Killer)
 	{
 		int32 RND_Montage = UKismetMathLibrary::RandomIntegerInRange(0,CharacterInfo.MontageDead.Num()-1);
 		GetMesh()->GetAnimInstance()->Montage_Play(CharacterInfo.MontageDead[RND_Montage]);
-		float EndPosition = CharacterInfo.MontageDead[RND_Montage]->CalculateSequenceLength();
+		//float EndPosition = CharacterInfo.MontageDead[RND_Montage]->CalculateSequenceLength();
 
-		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn,ECR_Ignore);
-		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic,ECR_Ignore);
-		SetActorEnableCollision(true);
+		//GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn,ECR_Ignore);
+		//GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic,ECR_Ignore);
+		//SetActorEnableCollision(true);
 
-		GetMesh()->SetAllBodiesSimulatePhysics(true);
-		GetMesh()->SetSimulatePhysics(true);
-		GetMesh()->WakeAllRigidBodies();
-		GetMesh()->bBlendPhysics = true;
+		//GetMesh()->SetAllBodiesSimulatePhysics(true);
+		//GetMesh()->SetSimulatePhysics(true);
+		//GetMesh()->WakeAllRigidBodies();
+		//GetMesh()->bBlendPhysics = true;
 
 		GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
-		GetWorld()->GetTimerManager().SetTimer(DeadTimer,this,&ABaseCharacter::StartRagdoll, 1.f,false, EndPosition + 1.f);
 		
+		//GetWorld()->GetTimerManager().SetTimer(DeadTimer,this,&ABaseCharacter::StartRagdoll, 1.f,false, EndPosition + 1.f);//TODO: Ragdoll
 	}
 }
 

@@ -56,7 +56,7 @@ void UTDSHealthComponent::HealthChange(AActor* DamageCauser,float Value)
 			if (CHealth <= 0)
 			{
 				CHealth = 0;
-				GetOwner()->SetActorEnableCollision(ECollisionResponse::ECR_Ignore);
+				//GetOwner()->SetActorEnableCollision(ECollisionResponse::ECR_Ignore);
 				if (GetWorld()->GetTimerManager().IsTimerActive(ShieldRecoveryTimer))
 					GetWorld()->GetTimerManager().ClearTimer(ShieldRecoveryTimer);
 				OnOwnerDeath.Broadcast(DamageCauser);
