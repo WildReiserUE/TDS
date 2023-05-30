@@ -124,33 +124,17 @@ void ABaseCharacter::DeadEvent(AActor* Killer)
 			UE_LOG(LogTemp, Log, TEXT("DEAD EVENT CPP --- EXPIRIENCE = %i --- NEED ADD TO --- %s"), CharacterInfo.CurrentExperience, *Killer->GetOwner()->GetOwner()->GetName());
 	}
 
-	if(CharacterInfo.MontageDead.Num() > 0)
+	if(CharacterInfo.MontageDead.IsValidIndex(0))
 	{
-		int32 RND_Montage = UKismetMathLibrary::RandomIntegerInRange(0,CharacterInfo.MontageDead.Num()-1);
+		const int32 RND_Montage = UKismetMathLibrary::RandomIntegerInRange(0,CharacterInfo.MontageDead.Num()-1);
 		GetMesh()->GetAnimInstance()->Montage_Play(CharacterInfo.MontageDead[RND_Montage]);
-		//float EndPosition = CharacterInfo.MontageDead[RND_Montage]->CalculateSequenceLength();
+		const float EndPosition = CharacterInfo.MontageDead[RND_Montage]->CalculateSequenceLength();
 
-		//GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn,ECR_Ignore);
-		//GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic,ECR_Ignore);
-		//SetActorEnableCollision(true);
-
-		//GetMesh()->SetAllBodiesSimulatePhysics(true);
-		//GetMesh()->SetSimulatePhysics(true);
-		//GetMesh()->WakeAllRigidBodies();
-		//GetMesh()->bBlendPhysics = true;
-
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn,ECR_Ignore);
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic,ECR_Ignore);
+		GetMesh()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
 		GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
-		
-		//GetWorld()->GetTimerManager().SetTimer(DeadTimer,this,&ABaseCharacter::StartRagdoll, 1.f,false, EndPosition + 1.f);//TODO: Ragdoll
+		SetLifeSpan(EndPosition + 3.f);
+		GetController()->UnPossess();
 	}
-}
-
-void ABaseCharacter::StartRagdoll()
-{
-	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
-
-	//TODO Need move to...
-	//DetachFromControllerPendingDestroy();
-	//GetController()->UnPossess();
-	//SetLifeSpan(EndPos + 3.f);
 }

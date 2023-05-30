@@ -127,8 +127,7 @@ public:
 
 	UFUNCTION()
 	void DeadEvent(AActor* Killer);
-	UFUNCTION()
-	void StartRagdoll();
+
 	FTimerHandle DeadTimer;
 	bool bIsALife = true;
 };
