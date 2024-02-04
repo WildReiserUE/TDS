@@ -197,7 +197,7 @@ struct FArmorInfo
 };
 
 USTRUCT(BlueprintType, meta = (ExposeOnSpawn))
-struct FItemInfo : public FTableRowBase
+struct FMyItemInfo : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin="0"))
@@ -239,7 +239,7 @@ struct FItemInfo : public FTableRowBase
 	int Weight = 0;
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponFire, FItemInfo, Info);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponFire, FMyItemInfo, Info);
 
 UCLASS()
 class TDS_API ATDSItemBase : public AActor
@@ -280,9 +280,9 @@ public:
 	UProjectileMovementComponent* ProjectileMovementComponent;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ItemSettings")
-	FItemInfo ItemInfo;
+	FMyItemInfo ItemInfo;
 
-	FORCEINLINE FItemInfo GetItemInfo() { return ItemInfo; };
+	FORCEINLINE FMyItemInfo GetItemInfo() { return ItemInfo; };
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn))
 	FName SpawnedName = FName("NoName");

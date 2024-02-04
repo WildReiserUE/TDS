@@ -55,7 +55,7 @@ public:
 	void StartFire();
 
 	UFUNCTION()
-	void DecreaseBullet(FItemInfo Info);
+	void DecreaseBullet(FMyItemInfo Info);
 
 	void ReloadWeapon();
 

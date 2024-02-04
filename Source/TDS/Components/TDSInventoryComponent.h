@@ -9,7 +9,7 @@
 
 class ABaseCharacter;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFindItem, FItemInfo, ItemInfo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFindItem, FMyItemInfo, ItemInfo);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCountChange, int, ItemCount);
 
@@ -28,10 +28,10 @@ public:
 	                           FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Inventory")
-	TArray<FItemInfo> Inventory;
+	TArray<FMyItemInfo> Inventory;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="WeaponInventory")
-	TArray<FItemInfo> WeaponInventory;
+	TArray<FMyItemInfo> WeaponInventory;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnFindItem OnFindItem;
@@ -53,6 +53,6 @@ public:
 	int FindInventoryItemById(int aId);
 	int FindWeaponItemById(int aId);
 	bool CheckBullets(int ProjectileId);
-	void DecreaseInventoryCount(FItemInfo WeaponInfo);
+	void DecreaseInventoryCount(FMyItemInfo WeaponInfo);
 	bool FoundAround = false;
 };

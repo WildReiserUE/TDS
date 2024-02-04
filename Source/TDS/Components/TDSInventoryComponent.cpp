@@ -117,7 +117,7 @@ int UTDSInventoryComponent::FindInventoryItemById(int aId)
 {
 	int n = INDEX_NONE;
 	int i = 0;
-	for (FItemInfo aItem : Inventory)
+	for (FMyItemInfo aItem : Inventory)
 	{
 		if (aItem.ItemID == aId)
 		{
@@ -133,7 +133,7 @@ int UTDSInventoryComponent::FindWeaponItemById(int aId)
 {
 	int n = INDEX_NONE;
 	int i = 0;
-	for (FItemInfo aItem : WeaponInventory)
+	for (FMyItemInfo aItem : WeaponInventory)
 	{
 		if (aItem.ItemID == aId)
 		{
@@ -167,7 +167,7 @@ bool UTDSInventoryComponent::CheckBullets(int ProjectileId)
 	}
 }
 
-void UTDSInventoryComponent::DecreaseInventoryCount(FItemInfo WeaponInfo)
+void UTDSInventoryComponent::DecreaseInventoryCount(FMyItemInfo WeaponInfo)
 {
 	int i = FindInventoryItemById(WeaponInfo.Weapon.ProjectileId);
 	if (i == INDEX_NONE) //если элемента нет

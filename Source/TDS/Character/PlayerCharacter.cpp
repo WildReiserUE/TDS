@@ -374,7 +374,7 @@ void APlayerCharacter::StartFire()
 	}
 }
 
-void APlayerCharacter::DecreaseBullet(FItemInfo Info)
+void APlayerCharacter::DecreaseBullet(FMyItemInfo Info)
 {
 	GetInventoryComponent()->WeaponInventory[CurrentWeaponIndex] = Info;
 	UE_LOG(LogTemp, Log, TEXT("WEAPON DELEGATE --- SAVE ITEM %i"), GetInventoryComponent()->WeaponInventory[CurrentWeaponIndex].Weapon.Magazine);
